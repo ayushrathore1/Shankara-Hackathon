@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import { contactAPI } from "../../services/api";
 
 const ContactForm = () => {

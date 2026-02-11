@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 /**
  * ScoreCircle - Animated circular score display for Analyzer
  *
