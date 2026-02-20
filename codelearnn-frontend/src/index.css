@@ -131,16 +131,15 @@ body {
   color: black;
 }
 
-/* Modern Grid Background */
+/* Einstein Spacetime Curved Grid Background */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='800' viewBox='0 0 800 800'%3E%3Cdefs%3E%3CradialGradient id='fade' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='white' stop-opacity='1'/%3E%3Cstop offset='70%25' stop-color='white' stop-opacity='0.6'/%3E%3Cstop offset='100%25' stop-color='white' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cmask id='m'%3E%3Crect width='800' height='800' fill='url(%23fade)'/%3E%3C/mask%3E%3C/defs%3E%3Cg mask='url(%23m)' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='1'%3E%3C!-- Horizontal curved lines (spacetime warp) --%3E%3Cpath d='M0,100 Q400,80 800,100'/%3E%3Cpath d='M0,160 Q400,130 800,160'/%3E%3Cpath d='M0,220 Q400,180 800,220'/%3E%3Cpath d='M0,280 Q400,240 800,280'/%3E%3Cpath d='M0,340 Q400,310 800,340'/%3E%3Cpath d='M0,400 Q400,370 800,400' stroke='rgba(255,255,255,0.06)'/%3E%3Cpath d='M0,460 Q400,490 800,460'/%3E%3Cpath d='M0,520 Q400,560 800,520'/%3E%3Cpath d='M0,580 Q400,620 800,580'/%3E%3Cpath d='M0,640 Q400,670 800,640'/%3E%3Cpath d='M0,700 Q400,720 800,700'/%3E%3C!-- Vertical curved lines (spacetime warp) --%3E%3Cpath d='M100,0 Q80,400 100,800'/%3E%3Cpath d='M160,0 Q130,400 160,800'/%3E%3Cpath d='M220,0 Q180,400 220,800'/%3E%3Cpath d='M280,0 Q240,400 280,800'/%3E%3Cpath d='M340,0 Q310,400 340,800'/%3E%3Cpath d='M400,0 Q370,400 400,800' stroke='rgba(255,255,255,0.06)'/%3E%3Cpath d='M460,0 Q490,400 460,800'/%3E%3Cpath d='M520,0 Q560,400 520,800'/%3E%3Cpath d='M580,0 Q620,400 580,800'/%3E%3Cpath d='M640,0 Q670,400 640,800'/%3E%3Cpath d='M700,0 Q720,400 700,800'/%3E%3C!-- Central gravity well accent --%3E%3Ccircle cx='400' cy='400' r='60' stroke='rgba(255,255,255,0.03)' stroke-width='0.5'/%3E%3Ccircle cx='400' cy='400' r='120' stroke='rgba(255,255,255,0.02)' stroke-width='0.5'/%3E%3Ccircle cx='400' cy='400' r='200' stroke='rgba(255,255,255,0.015)' stroke-width='0.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100vw 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
   pointer-events: none;
   z-index: -1;
 }
@@ -178,6 +177,34 @@ body::before {
 .btn-secondary:hover {
   border-color: var(--text-main);
   background: var(--bg-elevated);
+}
+
+/* Inputs */
+@layer components {
+  .input {
+    width: 100%;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    color: var(--text-main);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+  }
+
+  .input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-glow);
+  }
+
+  .input::placeholder {
+    color: var(--text-dim);
+  }
 }
 
 /* Cards (Bento Style) */
@@ -339,3 +366,166 @@ body::before {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   HIGH-TECH PAGE BACKGROUNDS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Grid Pattern ── (used by Career Explorer, Learning Plan, Career Journey) */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center center;
+}
+
+/* ── 2. Circuit Board ── (interconnected tech pathways) */
+.bg-circuit {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='rgba(16,185,129,0.06)' stroke-width='1'%3E%3Cpath d='M40,0 L40,60 L100,60'/%3E%3Cpath d='M160,0 L160,40 L200,40'/%3E%3Cpath d='M0,100 L60,100 L60,160 L120,160'/%3E%3Cpath d='M140,100 L200,100'/%3E%3Cpath d='M80,0 L80,20 L140,20 L140,80'/%3E%3Cpath d='M0,60 L20,60 L20,140 L80,140 L80,200'/%3E%3Cpath d='M160,120 L160,200'/%3E%3Cpath d='M120,80 L200,80'/%3E%3Ccircle cx='40' cy='60' r='3' fill='rgba(16,185,129,0.08)'/%3E%3Ccircle cx='60' cy='100' r='3' fill='rgba(16,185,129,0.08)'/%3E%3Ccircle cx='140' cy='80' r='3' fill='rgba(16,185,129,0.08)'/%3E%3Ccircle cx='80' cy='140' r='3' fill='rgba(16,185,129,0.08)'/%3E%3Ccircle cx='160' cy='40' r='3' fill='rgba(16,185,129,0.08)'/%3E%3Ccircle cx='120' cy='160' r='3' fill='rgba(16,185,129,0.08)'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+/* ── 3. Neural Network ── (nodes + connections, ideal for AI/career pages) */
+.bg-neural {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Cg fill='none' stroke='rgba(6,182,212,0.05)' stroke-width='0.8'%3E%3Cline x1='50' y1='50' x2='150' y2='100'/%3E%3Cline x1='150' y1='100' x2='250' y2='50'/%3E%3Cline x1='150' y1='100' x2='150' y2='200'/%3E%3Cline x1='50' y1='150' x2='150' y2='200'/%3E%3Cline x1='250' y1='150' x2='150' y2='200'/%3E%3Cline x1='50' y1='250' x2='150' y2='200'/%3E%3Cline x1='250' y1='250' x2='150' y2='200'/%3E%3Cline x1='50' y1='50' x2='50' y2='150'/%3E%3Cline x1='250' y1='50' x2='250' y2='150'/%3E%3Cline x1='50' y1='150' x2='50' y2='250'/%3E%3Cline x1='250' y1='150' x2='250' y2='250'/%3E%3Cline x1='100' y1='25' x2='200' y2='75'/%3E%3Cline x1='100' y1='275' x2='200' y2='225'/%3E%3C/g%3E%3Cg fill='rgba(6,182,212,0.07)'%3E%3Ccircle cx='50' cy='50' r='4'/%3E%3Ccircle cx='150' cy='100' r='5'/%3E%3Ccircle cx='250' cy='50' r='4'/%3E%3Ccircle cx='50' cy='150' r='4'/%3E%3Ccircle cx='250' cy='150' r='4'/%3E%3Ccircle cx='150' cy='200' r='5'/%3E%3Ccircle cx='50' cy='250' r='4'/%3E%3Ccircle cx='250' cy='250' r='4'/%3E%3Ccircle cx='100' cy='25' r='3'/%3E%3Ccircle cx='200' cy='75' r='3'/%3E%3Ccircle cx='100' cy='275' r='3'/%3E%3Ccircle cx='200' cy='225' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 300px 300px;
+}
+
+/* ── 4. Hexagonal Grid ── (premium honeycomb pattern) */
+.bg-hexagons {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='rgba(255,255,255,0.03)' stroke-width='1'/%3E%3Cpath d='M28 0L28 34L0 50L0 84L28 100L56 84L56 50L28 34' fill='none' stroke='rgba(255,255,255,0.02)' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 56px 100px;
+}
+
+/* ── 5. Floating Particles ── (animated dots that drift) */
+.bg-particles {
+  position: relative;
+}
+
+.bg-particles::before,
+.bg-particles::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-particles::before {
+  background-image:
+    radial-gradient(1.5px 1.5px at 10% 20%, rgba(16, 185, 129, 0.15) 50%, transparent 50%),
+    radial-gradient(1px 1px at 30% 65%, rgba(6, 182, 212, 0.12) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 55% 15%, rgba(16, 185, 129, 0.1) 50%, transparent 50%),
+    radial-gradient(1px 1px at 75% 45%, rgba(6, 182, 212, 0.12) 50%, transparent 50%),
+    radial-gradient(2px 2px at 90% 80%, rgba(16, 185, 129, 0.08) 50%, transparent 50%),
+    radial-gradient(1px 1px at 45% 85%, rgba(139, 92, 246, 0.1) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 20% 90%, rgba(6, 182, 212, 0.1) 50%, transparent 50%),
+    radial-gradient(1px 1px at 85% 10%, rgba(139, 92, 246, 0.08) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 65% 55%, rgba(16, 185, 129, 0.06) 50%, transparent 50%);
+  background-size: 100% 100%;
+  animation: particle-drift 20s ease-in-out infinite alternate;
+}
+
+.bg-particles::after {
+  background-image:
+    radial-gradient(1px 1px at 15% 40%, rgba(139, 92, 246, 0.12) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 40% 30%, rgba(16, 185, 129, 0.1) 50%, transparent 50%),
+    radial-gradient(1px 1px at 70% 70%, rgba(6, 182, 212, 0.1) 50%, transparent 50%),
+    radial-gradient(2px 2px at 50% 50%, rgba(16, 185, 129, 0.06) 50%, transparent 50%),
+    radial-gradient(1px 1px at 25% 75%, rgba(139, 92, 246, 0.08) 50%, transparent 50%),
+    radial-gradient(1.5px 1.5px at 80% 25%, rgba(6, 182, 212, 0.08) 50%, transparent 50%),
+    radial-gradient(1px 1px at 60% 90%, rgba(16, 185, 129, 0.1) 50%, transparent 50%);
+  background-size: 100% 100%;
+  animation: particle-drift 25s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes particle-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(10px, -15px) scale(1.02); }
+  50% { transform: translate(-5px, 10px) scale(0.98); }
+  75% { transform: translate(15px, 5px) scale(1.01); }
+  100% { transform: translate(-10px, -10px) scale(1); }
+}
+
+/* ── 6. Scan Lines ── (retro-futuristic CRT overlay, very subtle) */
+.bg-scanlines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.008) 2px,
+    rgba(255, 255, 255, 0.008) 4px
+  );
+}
+
+/* ── 7. Radial Glow Accents ── (soft colored glows for visual depth) */
+.bg-glow-primary {
+  background-image:
+    radial-gradient(ellipse 600px 400px at 15% 20%, rgba(16, 185, 129, 0.06), transparent),
+    radial-gradient(ellipse 500px 500px at 85% 80%, rgba(6, 182, 212, 0.04), transparent);
+}
+
+.bg-glow-secondary {
+  background-image:
+    radial-gradient(ellipse 500px 400px at 80% 15%, rgba(139, 92, 246, 0.05), transparent),
+    radial-gradient(ellipse 600px 500px at 20% 85%, rgba(16, 185, 129, 0.04), transparent);
+}
+
+.bg-glow-warm {
+  background-image:
+    radial-gradient(ellipse 500px 400px at 50% 10%, rgba(245, 158, 11, 0.04), transparent),
+    radial-gradient(ellipse 600px 500px at 10% 70%, rgba(16, 185, 129, 0.03), transparent),
+    radial-gradient(ellipse 400px 400px at 90% 60%, rgba(6, 182, 212, 0.03), transparent);
+}
+
+/* ── Combo Backgrounds for Pages ── */
+
+/* Home/Hero: grid + particles + primary glow */
+.bg-tech-hero {
+  background-image:
+    radial-gradient(ellipse 800px 500px at 20% 30%, rgba(16, 185, 129, 0.07), transparent),
+    radial-gradient(ellipse 600px 600px at 80% 70%, rgba(6, 182, 212, 0.05), transparent),
+    radial-gradient(ellipse 400px 400px at 50% 50%, rgba(139, 92, 246, 0.03), transparent),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+}
+
+/* Career pages: neural + circuit + cyan glow */
+.bg-tech-career {
+  background-image:
+    radial-gradient(ellipse 700px 500px at 15% 25%, rgba(6, 182, 212, 0.06), transparent),
+    radial-gradient(ellipse 500px 500px at 85% 75%, rgba(16, 185, 129, 0.05), transparent),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='rgba(6,182,212,0.04)' stroke-width='0.8'%3E%3Cpath d='M40,0 L40,60 L100,60'/%3E%3Cpath d='M160,0 L160,40 L200,40'/%3E%3Cpath d='M0,100 L60,100 L60,160 L120,160'/%3E%3Cpath d='M140,100 L200,100'/%3E%3Cpath d='M80,0 L80,20 L140,20 L140,80'/%3E%3Cpath d='M0,60 L20,60 L20,140 L80,140 L80,200'/%3E%3Cpath d='M160,120 L160,200'/%3E%3C/g%3E%3Cg fill='rgba(6,182,212,0.06)'%3E%3Ccircle cx='40' cy='60' r='2.5'/%3E%3Ccircle cx='60' cy='100' r='2.5'/%3E%3Ccircle cx='140' cy='80' r='2.5'/%3E%3Ccircle cx='80' cy='140' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 200px 200px;
+}
+
+/* Dashboard: hex + scanlines + green glow */
+.bg-tech-dashboard {
+  background-image:
+    radial-gradient(ellipse 600px 400px at 50% 15%, rgba(16, 185, 129, 0.05), transparent),
+    radial-gradient(ellipse 500px 500px at 80% 85%, rgba(6, 182, 212, 0.04), transparent),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='rgba(16,185,129,0.025)' stroke-width='1'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 56px 100px;
+}
+
+/* Auth pages: minimal grid + purple glow */
+.bg-tech-auth {
+  background-image:
+    radial-gradient(ellipse 500px 500px at 50% 40%, rgba(139, 92, 246, 0.06), transparent),
+    radial-gradient(ellipse 400px 400px at 20% 80%, rgba(16, 185, 129, 0.04), transparent),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 64px 64px, 64px 64px;
+}
+
+/* About/Contact: warm glow + hexagons */
+.bg-tech-about {
+  background-image:
+    radial-gradient(ellipse 600px 400px at 30% 20%, rgba(245, 158, 11, 0.04), transparent),
+    radial-gradient(ellipse 500px 500px at 70% 80%, rgba(16, 185, 129, 0.04), transparent),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='rgba(255,255,255,0.02)' stroke-width='0.8'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 56px 100px;
+}
+

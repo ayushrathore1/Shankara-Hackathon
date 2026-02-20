@@ -133,6 +133,9 @@ const savedVideosRoutes = require('./routes/savedVideos');
 const userLearningPathsRoutes = require('./routes/userLearningPaths');
 const learningPathVersionsRoutes = require('./routes/learningPathVersions');
 const aiSuggestionsRoutes = require('./routes/aiSuggestions');
+const recommendationRoutes = require('./routes/recommendationRoutes');
+const careerProfileRoutes = require('./routes/careerProfileRoutes');
+const youtubeHistoryRoutes = require('./routes/youtubeHistory');
 
 // Mount routers
 app.use('/api/auth', authRoutes);
@@ -154,6 +157,9 @@ app.use('/api/saved-videos', savedVideosRoutes);
 app.use('/api/user/learning-paths', userLearningPathsRoutes);
 app.use('/api/user/learning-paths', learningPathVersionsRoutes); // Version routes
 app.use('/api/ai-suggestions', aiSuggestionsRoutes);
+app.use('/api/recommendations', recommendationRoutes);
+app.use('/api/career-profile', careerProfileRoutes);
+app.use('/api/youtube-tracker', youtubeHistoryRoutes);
 
 // Career Readiness Routes
 const careerReadinessRoutes = require('./routes/careerReadiness');
@@ -204,6 +210,83 @@ app.use((req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
+
+// ─── ML Classifier Child Process ──────────────────────────────────────
+const { spawn } = require('child_process');
+const path = require('path');
+
+let mlProcess = null;
+let mlRestartCount = 0;
+const ML_MAX_RESTARTS = 5;
+const ML_RESTART_DELAY_BASE = 2000; // 2s, doubles each retry
+
+function spawnMLClassifier() {
+  if (process.env.DISABLE_ML === 'true') {
+    console.log('ℹ️  ML Classifier: Disabled via DISABLE_ML=true');
+    return;
+  }
+
+  const mlDir = path.join(__dirname, 'ml-classifier');
+  const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
+
+  console.log(`\n🧠 Starting ML Classifier (${pythonCmd} app.py)...`);
+
+  mlProcess = spawn(pythonCmd, ['-u', 'app.py'], {
+    cwd: mlDir,
+    env: { ...process.env },
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+
+  mlProcess.stdout.on('data', (data) => {
+    const lines = data.toString().trim().split('\n');
+    lines.forEach(line => console.log(`  [ML] ${line}`));
+  });
+
+  mlProcess.stderr.on('data', (data) => {
+    const lines = data.toString().trim().split('\n');
+    lines.forEach(line => {
+      // uvicorn logs INFO to stderr, so don't treat everything as error
+      if (line.includes('ERROR') || line.includes('Traceback')) {
+        console.error(`  [ML ERROR] ${line}`);
+      } else {
+        console.log(`  [ML] ${line}`);
+      }
+    });
+  });
+
+  mlProcess.on('close', (code) => {
+    mlProcess = null;
+    if (code !== 0 && code !== null) {
+      mlRestartCount++;
+      if (mlRestartCount <= ML_MAX_RESTARTS) {
+        const delay = ML_RESTART_DELAY_BASE * Math.pow(2, mlRestartCount - 1);
+        console.log(`⚠️  ML Classifier exited with code ${code}. Restarting in ${delay / 1000}s (attempt ${mlRestartCount}/${ML_MAX_RESTARTS})...`);
+        setTimeout(spawnMLClassifier, delay);
+      } else {
+        console.error(`❌ ML Classifier crashed ${ML_MAX_RESTARTS} times. Giving up. Node.js will continue without ML features.`);
+      }
+    } else {
+      console.log('🧠 ML Classifier stopped.');
+    }
+  });
+
+  mlProcess.on('error', (err) => {
+    console.error(`❌ Failed to start ML Classifier: ${err.message}`);
+    console.log('   Node.js will continue without ML features.');
+    mlProcess = null;
+  });
+}
+
+// Graceful shutdown: kill ML process when Node.js exits
+function shutdownML() {
+  if (mlProcess) {
+    console.log('🧠 Stopping ML Classifier...');
+    mlProcess.kill('SIGTERM');
+    mlProcess = null;
+  }
+}
+process.on('SIGTERM', shutdownML);
+process.on('SIGINT', shutdownML);
 
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
@@ -274,13 +357,18 @@ const server = app.listen(PORT, () => {
   console.log('  POST /api/contact');
   console.log('─'.repeat(50));
   console.log('');
+
+  // Start ML Classifier as a child process
+  spawnMLClassifier();
 });
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
   console.log(`Error: ${err.message}`);
+  shutdownML();
   // Close server & exit process
   server.close(() => process.exit(1));
 });
 
 module.exports = app;
+

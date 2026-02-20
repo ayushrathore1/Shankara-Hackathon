@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeLearnn Tracker</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Login Form -->
+    <div id="login-view" class="view">
+      <div class="logo">
+        <span class="bracket">&lt;</span>CodeLearnn<span class="bracket">/&gt;</span>
+      </div>
+      <p class="subtitle">YouTube Watch Tracker</p>
+
+      <div id="error-msg" class="error" style="display: none;"></div>
+
+      <form id="login-form">
+        <div class="field">
+          <label for="api-url">API URL</label>
+          <input type="url" id="api-url" value="http://localhost:5000/api" placeholder="http://localhost:5000/api">
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" id="login-btn" class="btn-primary">
+          Sign In
+        </button>
+      </form>
+    </div>
+
+    <!-- Logged-in View -->
+    <div id="status-view" class="view" style="display: none;">
+      <div class="logo">
+        <span class="bracket">&lt;</span>CodeLearnn<span class="bracket">/&gt;</span>
+      </div>
+
+      <div class="status-card">
+        <div class="status-indicator connected"></div>
+        <span>Connected</span>
+      </div>
+
+      <div class="user-info">
+        <p class="user-name" id="user-name">—</p>
+        <p class="user-email" id="user-email">—</p>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-value" id="pending-count">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+      </div>
+
+      <a id="dashboard-link" href="http://localhost:5173/youtube-tracker" target="_blank" class="btn-secondary">
+        Open Dashboard
+      </a>
+
+      <button id="logout-btn" class="btn-ghost">
+        Sign Out
+      </button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

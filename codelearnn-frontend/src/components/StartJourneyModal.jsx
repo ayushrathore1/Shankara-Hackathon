@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -14,6 +14,7 @@ import {
   faBook,
 } from "@fortawesome/free-solid-svg-icons";
 import { useCareerJourney } from "../context/CareerJourneyContext";
+import AIThinkingIndicator from "./AIThinkingIndicator";
 
 const StartJourneyModal = ({ isOpen, onClose, career }) => {
   const { startJourney, hasActiveJourney, journey } = useCareerJourney();
@@ -88,8 +89,7 @@ const StartJourneyModal = ({ isOpen, onClose, career }) => {
     setError(null);
 
     try {
-      // Simulate roadmap generation time
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+
 
       await startJourney(career, preferences);
 
@@ -466,38 +466,44 @@ const StartJourneyModal = ({ isOpen, onClose, career }) => {
             </>
           )}
 
-          {/* Step 3: Loading */}
+          {/* Step 3: Loading — AI generating roadmap */}
           {step === 3 && (
             <div className="p-12 text-center">
               <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="w-16 h-16 mx-auto mb-6 text-primary"
+                className="w-20 h-20 mx-auto mb-6 relative"
               >
-                <FontAwesomeIcon icon={faSpinner} className="text-5xl" />
+                <div className="absolute inset-0 rounded-full border-2 border-primary/20 animate-ping" />
+                <div className="absolute inset-2 rounded-full border-2 border-t-primary border-r-transparent border-b-transparent border-l-transparent animate-spin" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <FontAwesomeIcon icon={faRocket} className="text-primary text-2xl" />
+                </div>
               </motion.div>
 
               <h2 className="text-xl font-bold text-text-main mb-2">
-                Generating Your Roadmap
+                AI is Crafting Your Roadmap
               </h2>
               <p className="text-text-muted text-sm mb-6">
-                Creating your personalized learning path...
+                Personalized learning path for {career?.name}
               </p>
 
-              <div className="space-y-2 text-left max-w-xs mx-auto">
-                <div className="flex items-center gap-2 text-sm text-primary">
-                  <FontAwesomeIcon icon={faCheck} />
-                  <span>Analyzing career requirements</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-primary animate-pulse">
-                  <FontAwesomeIcon icon={faSpinner} spin />
-                  <span>Building learning phases</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-text-dim">
-                  <span className="w-4"></span>
-                  <span>Assigning resources</span>
-                </div>
-              </div>
+              <AIThinkingIndicator
+                messages={[
+                  "Scanning web data",
+                  "Analyzing job market",
+                  "Curating resources",
+                  "Mapping skill gaps",
+                  "Building phases",
+                  "Personalizing path",
+                  "Ranking projects",
+                  "Structuring roadmap",
+                  "Almost ready",
+                ]}
+                interval={2000}
+              />
+
+              <p className="text-[10px] text-text-dim font-mono mt-6">
+                This may take 15-30 seconds on first generation
+              </p>
             </div>
           )}
 

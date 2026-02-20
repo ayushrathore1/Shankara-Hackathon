@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -40,6 +41,10 @@ const userSchema = new mongoose.Schema({
   avatarIndex: {
     type: Number,
     default: 0
+  },
+  isOtpVerified: {
+    type: Boolean,
+    default: false
   },
   subscribedNewsletter: {
     type: Boolean,
@@ -132,6 +137,34 @@ const userSchema = new mongoose.Schema({
     }
   },
 
+  // Learning Preferences (for YouTube-powered learning paths)
+  learningPreferences: {
+    language: {
+      type: String,
+      enum: ['en', 'hi', 'hinglish', 'ta', 'te', 'bn', 'auto'],
+      default: 'auto'
+    },
+    region: {
+      type: String,
+      enum: ['IN', 'US', 'GB', 'global'],
+      default: 'IN'
+    },
+    contentCreatorPreference: {
+      type: String,
+      enum: ['indian', 'international', 'no-preference'],
+      default: 'no-preference'
+    },
+    includeAITools: {
+      type: Boolean,
+      default: true
+    },
+    experienceLevel: {
+      type: String,
+      enum: ['absolute-beginner', 'beginner', 'intermediate', 'advanced'],
+      default: 'beginner'
+    }
+  },
+
   // Notification Preferences
   notifications: {
     email: {
@@ -139,7 +172,9 @@ const userSchema = new mongoose.Schema({
       weeklyProgress: { type: Boolean, default: true },
       newFeatures: { type: Boolean, default: true },
       streakReminder: { type: Boolean, default: true },
-      projectUpdates: { type: Boolean, default: true }
+      projectUpdates: { type: Boolean, default: true },
+      distractionAlerts: { type: Boolean, default: false },
+      distractionThreshold: { type: Number, default: 5, min: 2, max: 20 }
     },
     push: {
       enabled: { type: Boolean, default: false },
@@ -165,6 +200,10 @@ const userSchema = new mongoose.Schema({
     pathsEnrolled: { type: Number, default: 0 }
   },
 
+  // Password Reset
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
+
   createdAt: {
     type: Date,
     default: Date.now
@@ -177,9 +216,9 @@ const userSchema = new mongoose.Schema({
 userSchema.index({ email: 1 });
 
 // Encrypt password using bcrypt before saving
-userSchema.pre('save', async function(next) {
+userSchema.pre('save', async function() {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
@@ -195,6 +234,23 @@ userSchema.methods.getSignedJwtToken = function() {
 // Match user entered password to hashed password in database
 userSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+// Generate and hash password reset token
+userSchema.methods.getResetPasswordToken = function() {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // Hash token and store in DB
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // Set expiry — 30 minutes
+  this.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
+
+  return resetToken;
 };
 
 // Check if user has premium access

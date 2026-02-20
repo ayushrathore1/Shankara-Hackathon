@@ -637,6 +637,198 @@ const sendEarlyAccessEmail = async (email, name = '') => {
 };
 
 /**
+ * Send password reset email
+ * @param {string} email - Recipient email
+ * @param {string} resetUrl - Password reset URL with token
+ * @returns {Promise<boolean>} - Success status
+ */
+const sendPasswordResetEmail = async (email, resetUrl) => {
+  const transporter = createTransporter();
+
+  if (!transporter) {
+    throw new Error('Email service not configured');
+  }
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    to: email,
+    subject: 'Reset Your CodeLearnn Password',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0a0a0f;">
+          <tr>
+            <td align="center" style="padding: 40px 20px;">
+              <table role="presentation" width="100%" style="max-width: 480px; background: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%); border-radius: 16px; border: 1px solid #2a2a3e;">
+                <tr>
+                  <td style="padding: 40px 32px;">
+                    <!-- Logo -->
+                    <div style="text-align: center; margin-bottom: 32px;">
+                      <span style="font-size: 28px; font-weight: bold; color: #ffffff;">
+                        <span style="color: #00d4ff;">&lt;</span>CodeLearnn<span style="color: #7c3aed;">/&gt;</span>
+                      </span>
+                    </div>
+
+                    <!-- Title -->
+                    <h1 style="color: #ffffff; font-size: 24px; font-weight: 600; text-align: center; margin: 0 0 16px 0;">
+                      Reset Your Password
+                    </h1>
+
+                    <p style="color: #a0a0b0; font-size: 15px; line-height: 1.6; text-align: center; margin: 0 0 32px 0;">
+                      We received a request to reset your password. Click the button below to choose a new password. This link expires in <strong style="color: #ffffff;">30 minutes</strong>.
+                    </p>
+
+                    <!-- Reset Button -->
+                    <div style="text-align: center; margin-bottom: 32px;">
+                      <a href="${resetUrl}" style="display: inline-block; background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; padding: 14px 40px; border-radius: 10px; font-size: 16px; font-weight: 600;">
+                        Reset Password
+                      </a>
+                    </div>
+
+                    <p style="color: #6b6b7b; font-size: 13px; line-height: 1.5; text-align: center; margin: 0 0 16px 0;">
+                      If the button doesn't work, copy and paste this link into your browser:
+                    </p>
+                    <p style="color: #00d4ff; font-size: 12px; word-break: break-all; text-align: center; margin: 0 0 24px 0;">
+                      ${resetUrl}
+                    </p>
+
+                    <p style="color: #6b6b7b; font-size: 13px; line-height: 1.5; text-align: center; margin: 0;">
+                      If you didn't request a password reset, you can safely ignore this email. Your password won't be changed.
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td style="padding: 0 32px 32px 32px;">
+                    <div style="border-top: 1px solid #2a2a3e; padding-top: 24px; text-align: center;">
+                      <p style="color: #4a4a5a; font-size: 12px; margin: 0;">
+                        © ${new Date().getFullYear()} CodeLearnn. Learn like an engineer.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `,
+    text: `Reset Your CodeLearnn Password\n\nWe received a request to reset your password. Visit this link to choose a new password:\n\n${resetUrl}\n\nThis link expires in 30 minutes.\n\nIf you didn't request a password reset, you can safely ignore this email.`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✉️  Password reset email sent to ${email}`);
+    return true;
+  } catch (error) {
+    console.error('Password reset email error:', error);
+    throw new Error('Failed to send password reset email');
+  }
+};
+
+/**
+ * Send distraction alert email
+ * @param {string} email - Recipient email
+ * @param {Object} data - Alert data { userName, distractionCount, threshold }
+ * @returns {Promise<boolean>} - Success status
+ */
+const sendDistractionAlertEmail = async (email, data) => {
+  const transporter = createTransporter();
+  if (!transporter) return false;
+
+  const { userName, distractionCount, threshold } = data;
+  const dashboardUrl = 'https://codelearnn.com/dashboard';
+
+  const mailOptions = {
+    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    to: email,
+    subject: `Hey ${userName} — time to refocus! 🎯`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0a0a0f; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0a0a0f;">
+          <tr>
+            <td align="center" style="padding: 40px 20px;">
+              <table role="presentation" width="100%" style="max-width: 480px; background: linear-gradient(135deg, #12121a 0%, #1a1a2e 100%); border-radius: 16px; border: 1px solid #2a2a3e;">
+                <tr>
+                  <td style="padding: 40px 32px;">
+                    <div style="text-align: center; margin-bottom: 32px;">
+                      <span style="font-size: 28px; font-weight: bold; color: #ffffff;">
+                        <span style="color: #00d4ff;">&lt;</span>CodeLearnn<span style="color: #7c3aed;">/&gt;</span>
+                      </span>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 24px;">
+                      <span style="font-size: 48px;">🎯</span>
+                    </div>
+
+                    <h1 style="color: #ffffff; font-size: 22px; font-weight: 600; text-align: center; margin: 0 0 16px 0;">
+                      Time to Refocus, ${userName}!
+                    </h1>
+
+                    <p style="color: #a0a0b0; font-size: 15px; line-height: 1.6; text-align: center; margin: 0 0 24px 0;">
+                      We noticed you've watched <strong style="color: #ff6b6b;">${distractionCount} distraction videos</strong> today
+                      (your alert threshold is ${threshold}). No judgment — it happens to everyone!
+                    </p>
+
+                    <div style="background: linear-gradient(135deg, #1e1e2e 0%, #252538 100%); border: 1px solid #3a3a4e; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
+                      <p style="color: #c8fa3c; font-size: 16px; font-weight: 600; margin: 0 0 8px 0;">💪 Quick Tip</p>
+                      <p style="color: #a0a0b0; font-size: 14px; margin: 0;">Try the Pomodoro technique: 25 min of focused learning, then a 5 min break for fun videos. You've got this!</p>
+                    </div>
+
+                    <div style="text-align: center; margin-bottom: 24px;">
+                      <a href="${dashboardUrl}" style="display: inline-block; background: linear-gradient(135deg, #c8fa3c 0%, #a3d635 100%); color: #0a0a0a; text-decoration: none; padding: 14px 32px; border-radius: 10px; font-size: 15px; font-weight: 600;">
+                        🎓 Back to Learning
+                      </a>
+                    </div>
+
+                    <p style="color: #6b6b7b; font-size: 12px; line-height: 1.5; text-align: center; margin: 0;">
+                      You can adjust or disable distraction alerts in your account settings.
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 0 32px 32px 32px;">
+                    <div style="border-top: 1px solid #2a2a3e; padding-top: 24px; text-align: center;">
+                      <p style="color: #4a4a5a; font-size: 12px; margin: 0;">
+                        © ${new Date().getFullYear()} CodeLearnn. Learn like an engineer.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `,
+    text: `Hey ${userName} — time to refocus!\n\nYou've watched ${distractionCount} distraction videos today (threshold: ${threshold}).\n\nTip: Try the Pomodoro technique — 25 min focused, 5 min break.\n\nBack to learning: ${dashboardUrl}\n\nYou can adjust alerts in settings.`
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`✉️  Distraction alert email sent to ${email}`);
+    return true;
+  } catch (error) {
+    console.error('Distraction alert email error:', error);
+    return false;
+  }
+};
+
+/**
  * Generate a 6-digit OTP
  * @returns {string} 6-digit OTP
  */
@@ -649,5 +841,7 @@ module.exports = {
   sendWaitlistEmail,
   sendAdminNotification,
   sendEarlyAccessEmail,
+  sendPasswordResetEmail,
+  sendDistractionAlertEmail,
   generateOTP
 };

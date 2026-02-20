@@ -7,6 +7,9 @@ const {
   getMe,
   updateDetails,
   updatePassword,
+  setPassword,
+  forgotPassword,
+  resetPassword,
   logout,
   sendOTP,
   verifyOTP,
@@ -23,6 +26,9 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/send-otp", sendOTP);
 router.post("/verify-otp", verifyOTP);
+router.post("/set-password", protect, setPassword);
+router.post("/forgot-password", forgotPassword);
+router.put("/reset-password/:token", resetPassword);
 router.get("/logout", logout);
 router.get("/me", protect, getMe);
 router.put("/updatedetails", protect, updateDetails);

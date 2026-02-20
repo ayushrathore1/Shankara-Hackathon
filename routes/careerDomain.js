@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const careerDomainService = require('../services/CareerDomainService');
 const jobApiService = require('../services/JobApiService');
+const learningPlanService = require('../services/LearningPlanService');
 const CareerKeywordCache = require('../models/CareerKeywordCache');
+const CareerLearningPlan = require('../models/CareerLearningPlan');
 
 /**
  * @route   GET /api/career/cached
@@ -424,6 +426,70 @@ router.get('/trending', async (req, res) => {
       success: false,
       message: 'Failed to get trending domains',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * @route   GET /api/career/learning-plan/:keyword
+ * @desc    Generate or retrieve an AI-powered learning plan with real-time data
+ * @access  Public
+ */
+router.get('/learning-plan/:keyword', async (req, res) => {
+  try {
+    const { keyword } = req.params;
+
+    if (!keyword || keyword.trim().length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'Keyword must be at least 2 characters'
+      });
+    }
+
+    const result = await learningPlanService.generateLearningPlan(keyword.trim());
+
+    if (!result.success) {
+      return res.status(400).json({
+        success: false,
+        message: result.message || 'Failed to generate learning plan'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: result.plan,
+      fromDatabase: result.fromDatabase || false,
+      usageCount: result.usageCount
+    });
+  } catch (error) {
+    console.error('Learning plan error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate learning plan',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+});
+
+/**
+ * @route   GET /api/career/learning-plans/popular
+ * @desc    Get most popular AI learning plans
+ * @access  Public
+ */
+router.get('/learning-plans/popular', async (req, res) => {
+  try {
+    const { limit = 10 } = req.query;
+    const popular = await CareerLearningPlan.getPopular(parseInt(limit));
+
+    res.json({
+      success: true,
+      data: popular
+    });
+  } catch (error) {
+    console.error('Popular learning plans error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get popular learning plans'
     });
   }
 });

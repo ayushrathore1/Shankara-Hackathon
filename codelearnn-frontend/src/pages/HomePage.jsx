@@ -36,6 +36,22 @@ const HomePage = () => {
   const [email, setEmail] = useState('');
   const [waitlistStatus, setWaitlistStatus] = useState('idle'); // idle, loading, success, error
   const [waitlistMessage, setWaitlistMessage] = useState('');
+  const [waitlistCount, setWaitlistCount] = useState(null);
+
+  // Fetch live waitlist count on mount
+  useEffect(() => {
+    const fetchCount = async () => {
+      try {
+        const response = await waitlistAPI.getCount();
+        if (response.data?.success) {
+          setWaitlistCount(response.data.count);
+        }
+      } catch (err) {
+        console.error('Failed to fetch waitlist count:', err);
+      }
+    };
+    fetchCount();
+  }, []);
 
   // Handle redirect from OAuth rejection - scroll to waitlist
   useEffect(() => {
@@ -75,8 +91,11 @@ const HomePage = () => {
       setWaitlistStatus(response.data.alreadyExists ? 'success' : 'success');
       setWaitlistMessage(response.data.message);
       
-      // If successful, maybe show their own referral link?
-      // For now, clear email field
+      // Increment the displayed count for new signups
+      if (!response.data.alreadyExists && waitlistCount !== null) {
+        setWaitlistCount(prev => prev + 1);
+      }
+      
       setEmail('');
     } catch (error) {
       setWaitlistStatus('error');
@@ -216,6 +235,8 @@ const HomePage = () => {
           HERO SECTION - ABOVE THE FOLD
           ═══════════════════════════════════════════════════════════════════ */}
       <section className="min-h-screen flex items-center pt-28 pb-20 px-6 relative overflow-hidden">
+        {/* High-tech background */}
+        <div className="absolute inset-0 bg-tech-hero pointer-events-none z-0" />
         {/* Glow Effects */}
         <div className="absolute top-20 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[128px] pointer-events-none" />
         <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[128px] pointer-events-none" />
@@ -303,14 +324,27 @@ const HomePage = () => {
               </motion.div>
 
               {/* Trust Line */}
-              <motion.div variants={fadeInUp} className="flex items-center gap-4 text-xs text-text-dim">
+              <motion.div variants={fadeInUp} className="flex items-center gap-4 text-xs text-text-dim flex-wrap">
+                {waitlistCount !== null && (
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium">
+                    <FontAwesomeIcon icon={faUsers} className="text-primary" />
+                    <motion.span
+                      key={waitlistCount}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      {waitlistCount.toLocaleString()}+ students waiting
+                    </motion.span>
+                  </span>
+                )}
                 <span className="flex items-center gap-1">
                   <FontAwesomeIcon icon={faCheckCircle} className="text-primary" />
                   Free for first 500 students
                 </span>
                 <span className="flex items-center gap-1">
                   <FontAwesomeIcon icon={faClock} className="text-secondary" />
-                  Launching Feb 2026
+                  Launching Nov 2026
                 </span>
               </motion.div>
 
@@ -401,6 +435,55 @@ const HomePage = () => {
               <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-primary to-secondary opacity-20 blur-2xl rounded-full" />
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════════
+          FEATURED LEARNING GUIDE BANNER
+          ═══════════════════════════════════════════════════════════════════ */}
+      <section className="py-12 px-6 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
+        <div className="container mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            onClick={() => navigate('/learning-guides/vibe-coding')}
+            className="max-w-4xl mx-auto cursor-pointer group"
+          >
+            <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-bg-elevated/50 backdrop-blur-md p-8 md:p-10 hover:border-primary/40 transition-all duration-300 hover:shadow-[0_0_60px_-10px_var(--primary-glow)]">
+              {/* Background glow */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/10 rounded-full blur-[80px] pointer-events-none" />
+              
+              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center gap-6">
+                {/* Icon */}
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/30 flex items-center justify-center flex-shrink-0">
+                  <span className="text-3xl">📖</span>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary">Free Guide</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary">60 min read</span>
+                  </div>
+                  <h3 className="text-xl md:text-2xl font-bold text-text-main mb-1 group-hover:text-primary transition-colors">
+                    The Vibe Coding Playbook
+                  </h3>
+                  <p className="text-text-muted text-sm">
+                    Build anything with AI. No coding background needed. Copy-paste prompts, step-by-step deployment, and the exact workflow to go from idea to shipped product.
+                  </p>
+                </div>
+
+                {/* CTA Arrow */}
+                <div className="hidden md:flex items-center gap-2 flex-shrink-0 text-primary group-hover:translate-x-1 transition-transform">
+                  <span className="text-sm font-medium">Read Now</span>
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
@@ -704,7 +787,16 @@ const HomePage = () => {
               <span className="text-primary">Start Building?</span>
             </h2>
             <p className="text-body-lg text-text-muted max-w-2xl mx-auto mb-10">
-              Join engineering students who are done with random tutorials and ready for structured growth.
+              {waitlistCount !== null ? (
+                <>Join <motion.span
+                  key={waitlistCount}
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-primary font-semibold"
+                >{waitlistCount.toLocaleString()}+</motion.span> engineering students who are done with random tutorials and ready for structured growth.</>
+              ) : (
+                'Join engineering students who are done with random tutorials and ready for structured growth.'
+              )}
             </p>
             
             {waitlistStatus === 'success' ? (

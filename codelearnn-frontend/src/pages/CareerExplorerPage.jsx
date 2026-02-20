@@ -14,7 +14,6 @@ import {
   faLightbulb,
   faChartLine,
   faTerminal,
-  faCodeBranch,
   faMicrochip,
   faRocket,
   faLayerGroup,
@@ -41,11 +40,19 @@ const CareerExplorerPage = () => {
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("India");
   const [analysisData, setAnalysisData] = useState(null);
-  const [expandedCategory, setExpandedCategory] = useState(null);
-  const [expandedDomain, setExpandedDomain] = useState(null);
-  const [domainDetails, setDomainDetails] = useState(null);
-  const [expandedJobRole, setExpandedJobRole] = useState(null);
-  const [jobRoleDetails, setJobRoleDetails] = useState(null);
+
+  // Accordion expand states (Sets allow multiple simultaneous expansions)
+  const [expandedCats, setExpandedCats] = useState(new Set());
+  const [expandedDoms, setExpandedDoms] = useState(new Set());
+  const [expandedRoles, setExpandedRoles] = useState(new Set());
+
+  // Cached API responses keyed by id/name
+  const [domainCache, setDomainCache] = useState({});
+  const [roleCache, setRoleCache] = useState({});
+
+  // Per-item loading indicators
+  const [loadingDoms, setLoadingDoms] = useState(new Set());
+  const [loadingRoles, setLoadingRoles] = useState(new Set());
 
   // Trending domains for dashboard view
   const [trendingDomains, setTrendingDomains] = useState(null);
@@ -53,8 +60,6 @@ const CareerExplorerPage = () => {
 
   // Loading states
   const [loading, setLoading] = useState(false);
-  const [loadingDomain, setLoadingDomain] = useState(false);
-  const [loadingJobRole, setLoadingJobRole] = useState(false);
 
   const [error, setError] = useState(null);
   const [isFocused, setIsFocused] = useState(false);
@@ -106,11 +111,11 @@ const CareerExplorerPage = () => {
       setLoading(true);
       setError(null);
       setAnalysisData(null);
-      setExpandedCategory(null);
-      setExpandedDomain(null);
-      setDomainDetails(null);
-      setExpandedJobRole(null);
-      setJobRoleDetails(null);
+      setExpandedCats(new Set());
+      setExpandedDoms(new Set());
+      setExpandedRoles(new Set());
+      setDomainCache({});
+      setRoleCache({});
 
       try {
         const response = await careerAPI.exploreKeyword(
@@ -131,85 +136,79 @@ const CareerExplorerPage = () => {
     [keyword, location],
   );
 
-  // Toggles
-  const toggleCategory = (category) => {
-    const isSame = expandedCategory?.id === category.id;
-    setExpandedCategory(isSame ? null : category);
-    setExpandedDomain(null);
-    setDomainDetails(null);
-    setExpandedJobRole(null);
-    setJobRoleDetails(null);
+  // ──────────── Accordion toggles ────────────
+
+  const toggleCategory = (catKey) => {
+    setExpandedCats((prev) => {
+      const next = new Set(prev);
+      next.has(catKey) ? next.delete(catKey) : next.add(catKey);
+      return next;
+    });
   };
 
-  const toggleDomain = async (domain) => {
-    if (expandedDomain?.id === domain.id) {
-      setExpandedDomain(null);
-      setDomainDetails(null);
-      setExpandedJobRole(null);
-      setJobRoleDetails(null);
-    } else {
-      setExpandedDomain(domain);
-      setExpandedJobRole(null);
-      setJobRoleDetails(null);
-      setLoadingDomain(true);
-
+  const toggleDomain = async (domain, parentCatName) => {
+    const key = domain.id || domain.name;
+    setExpandedDoms((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+    // Fetch domain details if not cached
+    if (!domainCache[key]) {
+      setLoadingDoms((prev) => new Set(prev).add(key));
       try {
         const response = await careerAPI.getDomainDetails(domain.name, keyword);
-        setDomainDetails(response.data.data);
+        setDomainCache((prev) => ({ ...prev, [key]: response.data.data }));
       } catch (err) {
         console.error("Domain fetch error:", err);
       } finally {
-        setLoadingDomain(false);
+        setLoadingDoms((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
       }
     }
   };
 
-  const toggleJobRole = async (jobRole) => {
-    if (expandedJobRole?.title === jobRole.title) {
-      setExpandedJobRole(null);
-      setJobRoleDetails(null);
-    } else {
-      setExpandedJobRole(jobRole);
-      setLoadingJobRole(true);
-
+  const toggleRole = async (role, contextDomainName) => {
+    const key = role.title;
+    setExpandedRoles((prev) => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+    // Fetch role details if not cached
+    if (!roleCache[key]) {
+      setLoadingRoles((prev) => new Set(prev).add(key));
       try {
-        const response = await careerAPI.getJobRoleDetails(
-          jobRole.title,
-          expandedDomain?.name || expandedCategory?.name,
-        );
-        setJobRoleDetails(response.data.data);
+        const response = await careerAPI.getJobRoleDetails(role.title, contextDomainName);
+        setRoleCache((prev) => ({ ...prev, [key]: response.data.data }));
       } catch (err) {
         console.error("Role details fetch error:", err);
       } finally {
-        setLoadingJobRole(false);
+        setLoadingRoles((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
       }
     }
   };
 
   const handleReset = () => {
     setAnalysisData(null);
-    setExpandedCategory(null);
-    setExpandedDomain(null);
-    setDomainDetails(null);
-    setExpandedJobRole(null);
-    setJobRoleDetails(null);
+    setExpandedCats(new Set());
+    setExpandedDoms(new Set());
+    setExpandedRoles(new Set());
+    setDomainCache({});
+    setRoleCache({});
     setKeyword("");
   };
 
-  // Git Graph Connector
-  const CircuitConnector = ({ height = "30px", className = "" }) => (
-    <div
-      className={`relative flex justify-center items-center ${className}`}
-      style={{ height }}
-    >
-      <div className="absolute top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary/50 to-secondary/50"></div>
-      <div className="w-2 h-2 rounded-full bg-secondary shadow-[0_0_10px_rgba(34,211,238,0.5)] z-10"></div>
-    </div>
-  );
-
   return (
     <main className="min-h-screen pt-28 pb-16 bg-bg-base relative overflow-hidden text-text-main">
-      <div className="absolute inset-0 pointer-events-none bg-grid-pattern opacity-40 z-0"></div>
+      <div className="absolute inset-0 pointer-events-none bg-tech-career opacity-60 z-0"></div>
 
       {/* Command Center Hero */}
       <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
@@ -320,322 +319,327 @@ const CareerExplorerPage = () => {
             </motion.div>
           )}
 
-          {/* Analysis Results (Mind Map) */}
+          {/* Analysis Results — Expandable Accordion */}
           {!loading && analysisData && (
             <motion.div
               key="results"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col items-center"
+              className="w-full"
             >
-              <motion.button
-                onClick={handleReset}
-                className="self-start mb-8 flex items-center gap-2 text-text-muted hover:text-text-main transition-colors font-mono text-xs"
-              >
-                <FontAwesomeIcon icon={faArrowLeft} />
-                <span>BACK_TO_DASHBOARD</span>
-              </motion.button>
-
-              {/* Root Node */}
-              <motion.div
-                className="relative z-10 mb-2"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-              >
-                <div className="px-8 py-5 bg-bg-surface border-2 border-primary/50 rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.1)] flex items-center gap-4">
-                  <div className="p-3 bg-primary/10 rounded-lg text-primary">
-                    <FontAwesomeIcon icon={faLayerGroup} className="text-2xl" />
-                  </div>
-                  <div className="text-left">
-                    <div className="text-xs font-mono text-primary mb-1">
-                      TARGET_PROTOCOL
-                    </div>
-                    <div className="text-2xl font-bold text-text-main tracking-tight">
-                      {keyword}
-                    </div>
-                  </div>
-                  <div className="ml-6 pl-6 border-l border-border text-right">
-                    <div className="text-xs font-mono text-text-muted">
-                      DOMAINS
-                    </div>
-                    <div className="text-xl font-mono text-text-main">
-                      {analysisData.analysis?.totalDomainsFound || 0}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-
-              <CircuitConnector height="40px" />
-
-              <div className="text-center max-w-2xl px-6 py-3 bg-bg-surface/50 rounded-lg border border-border backdrop-blur-sm mb-8">
-                <p className="text-sm text-text-muted font-mono leading-relaxed">
-                  {`// ${analysisData.analysis?.summary}`}
-                </p>
+              {/* Back to Dashboard */}
+              <div className="flex items-center gap-3 mb-6">
+                <button
+                  onClick={handleReset}
+                  className="flex items-center gap-2 text-text-muted hover:text-text-main transition-colors font-mono text-xs group"
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} className="group-hover:-translate-x-0.5 transition-transform" />
+                  <span>BACK_TO_DASHBOARD</span>
+                </button>
               </div>
 
-              {/* Categories Grid */}
-              <div className="w-full">
-                <div className="text-center mb-6">
-                  <span className="px-3 py-1 bg-bg-elevated rounded border border-border text-xs font-mono text-text-muted">
-                    AVAILABLE_PATHS
-                  </span>
+              {/* Root keyword header */}
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center gap-3 px-6 py-3 bg-bg-surface border border-primary/30 rounded-xl">
+                  <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                    <FontAwesomeIcon icon={faLayerGroup} />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-[10px] font-mono text-primary">TARGET_PROTOCOL</div>
+                    <div className="text-xl font-bold text-text-main">{keyword}</div>
+                  </div>
+                  <div className="pl-4 border-l border-border text-right">
+                    <div className="text-[10px] font-mono text-text-dim">DOMAINS</div>
+                    <div className="text-lg font-mono text-text-main">{analysisData.analysis?.totalDomainsFound || 0}</div>
+                  </div>
                 </div>
+                {analysisData.analysis?.summary && (
+                  <p className="text-sm text-text-muted font-mono mt-3 max-w-2xl mx-auto leading-relaxed">
+                    {`// ${analysisData.analysis.summary}`}
+                  </p>
+                )}
+              </div>
 
-                <div className="flex flex-wrap justify-center gap-6">
-                  {analysisData.analysis?.categories?.map((category, idx) => (
+              {/* ── Categories Grid — All cards always visible ── */}
+              <div className="text-center mb-6">
+                <span className="px-3 py-1 bg-bg-elevated rounded border border-border text-xs font-mono text-text-muted">
+                  AVAILABLE_PATHS
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {analysisData.analysis?.categories?.map((category, idx) => {
+                  const catKey = category.id || idx;
+                  const isCatExpanded = expandedCats.has(catKey);
+
+                  return (
                     <motion.div
-                      key={category.id || idx}
+                      key={catKey}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="flex flex-col items-center max-w-[300px]"
+                      transition={{ delay: idx * 0.06 }}
+                      className="flex flex-col"
                     >
+                      {/* Category card */}
                       <button
-                        onClick={() => toggleCategory(category)}
-                        className={`
-                          w-full p-4 rounded-lg border transition-all duration-300 text-left group relative overflow-hidden
-                          ${
-                            expandedCategory?.id === category.id
-                              ? "bg-bg-elevated border-primary shadow-[0_0_20px_rgba(16,185,129,0.1)]"
-                              : "bg-bg-surface border-border hover:border-primary/50 hover:bg-bg-elevated"
-                          }
-                        `}
+                        onClick={() => toggleCategory(catKey)}
+                        className={`p-5 rounded-xl border text-left transition-all group relative overflow-hidden ${
+                          isCatExpanded
+                            ? "bg-bg-elevated border-primary shadow-[0_0_20px_rgba(16,185,129,0.1)]"
+                            : "bg-bg-surface border-border hover:border-primary/50 hover:bg-bg-elevated"
+                        }`}
                       >
-                        <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                          <FontAwesomeIcon
-                            icon={faCodeBranch}
-                            className="text-4xl text-primary"
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-2xl text-text-main">
-                            {category.icon}
-                          </span>
-                          <FontAwesomeIcon
-                            icon={faChevronDown}
-                            className={`text-xs text-text-dim transition-transform ${expandedCategory?.id === category.id ? "rotate-180 text-primary" : ""}`}
-                          />
-                        </div>
-                        <h3
-                          className={`font-bold mb-1 ${expandedCategory?.id === category.id ? "text-primary" : "text-text-main"}`}
-                        >
-                          {category.name}
-                        </h3>
-                        <div className="text-xs font-mono text-text-muted flex items-center gap-2">
-                          <FontAwesomeIcon icon={faBriefcase} />
-                          {category.jobCount?.toLocaleString()}+ positions
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-primary/10 transition-colors" />
+                        <div className="relative z-10">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-3xl">{category.icon}</span>
+                            <FontAwesomeIcon
+                              icon={faChevronDown}
+                              className={`text-xs transition-all duration-300 ${
+                                isCatExpanded ? "rotate-180 text-primary" : "text-text-dim group-hover:text-primary"
+                              }`}
+                            />
+                          </div>
+                          <h3 className={`font-bold transition-colors mb-1 ${isCatExpanded ? "text-primary" : "text-text-main group-hover:text-primary"}`}>
+                            {category.name}
+                          </h3>
+                          <div className="flex items-center gap-3 text-xs font-mono text-text-muted">
+                            <span>
+                              <FontAwesomeIcon icon={faBriefcase} className="mr-1" />
+                              {category.jobCount?.toLocaleString()}+ jobs
+                            </span>
+                            <span className="text-text-dim">·</span>
+                            <span>{category.domains?.length || 0} domains</span>
+                          </div>
                         </div>
                       </button>
 
-                      {/* Expanded Domains List */}
+                      {/* Expanded domains — slide down below the card */}
                       <AnimatePresence>
-                        {expandedCategory?.id === category.id && (
+                        {isCatExpanded && (
                           <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="w-full flex flex-col items-center"
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="overflow-hidden"
                           >
-                            <CircuitConnector height="20px" />
+                            <div className="pt-2 space-y-2">
+                              {category.domains?.map((domain, dIdx) => {
+                                const domKey = domain.id || domain.name;
+                                const isDomExpanded = expandedDoms.has(domKey);
+                                const isDomLoading = loadingDoms.has(domKey);
+                                const details = domainCache[domKey];
 
-                            <div className="w-full bg-bg-elevated border border-border rounded-lg p-3 space-y-2">
-                              {category.domains?.map((domain, dIdx) => (
-                                <motion.div key={domain.id || dIdx}>
-                                  <button
-                                    onClick={() => toggleDomain(domain)}
-                                    className={`
-                                      w-full p-3 rounded border text-left flex items-center justify-between transition-all
-                                      ${
-                                        expandedDomain?.id === domain.id
-                                          ? "bg-secondary/10 border-secondary/50 text-secondary"
-                                          : "bg-bg-base border-border text-text-muted hover:border-text-muted hover:text-text-main"
-                                      }
-                                    `}
-                                  >
-                                    <div className="flex items-center gap-3">
+                                return (
+                                  <div key={dIdx} className="rounded-lg border border-border bg-bg-surface overflow-hidden">
+                                    {/* Domain button */}
+                                    <button
+                                      onClick={() => toggleDomain(domain, category.name)}
+                                      className={`w-full p-3 text-left flex items-center justify-between transition-colors ${
+                                        isDomExpanded ? "bg-bg-elevated" : "hover:bg-bg-elevated"
+                                      }`}
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faLightbulb} className="text-secondary text-xs" />
+                                        <span className={`text-sm font-medium ${isDomExpanded ? "text-secondary" : "text-text-main"}`}>
+                                          {domain.name}
+                                        </span>
+                                      </div>
                                       <FontAwesomeIcon
-                                        icon={faLightbulb}
-                                        className="text-xs"
+                                        icon={faChevronDown}
+                                        className={`text-[10px] transition-transform duration-300 ${
+                                          isDomExpanded ? "rotate-180 text-secondary" : "text-text-dim"
+                                        }`}
                                       />
-                                      <span className="text-sm font-medium">
-                                        {domain.name}
-                                      </span>
-                                    </div>
-                                    {expandedDomain?.id === domain.id && (
-                                      <div className="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
-                                    )}
-                                  </button>
+                                    </button>
 
-                                  {/* Expanded Job Roles */}
-                                  <AnimatePresence>
-                                    {expandedDomain?.id === domain.id && (
-                                      <motion.div
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: "auto" }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                        className="pl-4 mt-2 border-l-2 border-border ml-4 space-y-2"
-                                      >
-                                        {loadingDomain ? (
-                                          <div className="py-2 text-center text-secondary font-mono text-xs">
-                                            <FontAwesomeIcon
-                                              icon={faSpinner}
-                                              spin
-                                              className="mr-2"
-                                            />
-                                            Loading_Manifest...
-                                          </div>
-                                        ) : (
-                                          (
-                                            domainDetails?.domain?.jobRoles ||
-                                            domain.relatedJobTitles?.map(
-                                              (t) => ({ title: t }),
-                                            )
-                                          )
-                                            ?.slice(0, 5)
-                                            .map((role, rIdx) => (
-                                              <div key={rIdx}>
-                                                <button
-                                                  onClick={() =>
-                                                    toggleJobRole(role)
-                                                  }
-                                                  className={`
-                                                  w-full py-2 px-3 rounded text-left text-xs font-mono transition-colors
-                                                  ${
-                                                    expandedJobRole?.title ===
-                                                    role.title
-                                                      ? "bg-accent/20 text-accent border border-accent/30"
-                                                      : "text-text-muted hover:text-text-main hover:bg-bg-surface"
-                                                  }
-                                                `}
-                                                >
-                                                  {`> ${role.title}`}
-                                                </button>
+                                    {/* Expanded domain details */}
+                                    <AnimatePresence>
+                                      {isDomExpanded && (
+                                        <motion.div
+                                          initial={{ height: 0, opacity: 0 }}
+                                          animate={{ height: "auto", opacity: 1 }}
+                                          exit={{ height: 0, opacity: 0 }}
+                                          transition={{ duration: 0.25 }}
+                                          className="overflow-hidden"
+                                        >
+                                          <div className="px-3 pb-3 space-y-2 border-t border-border pt-2">
+                                            {/* Generate Learning Plan CTA */}
+                                            <Link
+                                              to={`/career/learning-plan/${encodeURIComponent(domain.name)}`}
+                                              className="flex items-center justify-center gap-2 w-full py-2.5 bg-secondary/10 hover:bg-secondary/20 text-secondary font-bold text-xs rounded-lg transition-all border border-secondary/20 hover:border-secondary/40"
+                                            >
+                                              <FontAwesomeIcon icon={faChartLine} />
+                                              AI Learning Plan → {domain.name}
+                                            </Link>
 
-                                                {/* Job Role Details */}
-                                                <AnimatePresence>
-                                                  {expandedJobRole?.title ===
-                                                    role.title && (
-                                                    <motion.div
-                                                      initial={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                      }}
-                                                      animate={{
-                                                        opacity: 1,
-                                                        height: "auto",
-                                                      }}
-                                                      exit={{
-                                                        opacity: 0,
-                                                        height: 0,
-                                                      }}
-                                                      className="mt-2 mb-2 bg-bg-base rounded border border-border p-3"
-                                                    >
-                                                      {loadingJobRole ? (
-                                                        <div className="text-center text-xs text-accent">
-                                                          <FontAwesomeIcon
-                                                            icon={faSpinner}
-                                                            spin
-                                                          />{" "}
-                                                          Fetching_Instances...
-                                                        </div>
-                                                      ) : (
-                                                        <div className="space-y-3">
-                                                          {/* Salary */}
-                                                          {jobRoleDetails?.role
-                                                            ?.salaryInsights && (
-                                                            <div className="flex items-center gap-2 text-primary text-xs font-mono p-2 bg-primary/10 rounded border border-primary/30">
-                                                              <FontAwesomeIcon
-                                                                icon={
-                                                                  faDollarSign
-                                                                }
-                                                              />
-                                                              <span>
-                                                                {`$${jobRoleDetails.role.salaryInsights.entry?.min?.toLocaleString()} - $${jobRoleDetails.role.salaryInsights.senior?.max?.toLocaleString()}`}
-                                                              </span>
-                                                            </div>
-                                                          )}
-
-                                                          {/* Jobs */}
-                                                          {(
-                                                            jobRoleDetails?.jobListings ||
-                                                            []
-                                                          )
-                                                            .slice(0, 3)
-                                                            .map(
-                                                              (job, jIdx) => (
-                                                                <a
-                                                                  key={jIdx}
-                                                                  href={
-                                                                    job.applyUrl
-                                                                  }
-                                                                  target="_blank"
-                                                                  rel="noopener noreferrer"
-                                                                  className="block p-2 bg-bg-surface rounded border border-border hover:border-secondary/50 transition-all group"
-                                                                >
-                                                                  <div className="flex justify-between items-start">
-                                                                    <span className="text-xs text-text-main font-medium group-hover:text-secondary truncate w-32">
-                                                                      {
-                                                                        job
-                                                                          .company
-                                                                          ?.name
-                                                                      }
-                                                                    </span>
-                                                                    <FontAwesomeIcon
-                                                                      icon={
-                                                                        faExternalLinkAlt
-                                                                      }
-                                                                      className="text-[10px] text-text-dim"
-                                                                    />
-                                                                  </div>
-                                                                  <div className="flex gap-1 text-[10px] text-text-muted mt-1">
-                                                                    <FontAwesomeIcon
-                                                                      icon={
-                                                                        faMapMarkerAlt
-                                                                      }
-                                                                    />{" "}
-                                                                    {
-                                                                      job.location
-                                                                    }
-                                                                  </div>
-                                                                </a>
-                                                              ),
-                                                            )}
-
-                                                          <a
-                                                            href={
-                                                              jobRoleDetails?.linkedinSearchUrl
-                                                            }
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="block w-full py-2 text-center bg-[#0077b5] hover:bg-[#006396] text-white text-xs rounded transition-colors"
-                                                          >
-                                                            <FontAwesomeIcon
-                                                              icon={faLinkedin}
-                                                              className="mr-2"
-                                                            />
-                                                            View All on LinkedIn
-                                                          </a>
-                                                        </div>
-                                                      )}
-                                                    </motion.div>
-                                                  )}
-                                                </AnimatePresence>
+                                            {isDomLoading ? (
+                                              <div className="text-center py-4">
+                                                <FontAwesomeIcon icon={faSpinner} spin className="text-secondary text-sm" />
+                                                <p className="text-[10px] text-text-muted font-mono mt-1">Loading...</p>
                                               </div>
-                                            ))
-                                        )}
-                                      </motion.div>
-                                    )}
-                                  </AnimatePresence>
-                                </motion.div>
-                              ))}
+                                            ) : (
+                                              <>
+                                                <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider pt-1">Job Roles</div>
+                                                {(details?.domain?.jobRoles || domain.relatedJobTitles?.map((t) => ({ title: t })))
+                                                  ?.slice(0, 6)
+                                                  .map((role, rIdx) => {
+                                                    const roleKey = role.title;
+                                                    const isRoleExpanded = expandedRoles.has(roleKey);
+                                                    const isRoleLoading = loadingRoles.has(roleKey);
+                                                    const roleData = roleCache[roleKey];
+
+                                                    return (
+                                                      <div key={rIdx} className="rounded-md border border-border overflow-hidden">
+                                                        {/* Role button */}
+                                                        <button
+                                                          onClick={() => toggleRole(role, domain.name)}
+                                                          className={`w-full p-2.5 text-left flex items-center justify-between transition-colors text-xs ${
+                                                            isRoleExpanded ? "bg-bg-elevated" : "bg-bg-surface hover:bg-bg-elevated"
+                                                          }`}
+                                                        >
+                                                          <div className="flex items-center gap-2">
+                                                            <span className="text-accent font-mono">›</span>
+                                                            <span className={`font-medium ${isRoleExpanded ? "text-accent" : "text-text-main"}`}>
+                                                              {role.title}
+                                                            </span>
+                                                            {role.experienceLevel && (
+                                                              <span className="px-1.5 py-0.5 text-[9px] font-mono rounded bg-accent/10 text-accent border border-accent/20">
+                                                                {role.experienceLevel}
+                                                              </span>
+                                                            )}
+                                                          </div>
+                                                          <FontAwesomeIcon
+                                                            icon={faChevronDown}
+                                                            className={`text-[9px] transition-transform duration-300 ${
+                                                              isRoleExpanded ? "rotate-180 text-accent" : "text-text-dim"
+                                                            }`}
+                                                          />
+                                                        </button>
+
+                                                        {/* Expanded role detail */}
+                                                        <AnimatePresence>
+                                                          {isRoleExpanded && (
+                                                            <motion.div
+                                                              initial={{ height: 0, opacity: 0 }}
+                                                              animate={{ height: "auto", opacity: 1 }}
+                                                              exit={{ height: 0, opacity: 0 }}
+                                                              transition={{ duration: 0.2 }}
+                                                              className="overflow-hidden"
+                                                            >
+                                                              <div className="px-2.5 pb-2.5 border-t border-border pt-2 space-y-2">
+                                                                {isRoleLoading ? (
+                                                                  <div className="text-center py-3">
+                                                                    <FontAwesomeIcon icon={faSpinner} spin className="text-accent text-sm" />
+                                                                    <p className="text-[10px] text-text-muted font-mono mt-1">Fetching...</p>
+                                                                  </div>
+                                                                ) : (
+                                                                  <>
+                                                                    {/* Salary */}
+                                                                    {roleData?.role?.salaryInsights && (
+                                                                      <div className="flex items-center gap-2 text-primary text-xs font-mono p-2 bg-primary/10 rounded-md border border-primary/30">
+                                                                        <FontAwesomeIcon icon={faDollarSign} />
+                                                                        <span>
+                                                                          ${roleData.role.salaryInsights.entry?.min?.toLocaleString()} - ${roleData.role.salaryInsights.senior?.max?.toLocaleString()}
+                                                                        </span>
+                                                                      </div>
+                                                                    )}
+
+                                                                    {/* Learning Plan */}
+                                                                    <Link
+                                                                      to={`/career/learning-plan/${encodeURIComponent(role.title)}`}
+                                                                      className="flex items-center justify-center gap-2 w-full py-2 bg-primary hover:bg-primary/90 text-bg-base font-bold text-xs rounded-md transition-all shadow-md shadow-primary/20"
+                                                                    >
+                                                                      <FontAwesomeIcon icon={faRocket} />
+                                                                      Generate Learning Plan
+                                                                    </Link>
+
+                                                                    {/* Job listings */}
+                                                                    {(roleData?.jobListings || []).length > 0 && (
+                                                                      <div className="space-y-1">
+                                                                        <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider">Live Openings</div>
+                                                                        {roleData.jobListings.slice(0, 3).map((job, jIdx) => (
+                                                                          <a
+                                                                            key={jIdx}
+                                                                            href={job.applyUrl}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="block p-2 bg-bg-surface rounded-md border border-border hover:border-secondary/50 transition-all text-xs group"
+                                                                          >
+                                                                            <div className="flex justify-between items-start">
+                                                                              <div>
+                                                                                <span className="text-text-main font-medium group-hover:text-secondary">
+                                                                                  {job.title || role.title}
+                                                                                </span>
+                                                                                <p className="text-[10px] text-text-muted">{job.company?.name}</p>
+                                                                              </div>
+                                                                              <FontAwesomeIcon icon={faExternalLinkAlt} className="text-[8px] text-text-dim" />
+                                                                            </div>
+                                                                            <div className="flex items-center gap-1.5 text-[9px] text-text-dim mt-1">
+                                                                              <FontAwesomeIcon icon={faMapMarkerAlt} />
+                                                                              <span>{job.location}</span>
+                                                                              {job.salary && (
+                                                                                <span className="text-primary font-mono">
+                                                                                  {typeof job.salary === "object"
+                                                                                    ? `${job.salary.min}-${job.salary.max} ${job.salary.currency || ""}`
+                                                                                    : job.salary}
+                                                                                </span>
+                                                                              )}
+                                                                            </div>
+                                                                          </a>
+                                                                        ))}
+
+                                                                        {roleData?.linkedinSearchUrl && (
+                                                                          <a
+                                                                            href={roleData.linkedinSearchUrl}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className="block w-full py-1.5 text-center bg-[#0077b5] hover:bg-[#006396] text-white text-[10px] font-bold rounded-md transition-colors"
+                                                                          >
+                                                                            <FontAwesomeIcon icon={faLinkedin} className="mr-1" />
+                                                                            View on LinkedIn
+                                                                          </a>
+                                                                        )}
+                                                                      </div>
+                                                                    )}
+
+                                                                    {/* Start Journey */}
+                                                                    <button
+                                                                      onClick={() => {
+                                                                        setSelectedCareer({ name: role.title, ...role });
+                                                                        setShowJourneyModal(true);
+                                                                      }}
+                                                                      className="w-full py-2 bg-bg-surface hover:bg-bg-elevated border border-border hover:border-primary/40 text-text-main text-xs font-bold rounded-md transition-all flex items-center justify-center gap-2"
+                                                                    >
+                                                                      <FontAwesomeIcon icon={faRocket} className="text-primary" />
+                                                                      Start Career Journey
+                                                                    </button>
+                                                                  </>
+                                                                )}
+                                                              </div>
+                                                            </motion.div>
+                                                          )}
+                                                        </AnimatePresence>
+                                                      </div>
+                                                    );
+                                                  })}
+                                              </>
+                                            )}
+                                          </div>
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+                                  </div>
+                                );
+                              })}
                             </div>
                           </motion.div>
                         )}
                       </AnimatePresence>
                     </motion.div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </motion.div>
           )}
@@ -746,17 +750,27 @@ const CareerExplorerPage = () => {
                         </div>
 
                         {/* Start Journey Button */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedCareer(domain);
-                            setShowJourneyModal(true);
-                          }}
-                          className="w-full py-2.5 bg-primary hover:bg-primary/90 text-bg-base text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
-                        >
-                          <FontAwesomeIcon icon={faRocket} />
-                          Start {domain.name} Journey
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedCareer(domain);
+                              setShowJourneyModal(true);
+                            }}
+                            className="flex-1 py-2.5 bg-primary hover:bg-primary/90 text-bg-base text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                          >
+                            <FontAwesomeIcon icon={faRocket} />
+                            Start Journey
+                          </button>
+                          <Link
+                            to={`/career/learning-plan/${encodeURIComponent(domain.name)}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="py-2.5 px-4 bg-secondary/10 hover:bg-secondary/20 text-secondary text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 border border-secondary/20 hover:border-secondary/40"
+                            title="AI Learning Plan"
+                          >
+                            <FontAwesomeIcon icon={faChartLine} />
+                          </Link>
+                        </div>
                       </motion.div>
                     ))}
                   </div>

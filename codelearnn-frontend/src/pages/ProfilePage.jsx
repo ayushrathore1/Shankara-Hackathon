@@ -21,13 +21,15 @@ import {
   faTrophy,
   faSpinner,
   faCalendarAlt,
+  faRoute,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext";
+import { useCareerJourney } from "../context/CareerJourneyContext";
 import { authAPI, progressAPI } from "../services/api";
 
-// Security Tab Component with Password Change
+// Security Tab Component with Password Management
 const SecurityTab = ({ user }) => {
-  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -37,7 +39,45 @@ const SecurityTab = ({ user }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handlePasswordChange = async (e) => {
+  const hasPassword = user?.hasPassword;
+  const isOAuthUser = !!(user?.googleId || user?.githubId);
+
+  const resetForm = () => {
+    setShowForm(false);
+    setError("");
+    setSuccess("");
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleSetPassword = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (newPassword !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await authAPI.setPassword(newPassword);
+      setSuccess("Password set successfully! You can now log in with email and password.");
+      resetForm();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to set password");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -46,24 +86,19 @@ const SecurityTab = ({ user }) => {
       setError("New passwords do not match");
       return;
     }
-
     if (newPassword.length < 6) {
       setError("Password must be at least 6 characters");
       return;
     }
 
     setIsLoading(true);
-
     try {
       await authAPI.updatePassword({
         currentPassword,
         newPassword,
       });
       setSuccess("Password updated successfully!");
-      setShowChangePassword(false);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      resetForm();
     } catch (err) {
       setError(err.response?.data?.message || "Failed to update password");
     } finally {
@@ -71,8 +106,21 @@ const SecurityTab = ({ user }) => {
     }
   };
 
-  // Check if user signed up via OAuth (no password set)
-  const isOAuthUser = user?.googleId || user?.githubId;
+  const handleForgotPassword = async () => {
+    if (!user?.email) return;
+    setError("");
+    setSuccess("");
+    setIsLoading(true);
+
+    try {
+      await authAPI.forgotPassword(user.email);
+      setSuccess("Password reset link sent to your email!");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to send reset email");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <motion.div
@@ -84,42 +132,57 @@ const SecurityTab = ({ user }) => {
         Security Settings
       </h3>
 
-      {isOAuthUser && !user?.hasPassword && (
-        <div className="bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm p-4 rounded-lg mb-6">
-          <FontAwesomeIcon icon={faShieldAlt} className="mr-2" />
-          You signed in with {user?.googleId ? "Google" : "GitHub"}. Password
-          login is not available for OAuth accounts.
-        </div>
-      )}
+      {/* Status Badge */}
+      <div className={`text-sm p-4 rounded-lg mb-6 ${
+        hasPassword
+          ? "bg-green-500/10 border border-green-500/30 text-green-400"
+          : "bg-blue-500/10 border border-blue-500/30 text-blue-400"
+      }`}>
+        <FontAwesomeIcon icon={hasPassword ? faCheckCircle : faShieldAlt} className="mr-2" />
+        {hasPassword
+          ? "Password is set. You can log in with email and password."
+          : isOAuthUser
+            ? `You signed in with ${user?.googleId ? "Google" : "GitHub"}. Set a password to also log in with email.`
+            : "No password set yet. Set one to enable email + password login."
+        }
+      </div>
 
       <div className="space-y-6 max-w-xl">
-        {!showChangePassword ? (
-          <>
-            <p className="text-sm text-text-muted">
-              Manage your password and security preferences.
-            </p>
+        {/* Success / Error Messages */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm p-3 rounded-lg">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm p-3 rounded-lg">
+            {success}
+          </div>
+        )}
+
+        {!showForm ? (
+          <div className="flex flex-wrap gap-3">
             <button
-              onClick={() => setShowChangePassword(true)}
+              onClick={() => { setShowForm(true); setError(""); setSuccess(""); }}
               className="btn-secondary px-6 py-2"
-              disabled={isOAuthUser && !user?.hasPassword}
             >
               <FontAwesomeIcon icon={faLock} className="mr-2" />
-              Change Password
+              {hasPassword ? "Change Password" : "Set Password"}
             </button>
-          </>
-        ) : (
-          <form onSubmit={handlePasswordChange} className="space-y-4">
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm p-3 rounded-lg">
-                {error}
-              </div>
-            )}
-            {success && (
-              <div className="bg-green-500/10 border border-green-500/30 text-green-400 text-sm p-3 rounded-lg">
-                {success}
-              </div>
-            )}
 
+            {hasPassword && (
+              <button
+                onClick={handleForgotPassword}
+                disabled={isLoading}
+                className="text-sm text-primary hover:text-primary-glow transition-colors px-4 py-2 disabled:opacity-50"
+              >
+                {isLoading ? "Sending..." : "Forgot Password?"}
+              </button>
+            )}
+          </div>
+        ) : hasPassword ? (
+          /* ─── Change Password Form (needs current password) ─── */
+          <form onSubmit={handleChangePassword} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-text-muted mb-2">
                 Current Password
@@ -142,6 +205,14 @@ const SecurityTab = ({ user }) => {
                   />
                 </button>
               </div>
+              <button
+                type="button"
+                onClick={handleForgotPassword}
+                disabled={isLoading}
+                className="text-xs text-primary hover:text-primary-glow mt-1 disabled:opacity-50"
+              >
+                Forgot your password?
+              </button>
             </div>
 
             <div>
@@ -193,13 +264,66 @@ const SecurityTab = ({ user }) => {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setShowChangePassword(false);
-                  setError("");
-                  setCurrentPassword("");
-                  setNewPassword("");
-                  setConfirmPassword("");
-                }}
+                onClick={resetForm}
+                className="btn-secondary px-6 py-2"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          /* ─── Set Password Form (no current password needed) ─── */
+          <form onSubmit={handleSetPassword} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-text-muted mb-2">
+                New Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full bg-bg-base border border-border rounded-lg px-4 py-3 pr-12 text-text-main focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-dim hover:text-text-main"
+                >
+                  <FontAwesomeIcon
+                    icon={showNewPassword ? faEyeSlash : faEye}
+                  />
+                </button>
+              </div>
+              <p className="text-xs text-text-dim mt-1">Minimum 6 characters</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text-muted mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full bg-bg-base border border-border rounded-lg px-4 py-3 text-text-main focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                required
+              />
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn-primary px-6 py-2 disabled:opacity-50"
+              >
+                {isLoading ? "Setting..." : "Set Password"}
+              </button>
+              <button
+                type="button"
+                onClick={resetForm}
                 className="btn-secondary px-6 py-2"
               >
                 Cancel
@@ -358,6 +482,7 @@ const ProgressCard = ({ inProgress, isLoading }) => {
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
+  const { journey } = useCareerJourney();
   const [activeTab, setActiveTab] = useState("overview");
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState(null);
@@ -596,6 +721,56 @@ const ProfilePage = () => {
                   ))}
                 </div>
 
+                {/* ─── Learning Plan ─── */}
+                {journey && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 }}
+                    className="card-bento p-6"
+                  >
+                    <h3 className="text-lg font-bold text-text-main mb-4 flex items-center gap-2">
+                      <FontAwesomeIcon icon={faRoute} className="text-primary" />
+                      Learning Plan
+                    </h3>
+
+                    <div className="flex items-center gap-5">
+                      {/* Progress Ring (small) */}
+                      <div className="relative flex-shrink-0">
+                        <svg width="72" height="72" viewBox="0 0 72 72" className="transform -rotate-90">
+                          <circle cx="36" cy="36" r="30" fill="none" stroke="var(--bg-elevated)" strokeWidth="6" />
+                          <circle
+                            cx="36" cy="36" r="30" fill="none"
+                            stroke="var(--primary)" strokeWidth="6"
+                            strokeLinecap="round"
+                            strokeDasharray={`${2 * Math.PI * 30}`}
+                            strokeDashoffset={`${2 * Math.PI * 30 * (1 - (journey.stats?.overallProgress || 0) / 100)}`}
+                            className="transition-all duration-700"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-sm font-bold text-text-main">
+                            {journey.stats?.overallProgress || 0}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-base font-semibold text-text-main truncate">
+                          {journey.career?.title || journey.career?.name || "My Learning Plan"}
+                        </h4>
+                        <p className="text-xs text-text-dim mt-0.5">
+                          Phase {journey.roadmap?.currentPhaseNumber || 1} of {journey.roadmap?.phases?.length || "—"}
+                          {" · "}
+                          {journey.stats?.resourcesCompleted || 0} resources completed
+                        </p>
+                        <p className="text-xs text-text-dim">
+                          Started {journey.startedAt ? new Date(journey.startedAt).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : "recently"}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
                 {/* Skills Card */}
                 <SkillsCard skills={skills} isLoading={isLoading} />
 

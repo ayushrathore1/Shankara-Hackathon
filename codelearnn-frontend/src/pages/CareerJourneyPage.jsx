@@ -21,8 +21,12 @@ import {
   faCalendarAlt,
   faLayerGroup,
   faAngleRight,
+  faSync,
+  faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
+import { faYoutube } from "@fortawesome/free-brands-svg-icons";
 import { useCareerJourney } from "../context/CareerJourneyContext";
+import { journeyAPI } from "../services/api";
 
 // Phase Status Badge
 const PhaseStatusBadge = ({ status }) => {
@@ -103,16 +107,15 @@ const PhaseCard = ({ phase, isExpanded, onToggle, onResourceComplete }) => {
         rounded-xl border transition-all duration-300
         ${isActive ? "bg-bg-surface border-primary/50 shadow-lg shadow-primary/10" : ""}
         ${isCompleted ? "bg-bg-surface border-green-500/30" : ""}
-        ${isLocked ? "bg-bg-surface/50 border-border opacity-60" : ""}
+        ${isLocked ? "bg-bg-surface/50 border-border" : ""}
       `}
     >
       {/* Phase Header */}
       <button
-        onClick={() => !isLocked && onToggle()}
-        disabled={isLocked}
+        onClick={() => onToggle()}
         className={`
           w-full p-5 flex items-center justify-between text-left
-          ${isLocked ? "cursor-not-allowed" : "cursor-pointer hover:bg-bg-elevated/50"}
+          cursor-pointer hover:bg-bg-elevated/50
           transition-colors rounded-xl
         `}
       >
@@ -147,7 +150,7 @@ const PhaseCard = ({ phase, isExpanded, onToggle, onResourceComplete }) => {
 
         <div className="flex items-center gap-4">
           {/* Progress indicator */}
-          {!isLocked && (
+          {(
             <div className="text-right">
               <div className="text-sm font-bold text-text-main">
                 {phase.progress || 0}%
@@ -156,7 +159,7 @@ const PhaseCard = ({ phase, isExpanded, onToggle, onResourceComplete }) => {
             </div>
           )}
 
-          {!isLocked && (
+          {(
             <FontAwesomeIcon
               icon={isExpanded ? faChevronUp : faChevronDown}
               className="text-text-dim"
@@ -167,7 +170,7 @@ const PhaseCard = ({ phase, isExpanded, onToggle, onResourceComplete }) => {
 
       {/* Expanded Content */}
       <AnimatePresence>
-        {isExpanded && !isLocked && (
+        {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -227,48 +230,76 @@ const PhaseCard = ({ phase, isExpanded, onToggle, onResourceComplete }) => {
                         }
                         transition-colors cursor-pointer
                       `}
-                      onClick={() =>
-                        onResourceComplete(phase.phaseId, resource.resourceId)
-                      }
+                      onClick={() => {
+                        if (resource.youtubeUrl) {
+                          window.open(resource.youtubeUrl, '_blank');
+                        } else if (resource.url) {
+                          window.open(resource.url, '_blank');
+                        } else {
+                          onResourceComplete(phase.phaseId, resource.resourceId);
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-3">
-                        <div
-                          className={`
-                          w-8 h-8 rounded flex items-center justify-center text-xs
-                          ${resource.isCompleted ? "bg-green-500/20 text-green-400" : "bg-bg-base text-text-muted"}
-                        `}
-                        >
-                          {resource.isCompleted ? (
-                            <FontAwesomeIcon icon={faCheckCircle} />
-                          ) : resource.type === "video" ? (
-                            <FontAwesomeIcon icon={faPlay} />
-                          ) : resource.type === "quiz" ? (
-                            <FontAwesomeIcon icon={faGraduationCap} />
-                          ) : resource.type === "practice" ? (
-                            <FontAwesomeIcon icon={faCode} />
-                          ) : (
-                            <FontAwesomeIcon icon={faBook} />
-                          )}
-                        </div>
-                        <div>
+                        {/* YouTube thumbnail */}
+                        {resource.thumbnailUrl ? (
+                          <img
+                            src={resource.thumbnailUrl}
+                            alt=""
+                            className="w-16 h-10 rounded object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div
+                            className={`
+                            w-8 h-8 rounded flex items-center justify-center text-xs
+                            ${resource.isCompleted ? "bg-green-500/20 text-green-400" : "bg-bg-base text-text-muted"}
+                          `}
+                          >
+                            {resource.isCompleted ? (
+                              <FontAwesomeIcon icon={faCheckCircle} />
+                            ) : resource.videoId ? (
+                              <FontAwesomeIcon icon={faPlay} className="text-red-400" />
+                            ) : resource.type === "video" ? (
+                              <FontAwesomeIcon icon={faPlay} />
+                            ) : resource.type === "quiz" ? (
+                              <FontAwesomeIcon icon={faGraduationCap} />
+                            ) : resource.type === "practice" ? (
+                              <FontAwesomeIcon icon={faCode} />
+                            ) : (
+                              <FontAwesomeIcon icon={faBook} />
+                            )}
+                          </div>
+                        )}
+                        <div className="min-w-0">
                           <span
-                            className={`text-sm font-medium ${resource.isCompleted ? "text-green-400 line-through" : "text-text-main"}`}
+                            className={`text-sm font-medium block truncate ${resource.isCompleted ? "text-green-400 line-through" : "text-text-main"}`}
                           >
                             {resource.title}
                           </span>
                           <div className="text-xs text-text-muted flex items-center gap-2">
+                            {resource.provider && (
+                              <><span className="text-text-dim">{resource.provider}</span><span>•</span></>
+                            )}
                             <span className="capitalize">{resource.type}</span>
                             <span>•</span>
                             <span>{resource.duration} min</span>
+                            {resource.qualityScore && (
+                              <><span>•</span><span className="text-primary">Score {resource.qualityScore}</span></>
+                            )}
                           </div>
                         </div>
                       </div>
 
-                      {!resource.isCompleted && (
+                      {resource.youtubeUrl ? (
+                        <span className="text-red-400 text-xs flex items-center gap-1 flex-shrink-0">
+                          <FontAwesomeIcon icon={faExternalLinkAlt} />
+                          Watch
+                        </span>
+                      ) : !resource.isCompleted ? (
                         <button className="px-3 py-1.5 bg-primary/10 text-primary text-xs rounded hover:bg-primary/20 transition-colors">
                           Start
                         </button>
-                      )}
+                      ) : null}
                     </div>
                   ))}
                 </div>
@@ -417,6 +448,10 @@ const CareerJourneyPage = () => {
   const initialPhaseId = journey?.currentPhase?.phaseId || null;
   const [expandedPhase, setExpandedPhase] = useState(initialPhaseId);
 
+  // Regenerate roadmap state (must be before early returns — React hooks rule)
+  const [regenerating, setRegenerating] = useState(false);
+  const [regenerateMsg, setRegenerateMsg] = useState(null);
+
   // Redirect if no journey
   useEffect(() => {
     if (!isLoading && !journey) {
@@ -468,6 +503,30 @@ const CareerJourneyPage = () => {
     } else if (action.type === "project") {
       // Navigate to project guide
       // navigate(`/project/${action.projectId}`);
+    }
+  };
+
+  // ─── Regenerate Roadmap with YouTube ─────────────────────
+
+  const handleRegenerateRoadmap = async () => {
+    if (regenerating) return;
+    if (!window.confirm('Regenerate your roadmap with real YouTube resources?\nCompleted items will be preserved.')) return;
+
+    setRegenerating(true);
+    setRegenerateMsg(null);
+    try {
+      const res = await journeyAPI.regenerateRoadmap();
+      if (res.data?.success) {
+        setRegenerateMsg(`✅ ${res.data.message}`);
+        // Reload the page after a brief delay to reflect new data
+        setTimeout(() => window.location.reload(), 1500);
+      } else {
+        setRegenerateMsg('⚠️ Regeneration failed. Try again.');
+      }
+    } catch (err) {
+      setRegenerateMsg(`❌ ${err.response?.data?.message || err.message}`);
+    } finally {
+      setRegenerating(false);
     }
   };
 
@@ -605,10 +664,28 @@ const CareerJourneyPage = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Content - Roadmap */}
           <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-xl font-bold text-text-main flex items-center gap-2 mb-6">
-              <FontAwesomeIcon icon={faChartLine} className="text-primary" />
-              Your Learning Roadmap
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-text-main flex items-center gap-2">
+                <FontAwesomeIcon icon={faChartLine} className="text-primary" />
+                Your Learning Roadmap
+              </h2>
+              <button
+                onClick={handleRegenerateRoadmap}
+                disabled={regenerating}
+                className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg border transition-all ${
+                  regenerating
+                    ? 'bg-bg-elevated text-text-dim border-border cursor-wait'
+                    : 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20'
+                }`}
+                title="Regenerate with real YouTube videos and web resources"
+              >
+                <FontAwesomeIcon icon={regenerating ? faSpinner : faSync} spin={regenerating} />
+                {regenerating ? 'Regenerating...' : 'Refresh with YouTube'}
+              </button>
+            </div>
+            {regenerateMsg && (
+              <div className="text-sm text-text-muted bg-bg-surface border border-border rounded-lg p-3 mb-2">{regenerateMsg}</div>
+            )}
 
             {roadmap.phases?.map((phase) => (
               <PhaseCard

@@ -107,7 +107,9 @@ const VaultPage = () => {
   });
 
   return (
-    <main className="min-h-screen pt-28 pb-16 px-6 bg-bg-base">
+    <main className="min-h-screen pt-28 pb-16 px-6 bg-bg-base relative overflow-hidden">
+      <div className="absolute inset-0 bg-grid-pattern opacity-40 pointer-events-none z-0" />
+      <div className="absolute inset-0 bg-glow-primary pointer-events-none z-0" />
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <motion.div

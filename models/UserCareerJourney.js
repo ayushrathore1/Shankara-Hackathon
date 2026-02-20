@@ -61,6 +61,26 @@ const userCareerJourneySchema = new mongoose.Schema({
       type: String,
       enum: ['daily', 'weekly', 'none'],
       default: 'weekly'
+    },
+    // Language & region preferences for YouTube-powered learning
+    language: {
+      type: String,
+      enum: ['en', 'hi', 'hinglish', 'ta', 'te', 'bn', 'auto'],
+      default: 'auto'
+    },
+    region: {
+      type: String,
+      enum: ['IN', 'US', 'GB', 'global'],
+      default: 'IN'
+    },
+    contentCreatorPreference: {
+      type: String,
+      enum: ['indian', 'international', 'no-preference'],
+      default: 'no-preference'
+    },
+    includeAITools: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -115,15 +135,23 @@ const userCareerJourneySchema = new mongoose.Schema({
         externalResourceId: String, // For non-vault resources
         type: {
           type: String,
-          enum: ['video', 'article', 'course', 'quiz', 'practice', 'tutorial', 'guide']
+          enum: ['video', 'article', 'course', 'quiz', 'practice', 'tutorial', 'guide', 'playlist']
         },
         title: String,
         url: String,
-        duration: Number, // in minutes
+        provider: String,           // Channel name or platform
+        duration: Number,           // in minutes
         isCompleted: { type: Boolean, default: false },
         completedAt: Date,
         progress: { type: Number, default: 0 },
-        order: Number
+        order: Number,
+        // YouTube video integration fields
+        videoId: String,            // YouTube video ID for watch tracking bridge
+        youtubeUrl: String,         // Direct YouTube link
+        thumbnailUrl: String,       // Video thumbnail for UI
+        qualityScore: Number,       // 0-100 from YouTubeSearchService analysis
+        autoCompleted: { type: Boolean, default: false }, // Set by extension watch tracking
+        autoCompletedAt: Date,
       }],
       
       // Projects for this phase
@@ -204,7 +232,8 @@ const userCareerJourneySchema = new mongoose.Schema({
         'STREAK_ACHIEVED',
         'JOURNEY_PAUSED',
         'JOURNEY_RESUMED',
-        'JOURNEY_COMPLETED'
+        'JOURNEY_COMPLETED',
+        'ROADMAP_REGENERATED'
       ],
       required: true
     },

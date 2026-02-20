@@ -3,6 +3,10 @@ const FreeResource = require('../models/FreeResource');
 const YouTubeAnalysisCache = require('../models/YouTubeAnalysisCache');
 const youtubeService = require('./YouTubeService');
 const groqService = require('./GroqService');
+const axios = require('axios');
+
+// ML Classifier service URL
+const ML_CLASSIFIER_URL = process.env.ML_CLASSIFIER_URL || 'http://localhost:8100';
 
 /**
  * FreeResourceService - Business logic layer for free resources
@@ -141,12 +145,13 @@ class FreeResourceService extends BaseService {
   }
 
   /**
-   * Save analyzed video to cache with auto-categorization
+   * Save analyzed video to cache with ML-powered auto-categorization
    */
   async saveVideoToCache(videoId, videoData, evaluation, engagement) {
     try {
-      // Map detected category to our category system
-      const category = this.mapToCategory(evaluation.detectedCategory);
+      // Use ML classifier for intelligent categorization
+      const classification = await this.classifyAndAssignCourse(videoData, evaluation);
+      const category = classification.category || this.mapToCategory(evaluation.detectedCategory);
       const subcategory = evaluation.detectedSubcategory || '';
       const tags = this.extractTags(evaluation, videoData);
 
@@ -160,11 +165,11 @@ class FreeResourceService extends BaseService {
         category,
         subcategory,
         tags,
-        analysisData: { evaluation, engagement }
+        analysisData: { evaluation, engagement, mlClassification: classification }
       });
 
       await cacheEntry.save();
-      this.log('info', `Saved video to cache: ${videoId} [${category}/${subcategory}]`);
+      this.log('info', `Saved video to cache: ${videoId} [${category}/${subcategory}] (ML course: ${classification.courseName || 'none'})`);
     } catch (error) {
       if (error.code !== 11000) {
         this.log('warn', `Failed to cache video: ${error.message}`);
@@ -207,6 +212,48 @@ class FreeResourceService extends BaseService {
     }
     
     return [...tags].slice(0, 10);
+  }
+
+  /**
+   * Classify a video using the ML microservice and assign it to a course.
+   * Falls back to rule-based mapToCategory() if the ML service is unavailable.
+   * @param {Object} videoData - Video metadata from YouTube API
+   * @param {Object} evaluation - AI evaluation from GroqService
+   * @returns {Promise<Object>} Classification result { courseId, courseName, category, isNewCourse, confidence }
+   */
+  async classifyAndAssignCourse(videoData, evaluation) {
+    try {
+      const response = await axios.post(`${ML_CLASSIFIER_URL}/classify`, {
+        title: videoData.title,
+        tags: this.extractTags(evaluation, videoData),
+        summary: evaluation.summary || '',
+        topics: evaluation.topicsCovered || [],
+        category: evaluation.detectedCategory || '',
+        subcategory: evaluation.detectedSubcategory || '',
+        channel: videoData.channelTitle || '',
+        duration: videoData.duration || '',
+        score: evaluation.codeLearnnScore || 0,
+        youtubeId: videoData.id || '',
+        thumbnail: videoData.thumbnails?.high?.url || videoData.thumbnails?.medium?.url || '',
+        recommendedFor: evaluation.recommendedFor || ''
+      }, {
+        timeout: 15000  // 15 second timeout
+      });
+
+      this.log('info', `ML classification: ${response.data.courseName} (confidence: ${response.data.confidence})`);
+      return response.data;
+    } catch (error) {
+      // Graceful fallback to rule-based classification
+      this.log('warn', `ML classifier unavailable (${error.message}), falling back to rule-based classification`);
+      return {
+        courseId: null,
+        courseName: null,
+        category: this.mapToCategory(evaluation.detectedCategory),
+        isNewCourse: false,
+        confidence: 0,
+        matchDetails: { reason: 'ml_service_unavailable', fallback: true }
+      };
+    }
   }
 
   /**

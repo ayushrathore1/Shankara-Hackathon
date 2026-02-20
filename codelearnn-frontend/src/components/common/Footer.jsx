@@ -40,6 +40,10 @@ const Footer = () => {
     },
   ];
 
+  const learningGuideLinks = [
+    { label: "The Vibe Coding Playbook", path: "/learning-guides/vibe-coding" },
+  ];
+
   const socialLinks = [
     {
       icon: faTwitter,
@@ -168,6 +172,21 @@ const Footer = () => {
                   {link.label}
                 </Link>
               ))}
+
+              <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mt-6 mb-4">
+                Learning Guides
+              </h4>
+              <div className="space-y-3">
+                {learningGuideLinks.map((link, index) => (
+                  <Link
+                    key={index}
+                    to={link.path}
+                    className="block text-text-muted text-sm hover:text-primary transition-colors duration-200"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
 
               <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mt-6 mb-4">
                 Other

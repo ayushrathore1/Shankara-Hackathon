@@ -49,6 +49,7 @@ const Navbar = () => {
     { path: "/career", label: "Careers" },
     { path: "/learning-paths", label: "Learning Paths" },
     { path: "/vault", label: "Vault" },
+    { path: "/youtube-tracker", label: "YT Tracker" },
     { path: "/charcha", label: "Charcha" },
   ];
 

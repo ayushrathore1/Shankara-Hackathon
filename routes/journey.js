@@ -32,4 +32,7 @@ router.post('/resource/complete', protect, journeyController.completeResource);
 // Pause/Resume journey
 router.post('/toggle-pause', protect, journeyController.togglePauseJourney);
 
+// Regenerate roadmap with real YouTube resources
+router.post('/regenerate-roadmap', protect, journeyController.regenerateRoadmap);
+
 module.exports = router;

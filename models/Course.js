@@ -98,6 +98,17 @@ const courseSchema = new mongoose.Schema({
   addedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
+  },
+  
+  // ML Classification metadata
+  mlGenerated: {
+    type: Boolean,
+    default: false
+  },
+  mlConfidence: {
+    type: Number,
+    min: 0,
+    max: 1
   }
 }, {
   timestamps: true,

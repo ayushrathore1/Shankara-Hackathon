@@ -45,6 +45,9 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   sendOTP: (email) => api.post('/auth/send-otp', { email }),
   verifyOTP: (email, otp) => api.post('/auth/verify-otp', { email, otp }),
+  setPassword: (password) => api.post('/auth/set-password', { password }),
+  forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (token, password) => api.put(`/auth/reset-password/${token}`, { password }),
   getMe: () => api.get('/auth/me'),
   updateDetails: (data) => api.put('/auth/updatedetails', data),
   updatePassword: (data) => api.put('/auth/updatepassword', data),
@@ -138,7 +141,13 @@ export const careerAPI = {
   getPopular: (limit = 12) => api.get('/career/popular', { params: { limit } }),
   
   // Health check
-  healthCheck: () => api.get('/career/health')
+  healthCheck: () => api.get('/career/health'),
+
+  // AI Learning Plan - generates comprehensive real-time learning plan
+  getLearningPlan: (keyword) => api.get(`/career/learning-plan/${encodeURIComponent(keyword)}`),
+
+  // Get popular AI learning plans
+  getPopularLearningPlans: (limit = 10) => api.get('/career/learning-plans/popular', { params: { limit } })
 };
 
 // Learning Paths API (Vault)
@@ -382,7 +391,34 @@ export const journeyAPI = {
   completeResource: (phaseId, resourceId) => api.post('/journey/resource/complete', { phaseId, resourceId }),
   
   // Pause/Resume journey
-  togglePause: () => api.post('/journey/toggle-pause')
+  togglePause: () => api.post('/journey/toggle-pause'),
+
+  // Regenerate roadmap with real YouTube resources
+  regenerateRoadmap: () => api.post('/journey/regenerate-roadmap'),
+};
+
+// ML Recommendations API
+export const recommendationsAPI = {
+  // Get personalized recommendations (authenticated)
+  get: (limit = 5) => api.get('/recommendations', { params: { limit } }),
+
+  // Get trending courses (public, for new users)
+  getTrending: (limit = 5) => api.get('/recommendations/trending', { params: { limit } }),
+};
+
+// Career Profile API (career save, switch, history)
+export const careerProfileAPI = {
+  // Get active career + history summary
+  get: () => api.get('/career-profile'),
+
+  // Save/set active career (auto-save on selection)
+  set: (careerData) => api.post('/career-profile/set', careerData),
+
+  // Switch career (pause current, activate target)
+  switch: (targetJourneyId) => api.post('/career-profile/switch', { targetJourneyId }),
+
+  // Get detailed career history
+  getHistory: () => api.get('/career-profile/history'),
 };
 
 // ============================================
@@ -566,10 +602,57 @@ export const careerReadinessAPI = {
     api.put(`/readiness/refresh/${pathId}`)
 };
 
+// ============================================
+// YouTube Tracker API (Watch History Tracking)
+// ============================================
+export const youtubeTrackerAPI = {
+  // Get full progress dashboard
+  getProgress: () => api.get('/youtube-tracker'),
+
+  // Grant tracking consent
+  grantConsent: () => api.post('/youtube-tracker/consent'),
+
+  // Revoke tracking consent
+  revokeConsent: (clearData = false) =>
+    api.delete('/youtube-tracker/consent', { params: { clearData } }),
+
+  // Add playlist to track
+  addPlaylist: (url) => api.post('/youtube-tracker/playlist', { url }),
+
+  // Get playlist progress detail
+  getPlaylistProgress: (playlistId) =>
+    api.get(`/youtube-tracker/playlist/${playlistId}`),
+
+  // Remove playlist from tracking
+  removePlaylist: (playlistId) =>
+    api.delete(`/youtube-tracker/playlist/${playlistId}`),
+
+  // Add standalone video to track
+  addVideo: (url) => api.post('/youtube-tracker/video', { url }),
+
+  // Update video watch progress (0-100)
+  updateVideoProgress: (videoId, watchProgress = 100) =>
+    api.put(`/youtube-tracker/video/${videoId}/progress`, { watchProgress }),
+
+  // Mark video as unwatched
+  unwatchVideo: (videoId) =>
+    api.put(`/youtube-tracker/video/${videoId}/unwatch`),
+
+  // Remove standalone video
+  removeVideo: (videoId) =>
+    api.delete(`/youtube-tracker/video/${videoId}`),
+
+  // Auto-tracked history (from Chrome extension)
+  getAutoTracked: (page = 1, limit = 20) =>
+    api.get(`/youtube-tracker/auto-tracked?page=${page}&limit=${limit}`),
+
+  // Subscribe to live activity stream (SSE)
+  subscribeLive: () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    const baseURL = api.defaults.baseURL;
+    return new EventSource(`${baseURL}/youtube-tracker/live?token=${token}`);
+  },
+};
+
 export default api;
-
-
-
-
-
-

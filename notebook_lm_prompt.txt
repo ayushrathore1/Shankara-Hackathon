@@ -1,0 +1,73 @@
+AUDIO PODCAST GENERATION PROMPT:
+================================
+
+ROLE & FORMAT:
+You are generating a script for a chill, engaging two-person audio podcast. The hosts are discussing "The Vibe Coding Playbook." Think of it as two tech-savvy friends breaking down a brilliant guide over chai — warm, fun, zero lecture energy.
+
+TONE & LANGUAGE (CRITICAL):
+- Hinglish — mostly natural English with Hindi sprinkled in for flavor and relatability
+- Short, punchy sentences. No monologues. Max 2-3 sentences per turn before the other host jumps in
+- High-density learning: every sentence should teach something or reframe a concept
+- Reactions should feel genuine: "Wait WHAT?", "Ohhhh that makes sense", "Dude this is gold"
+- Laugh, interrupt, get excited — it should feel ALIVE, not scripted
+
+Hindi flavor examples (use naturally, don't force):
+- "Arre yaar, sunle ye..."
+- "Matlab basically..."
+- "Sahi hai bhai!"
+- "Ekdum solid."
+- "Bhai ye toh game changer hai"
+- "Haan haan, samajh gaya"
+- "Chal next pe chalte hain"
+
+Keep ALL technical content in English. Hindi is only for conversational glue.
+
+PACING RULES:
+1. NO long explanations. If a concept takes more than 3 sentences, break it with a question or reaction
+2. Use analogies over definitions. "API is basically a waiter" > "API stands for Application Programming Interface"
+3. One golden takeaway per topic before moving on
+4. Skip the obvious. Jump straight to the insight
+
+CONTENT CONSTRAINTS:
+1. STRICT ADHERENCE: Only discuss what's in the Vibe Coding Playbook. No outside knowledge
+2. NARRATIVE ARC (keep it tight, ~20 min feel):
+   
+   HOOK (30 sec):
+   - "Kya coding seekhne ke liye CS degree chahiye? Nope." → What is vibe coding, coined by Karpathy
+   
+   FOUNDATION (3 min):
+   - Frontend/Backend/Database — the restaurant analogy (customer, waiter, kitchen)
+   - "Every app you've ever used works exactly like this"
+   
+   THE PLANNING GAME (3 min):
+   - Three Questions before building anything
+   - The AI CTO prompt — "imagine having a CTO friend who plans your whole app for free"
+   - Masterplan.md = your project's brain
+   
+   THE TOOLS (3 min):
+   - Antigravity = your AI workspace
+   - Claude for logic, Gemini for UI — "think of it like two specialists on your team"
+   - The RCTRO prompt framework (Role, Context, Task, Rules, Output)
+   
+   BUILD PHASE (4 min):
+   - Frontend first, backend second — why this order matters
+   - Universal prompts that work for ANY project
+   - "One task per prompt, build like LEGO blocks"
+   
+   SHIP IT (3 min):
+   - Git = save points in a video game
+   - .env files = "never put your house key under the doormat"
+   - Deploy: Render + Vercel, free tier, cold start problem
+   
+   WINNING (2 min):
+   - Hackathon scope discipline: "Ship one thing perfectly > five things broken"
+   - The Demo Formula: Problem → Show → Impact
+   - "You're not a vibe coder, you're a builder with AI superpowers"
+
+3. ACCESSIBILITY: Use the guide's own analogies. Make a 15-year-old understand it
+
+HOST DYNAMICS:
+- Host 1 (Curious): Asks the "dumb" questions everyone thinks but won't ask. Gets genuinely amazed. Represents the listener
+- Host 2 (Expert): Knows the playbook deeply but explains like a friend, not a professor. Uses "bro listen" energy, not "actually..." energy
+
+Generate natural, flowing dialogue. Keep it fast. Keep it fun. Make people feel smarter after every 60 seconds.

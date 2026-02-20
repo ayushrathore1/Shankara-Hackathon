@@ -496,6 +496,38 @@ const BlogsPage = () => {
 
       {/* Blogs Content */}
       <section className="container mx-auto px-6 pb-20">
+        {/* Pinned Featured Guide — always visible */}
+        {pagination.page === 1 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-12"
+          >
+            <Link to="/learning-guides/vibe-coding" className="block group">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600/20 via-pink-500/20 to-orange-500/20 border border-purple-500/30 p-6 md:p-8 hover:border-purple-500/50 transition-all">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px] pointer-events-none" />
+                <div className="relative flex flex-col md:flex-row items-start md:items-center gap-4">
+                  <div className="text-5xl">🚀</div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black uppercase">New</span>
+                      <span className="px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 uppercase">Complete Guide</span>
+                    </div>
+                    <h3 className="font-heading font-bold text-text-main text-xl md:text-2xl mb-1 group-hover:text-primary transition-colors">
+                      The Complete Vibe Coding Guide
+                    </h3>
+                    <p className="text-text-muted text-sm">
+                      From Zero to Deployed — Build a full-stack AI web app using Antigravity, Groq, MongoDB, and more. No prior web dev experience needed.
+                    </p>
+                  </div>
+                  <FontAwesomeIcon icon={faArrowRight} className="text-primary text-lg group-hover:translate-x-2 transition-transform hidden md:block" />
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        )}
+
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32">
             <FontAwesomeIcon

@@ -2,7 +2,7 @@ const UserCareerJourney = require('../models/UserCareerJourney');
 const CareerRoadmap = require('../models/CareerRoadmap');
 const FreeResource = require('../models/FreeResource');
 const User = require('../models/User');
-const { EventService } = require('../services/EventService');
+const EventService = require('../services/EventService');
 
 /**
  * @desc    Get user's active career journey
@@ -175,15 +175,29 @@ exports.startJourney = async (req, res) => {
   try {
     const { career, preferences } = req.body;
     
-    if (!career || !career.title) {
+    if (!career || (!career.title && !career.name)) {
       return res.status(400).json({
         success: false,
-        message: 'Career data is required'
+        message: 'Career data is required (provide career.title or career.name)'
       });
     }
 
-    // Generate roadmap (could call AI service here in future)
-    const roadmap = await generateDefaultRoadmap(career, preferences);
+    // Fetch user's learning preferences (language, region, AI tools)
+    const userDoc = await User.findById(req.user._id).select('learningPreferences').lean();
+    const userLearningPrefs = userDoc?.learningPreferences || {};
+
+    // Merge user-level prefs with journey-level prefs
+    const mergedPrefs = {
+      ...preferences,
+      language: preferences?.language || userLearningPrefs.language || 'auto',
+      region: preferences?.region || userLearningPrefs.region || 'IN',
+      contentCreatorPreference: preferences?.contentCreatorPreference || userLearningPrefs.contentCreatorPreference || 'no-preference',
+      includeAITools: preferences?.includeAITools ?? userLearningPrefs.includeAITools ?? true,
+      experienceLevel: preferences?.experienceLevel || userLearningPrefs.experienceLevel || 'beginner',
+    };
+
+    // Generate roadmap (AI service with YouTube video enrichment)
+    const roadmap = await generateDefaultRoadmap(career, mergedPrefs);
 
     // Create the journey
     const journey = await UserCareerJourney.startJourney(
@@ -198,9 +212,13 @@ exports.startJourney = async (req, res) => {
         growthRate: career.growthRate
       },
       {
-        weeklyHours: preferences?.weeklyHours || 10,
-        experienceLevel: preferences?.experienceLevel || 'beginner',
-        learningStyle: preferences?.learningStyle || 'mixed'
+        weeklyHours: mergedPrefs.weeklyHours || 10,
+        experienceLevel: mergedPrefs.experienceLevel || 'beginner',
+        learningStyle: mergedPrefs.learningStyle || 'mixed',
+        language: mergedPrefs.language,
+        region: mergedPrefs.region,
+        contentCreatorPreference: mergedPrefs.contentCreatorPreference,
+        includeAITools: mergedPrefs.includeAITools,
       },
       roadmap
     );
@@ -210,12 +228,15 @@ exports.startJourney = async (req, res) => {
       $set: { careerGoal: career.name || career.title }
     });
 
-    // Record event
-    if (EventService) {
-      await EventService.recordEvent(req.user._id, 'CAREER_SELECTED', {
-        careerId: journey.career.careerId,
-        careerTitle: journey.career.title
-      });
+    // Record event — use correct static methods
+    try {
+      await EventService.pathEnrolled(
+        req.user._id,
+        journey._id,
+        journey.career.title
+      );
+    } catch (evtErr) {
+      console.error('Event recording failed:', evtErr.message);
     }
 
     res.status(201).json({
@@ -263,13 +284,20 @@ exports.completeResource = async (req, res) => {
 
     await journey.completeResource(phaseId, resourceId);
 
-    // Record event
-    if (EventService) {
-      await EventService.recordEvent(req.user._id, 'VIDEO_COMPLETED', {
+    // Record event — resource completed
+    try {
+      const phase = journey.roadmap.phases.find(p => p.phaseId === phaseId);
+      const resource = phase?.resources?.find(r => (r.resourceId || r.externalResourceId) === resourceId);
+      await EventService.resourceCompleted(
+        req.user._id,
         resourceId,
-        source: 'career_journey',
-        phaseId
-      });
+        resource?.title || 'Resource',
+        resource?.type || 'video',
+        0,
+        journey._id
+      );
+    } catch (evtErr) {
+      console.error('Event recording failed:', evtErr.message);
     }
 
     res.json({
@@ -422,16 +450,289 @@ exports.togglePauseJourney = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Regenerate roadmap with real YouTube resources
+ * @route   POST /api/journey/regenerate-roadmap
+ * @access  Private
+ */
+exports.regenerateRoadmap = async (req, res) => {
+  try {
+    const journey = await UserCareerJourney.findOne({
+      user: req.user._id,
+      status: { $in: ['active', 'paused'] }
+    });
+
+    if (!journey) {
+      return res.status(404).json({
+        success: false,
+        message: 'No active journey found'
+      });
+    }
+
+    const careerName = journey.career?.title || journey.career?.name || 'Developer';
+
+    // Fetch user preferences
+    const user = await User.findById(req.user._id).select('learningPreferences').lean();
+    const userPrefs = user?.learningPreferences || {};
+
+    const mergedPrefs = {
+      weeklyHours: journey.preferences?.weeklyHours || 10,
+      experienceLevel: journey.preferences?.experienceLevel || 'beginner',
+      language: userPrefs.language || journey.preferences?.language || 'auto',
+      region: userPrefs.region || journey.preferences?.region || 'IN',
+      contentCreatorPreference: userPrefs.contentCreatorPreference || 'no-preference',
+      includeAITools: userPrefs.includeAITools ?? true,
+      forceRefresh: true, // bypass cache — generate fresh with YouTube enrichment
+    };
+
+    console.log(`🔄 Regenerating roadmap for "${careerName}" with YouTube enrichment...`);
+
+    // Build a map of completed resource IDs to preserve completion status
+    const completedMap = new Map();
+    for (const phase of (journey.roadmap?.phases || [])) {
+      for (const res of (phase.resources || [])) {
+        if (res.isCompleted) {
+          completedMap.set(res.title?.toLowerCase(), {
+            isCompleted: true,
+            completedAt: res.completedAt,
+            progress: 100,
+            autoCompleted: res.autoCompleted,
+          });
+        }
+      }
+    }
+
+    // Generate fresh roadmap with real YouTube resources
+    const newRoadmap = await generateDefaultRoadmap({ name: careerName }, mergedPrefs);
+
+    // Preserve completion status for resources with matching titles
+    for (const phase of newRoadmap.phases) {
+      for (const res of (phase.resources || [])) {
+        const match = completedMap.get(res.title?.toLowerCase());
+        if (match) {
+          Object.assign(res, match);
+        }
+      }
+    }
+
+    // Count YouTube-enriched resources
+    const videoCount = newRoadmap.phases.reduce((sum, p) =>
+      sum + (p.resources || []).filter(r => r.videoId).length, 0
+    );
+
+    // Update journey roadmap
+    journey.roadmap.phases = newRoadmap.phases;
+    journey.roadmap.estimatedWeeks = newRoadmap.estimatedWeeks;
+    journey.roadmap.generatedAt = new Date();
+    journey.roadmap.generatedBy = 'ai';
+
+    journey.history.push({
+      eventType: 'ROADMAP_REGENERATED',
+      timestamp: new Date(),
+      details: { reason: 'YouTube enrichment', videoResourceCount: videoCount }
+    });
+
+    await journey.save();
+
+    console.log(`✅ Regenerated roadmap for "${careerName}": ${newRoadmap.phases.length} phases, ${videoCount} YouTube videos`);
+
+    res.json({
+      success: true,
+      message: `Roadmap regenerated with ${videoCount} real YouTube resources`,
+      data: {
+        roadmap: journey.roadmap,
+        stats: journey.stats,
+        videoResourceCount: videoCount,
+      }
+    });
+  } catch (error) {
+    console.error('Error regenerating roadmap:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to regenerate roadmap',
+      error: error.message
+    });
+  }
+};
+
 // ============= Helper Functions =============
 
 /**
- * Generate default roadmap phases based on career
+ * Generate roadmap phases — tries AI-powered generation first, falls back to defaults.
  */
 async function generateDefaultRoadmap(career, preferences) {
   const careerName = career.name || career.title || 'Developer';
   const weeklyHours = preferences?.weeklyHours || 10;
   const experienceLevel = preferences?.experienceLevel || 'beginner';
 
+  // ─── 1. Try AI-generated roadmap via LearningPlanService ───
+  try {
+    const learningPlanService = require('../services/LearningPlanService');
+    // Pass user preferences (language, region, AI tools) to the plan generator
+    const result = await learningPlanService.generateLearningPlan(careerName, {
+      language: preferences?.language || 'auto',
+      region: preferences?.region || 'IN',
+      contentCreatorPreference: preferences?.contentCreatorPreference || 'no-preference',
+      includeAITools: preferences?.includeAITools ?? true,
+      experienceLevel: experienceLevel,
+      forceRefresh: preferences?.forceRefresh || false,
+    });
+
+    if (result.success && result.plan?.phases?.length > 0) {
+      console.log(`✅ AI roadmap generated for "${careerName}" (${result.plan.phases.length} phases)`);
+      return convertAIPlanToRoadmap(result.plan, preferences);
+    }
+  } catch (err) {
+    console.log(`⚠️ AI roadmap generation failed for "${careerName}", using defaults:`, err.message);
+  }
+
+  // ─── 2. Fallback: vault resources + hardcoded structure ────
+  return generateFallbackRoadmap(careerName, weeklyHours, experienceLevel);
+}
+
+/**
+ * Convert an AI-generated learning plan into the journey roadmap schema.
+ *
+ * AI plan phase format:
+ *   { phase, title, duration, objectives, skills, steps[], projects[], milestones[] }
+ *
+ * Journey roadmap phase format:
+ *   { phaseId, phaseNumber, title, description, status, progress, priority,
+ *     durationWeeks, skills[], resources[], projects[], milestones[] }
+ */
+function convertAIPlanToRoadmap(aiPlan, preferences) {
+  const weeklyHours = preferences?.weeklyHours || 10;
+  const phases = (aiPlan.phases || []).map((aiPhase, idx) => {
+    const phaseNum = aiPhase.phase || (idx + 1);
+    const phaseId = `phase-${phaseNum}`;
+
+    // Map step type to resource type
+    const typeMap = { learn: 'course', build: 'tutorial', practice: 'practice', read: 'article', explore: 'video' };
+
+    // Convert AI steps → journey resources (with YouTube video data)
+    const resources = (aiPhase.steps || []).map((step, i) => {
+      // Flatten resources from the step's resource array (includes YouTube videos)
+      const stepResources = (step.resources || []).map((res, ri) => ({
+        externalResourceId: `${phaseId}-r${i + 1}-${ri + 1}`,
+        type: typeMap[res.type] || res.type || typeMap[step.type] || 'video',
+        title: res.name || step.title || `Step ${i + 1}`,
+        url: res.url || res.youtubeUrl || '',
+        provider: res.provider || '',
+        duration: res.durationSeconds ? Math.round(res.durationSeconds / 60) : (step.estimatedHours || 1) * 60,
+        isCompleted: false,
+        progress: 0,
+        order: (i * 10) + ri + 1,
+        // YouTube video integration fields
+        videoId: res.videoId || null,
+        youtubeUrl: res.youtubeUrl || null,
+        thumbnailUrl: res.thumbnailUrl || null,
+        qualityScore: res.qualityScore || null,
+        autoCompleted: false,
+      }));
+
+      // If no resources from AI, create a default resource from the step itself
+      if (stepResources.length === 0) {
+        return [{
+          externalResourceId: `${phaseId}-r${i + 1}`,
+          type: typeMap[step.type] || step.type || 'video',
+          title: step.title || `Step ${i + 1}`,
+          duration: (step.estimatedHours || 1) * 60,
+          isCompleted: false,
+          progress: 0,
+          order: step.order || (i + 1),
+        }];
+      }
+
+      return stepResources;
+    }).flat(); // Flatten nested resource arrays
+
+    // Convert AI projects → journey projects
+    const projects = (aiPhase.projects || []).map((proj, i) => ({
+      projectId: `${phaseId}-p${i + 1}`,
+      title: proj.name || proj.title || `Project ${i + 1}`,
+      description: proj.description || '',
+      difficulty: proj.difficulty || 'beginner',
+      estimatedHours: proj.estimatedHours || 10,
+      isStarted: false,
+      isCompleted: false
+    }));
+
+    // Convert AI skills → journey skills
+    const skills = (aiPhase.skills || []).map(skillName => ({
+      skillName: typeof skillName === 'string' ? skillName : skillName.name || 'Skill',
+      targetScore: 80,
+      currentScore: 0
+    }));
+
+    // Convert AI milestones → journey milestones
+    const milestones = (aiPhase.milestones || []).map((m, i) => ({
+      milestoneId: `${phaseId}-m${i + 1}`,
+      title: typeof m === 'string' ? m : (m.title || `Milestone ${i + 1}`),
+      xpReward: 50 + (phaseNum * 25),
+      isAchieved: false
+    }));
+
+    // Parse duration string like "3-4 weeks" → number
+    const durationWeeks = parseDurationWeeks(aiPhase.duration) || 4;
+
+    // Determine priority based on phase position
+    let priority = 'medium';
+    if (phaseNum <= 2) priority = 'critical';
+    else if (phaseNum <= 4) priority = 'high';
+
+    return {
+      phaseId,
+      phaseNumber: phaseNum,
+      title: aiPhase.title || `Phase ${phaseNum}`,
+      description: (aiPhase.objectives || []).join('. ') || aiPhase.title || '',
+      status: phaseNum === 1 ? 'in_progress' : 'locked',
+      progress: 0,
+      priority,
+      startedAt: phaseNum === 1 ? new Date() : undefined,
+      durationWeeks,
+      skills: skills.length > 0 ? skills : [{ skillName: aiPhase.title || 'Core Skills', targetScore: 80, currentScore: 0 }],
+      resources: resources.length > 0 ? resources : [
+        { externalResourceId: `${phaseId}-r1`, type: 'video', title: `${aiPhase.title} - Introduction`, duration: 30, isCompleted: false, order: 1 },
+        { externalResourceId: `${phaseId}-r2`, type: 'article', title: `${aiPhase.title} - Deep Dive`, duration: 20, isCompleted: false, order: 2 },
+        { externalResourceId: `${phaseId}-r3`, type: 'practice', title: `${aiPhase.title} - Practice`, duration: 45, isCompleted: false, order: 3 }
+      ],
+      projects: projects.length > 0 ? projects : [
+        { projectId: `${phaseId}-p1`, title: `${aiPhase.title} Project`, difficulty: phaseNum <= 2 ? 'beginner' : 'intermediate', estimatedHours: 8, isStarted: false, isCompleted: false }
+      ],
+      milestones: milestones.length > 0 ? milestones : [
+        { milestoneId: `${phaseId}-m1`, title: `Complete ${aiPhase.title}`, xpReward: 50 + (phaseNum * 25), isAchieved: false }
+      ]
+    };
+  });
+
+  // Calculate estimated weeks
+  const baseWeeks = phases.reduce((sum, p) => sum + p.durationWeeks, 0);
+  const adjustedWeeks = Math.round(baseWeeks * (15 / weeklyHours));
+
+  return {
+    phases,
+    currentPhaseId: 'phase-1',
+    currentPhaseNumber: 1,
+    estimatedWeeks: adjustedWeeks,
+    generatedAt: new Date(),
+    generatedBy: 'ai'
+  };
+}
+
+/**
+ * Parse a duration string like "3-4 weeks" or "2 weeks" into a number.
+ */
+function parseDurationWeeks(durationStr) {
+  if (!durationStr) return null;
+  const match = String(durationStr).match(/(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+/**
+ * Fallback roadmap generator — uses vault resources + hardcoded structure.
+ * Called when AI generation fails.
+ */
+async function generateFallbackRoadmap(careerName, weeklyHours, experienceLevel) {
   // Try to get existing resources from vault
   let vaultResources = [];
   try {
@@ -451,19 +752,14 @@ async function generateDefaultRoadmap(career, preferences) {
     console.log('Could not fetch vault resources:', e.message);
   }
 
-  // Distribute resources across phases
   const resourcesPerPhase = Math.max(3, Math.ceil(vaultResources.length / 5));
 
-  // Default phases structure
   const phases = [
     {
-      phaseId: 'phase-1',
-      phaseNumber: 1,
-      title: 'Fundamentals & Setup',
+      phaseId: 'phase-1', phaseNumber: 1,
+      title: `${careerName} Fundamentals & Setup`,
       description: `Build the foundational knowledge required for ${careerName}`,
-      status: 'in_progress',
-      progress: 0,
-      priority: 'critical',
+      status: 'in_progress', progress: 0, priority: 'critical',
       startedAt: new Date(),
       durationWeeks: experienceLevel === 'beginner' ? 4 : 2,
       skills: [
@@ -472,130 +768,75 @@ async function generateDefaultRoadmap(career, preferences) {
         { skillName: 'Problem Solving', targetScore: 75, currentScore: 0 }
       ],
       resources: vaultResources.slice(0, resourcesPerPhase).map((r, i) => ({
-        resourceId: r._id,
-        type: r.type || 'video',
-        title: r.title,
-        duration: r.duration || 60,
-        isCompleted: false,
-        progress: 0,
-        order: i + 1
+        resourceId: r._id, type: r.type || 'video', title: r.title,
+        duration: r.duration || 60, isCompleted: false, progress: 0, order: i + 1
       })),
-      projects: [
-        { projectId: 'p1-1', title: 'Setup Development Portfolio', difficulty: 'beginner', estimatedHours: 4, isStarted: false, isCompleted: false }
-      ],
-      milestones: [
-        { milestoneId: 'm1-1', title: 'Complete fundamentals', xpReward: 50, isAchieved: false }
-      ]
+      projects: [{ projectId: 'p1-1', title: `Setup ${careerName} Development Environment`, difficulty: 'beginner', estimatedHours: 4, isStarted: false, isCompleted: false }],
+      milestones: [{ milestoneId: 'm1-1', title: 'Complete fundamentals', xpReward: 50, isAchieved: false }]
     },
     {
-      phaseId: 'phase-2',
-      phaseNumber: 2,
-      title: 'Core Technical Skills',
+      phaseId: 'phase-2', phaseNumber: 2,
+      title: `Core ${careerName} Skills`,
       description: `Master the essential technical skills for ${careerName}`,
-      status: 'locked',
-      progress: 0,
-      priority: 'critical',
-      durationWeeks: 5,
+      status: 'locked', progress: 0, priority: 'critical', durationWeeks: 5,
       skills: [
         { skillName: 'Core Technology', targetScore: 85, currentScore: 0 },
         { skillName: 'Data Structures', targetScore: 70, currentScore: 0 },
         { skillName: 'Algorithms', targetScore: 65, currentScore: 0 }
       ],
       resources: vaultResources.slice(resourcesPerPhase, resourcesPerPhase * 2).map((r, i) => ({
-        resourceId: r._id,
-        type: r.type || 'video',
-        title: r.title,
-        duration: r.duration || 90,
-        isCompleted: false,
-        progress: 0,
-        order: i + 1
+        resourceId: r._id, type: r.type || 'video', title: r.title,
+        duration: r.duration || 90, isCompleted: false, progress: 0, order: i + 1
       })),
-      projects: [
-        { projectId: 'p2-1', title: 'Build Your First Application', difficulty: 'beginner', estimatedHours: 8, isStarted: false, isCompleted: false }
-      ],
-      milestones: [
-        { milestoneId: 'm2-1', title: 'Complete first project', xpReward: 100, isAchieved: false }
-      ]
+      projects: [{ projectId: 'p2-1', title: `Build Your First ${careerName} Application`, difficulty: 'beginner', estimatedHours: 8, isStarted: false, isCompleted: false }],
+      milestones: [{ milestoneId: 'm2-1', title: 'Complete first project', xpReward: 100, isAchieved: false }]
     },
     {
-      phaseId: 'phase-3',
-      phaseNumber: 3,
-      title: 'Intermediate Concepts',
-      description: 'Level up with intermediate concepts and practices',
-      status: 'locked',
-      progress: 0,
-      priority: 'high',
-      durationWeeks: 5,
+      phaseId: 'phase-3', phaseNumber: 3,
+      title: `Intermediate ${careerName} Concepts`,
+      description: `Level up with intermediate ${careerName} concepts and practices`,
+      status: 'locked', progress: 0, priority: 'high', durationWeeks: 5,
       skills: [
         { skillName: 'Frameworks', targetScore: 80, currentScore: 0 },
         { skillName: 'Database', targetScore: 75, currentScore: 0 },
         { skillName: 'APIs', targetScore: 80, currentScore: 0 }
       ],
       resources: vaultResources.slice(resourcesPerPhase * 2, resourcesPerPhase * 3).map((r, i) => ({
-        resourceId: r._id,
-        type: r.type || 'video',
-        title: r.title,
-        duration: r.duration || 120,
-        isCompleted: false,
-        progress: 0,
-        order: i + 1
+        resourceId: r._id, type: r.type || 'video', title: r.title,
+        duration: r.duration || 120, isCompleted: false, progress: 0, order: i + 1
       })),
-      projects: [
-        { projectId: 'p3-1', title: 'Full-Featured Application', difficulty: 'intermediate', estimatedHours: 16, isStarted: false, isCompleted: false }
-      ]
+      projects: [{ projectId: 'p3-1', title: `Full-Featured ${careerName} Application`, difficulty: 'intermediate', estimatedHours: 16, isStarted: false, isCompleted: false }]
     },
     {
-      phaseId: 'phase-4',
-      phaseNumber: 4,
-      title: 'Advanced & Professional Skills',
-      description: 'Master advanced concepts and professional practices',
-      status: 'locked',
-      progress: 0,
-      priority: 'high',
-      durationWeeks: 5,
+      phaseId: 'phase-4', phaseNumber: 4,
+      title: `Advanced ${careerName} & Professional Skills`,
+      description: `Master advanced ${careerName} concepts and professional practices`,
+      status: 'locked', progress: 0, priority: 'high', durationWeeks: 5,
       skills: [
         { skillName: 'System Design', targetScore: 70, currentScore: 0 },
         { skillName: 'Testing', targetScore: 75, currentScore: 0 },
         { skillName: 'Security', targetScore: 70, currentScore: 0 }
       ],
       resources: vaultResources.slice(resourcesPerPhase * 3, resourcesPerPhase * 4).map((r, i) => ({
-        resourceId: r._id,
-        type: r.type || 'video',
-        title: r.title,
-        duration: r.duration || 120,
-        isCompleted: false,
-        progress: 0,
-        order: i + 1
+        resourceId: r._id, type: r.type || 'video', title: r.title,
+        duration: r.duration || 120, isCompleted: false, progress: 0, order: i + 1
       })),
-      projects: [
-        { projectId: 'p4-1', title: 'Production-Ready Project', difficulty: 'advanced', estimatedHours: 24, isStarted: false, isCompleted: false }
-      ]
+      projects: [{ projectId: 'p4-1', title: `Production-Ready ${careerName} Project`, difficulty: 'advanced', estimatedHours: 24, isStarted: false, isCompleted: false }]
     },
     {
-      phaseId: 'phase-5',
-      phaseNumber: 5,
+      phaseId: 'phase-5', phaseNumber: 5,
       title: 'Capstone & Career Prep',
-      description: 'Complete capstone project and prepare for job applications',
-      status: 'locked',
-      progress: 0,
-      priority: 'medium',
-      durationWeeks: 4,
+      description: `Complete capstone project and prepare for ${careerName} job applications`,
+      status: 'locked', progress: 0, priority: 'medium', durationWeeks: 4,
       skills: [
         { skillName: 'Portfolio', targetScore: 85, currentScore: 0 },
         { skillName: 'Interview Prep', targetScore: 80, currentScore: 0 }
       ],
       resources: vaultResources.slice(resourcesPerPhase * 4).map((r, i) => ({
-        resourceId: r._id,
-        type: r.type || 'video',
-        title: r.title,
-        duration: r.duration || 60,
-        isCompleted: false,
-        progress: 0,
-        order: i + 1
+        resourceId: r._id, type: r.type || 'video', title: r.title,
+        duration: r.duration || 60, isCompleted: false, progress: 0, order: i + 1
       })),
-      projects: [
-        { projectId: 'p5-1', title: 'Capstone Project', difficulty: 'advanced', estimatedHours: 40, isStarted: false, isCompleted: false }
-      ],
+      projects: [{ projectId: 'p5-1', title: `${careerName} Capstone Project`, difficulty: 'advanced', estimatedHours: 40, isStarted: false, isCompleted: false }],
       milestones: [
         { milestoneId: 'm5-1', title: 'Portfolio complete', xpReward: 200, isAchieved: false },
         { milestoneId: 'm5-2', title: 'Career ready!', xpReward: 500, isAchieved: false }
@@ -614,9 +855,8 @@ async function generateDefaultRoadmap(career, preferences) {
     }
   });
 
-  // Calculate estimated weeks based on commitment
   const baseWeeks = phases.reduce((sum, p) => sum + p.durationWeeks, 0);
-  const adjustedWeeks = Math.round(baseWeeks * (15 / weeklyHours)); // 15 hrs is baseline
+  const adjustedWeeks = Math.round(baseWeeks * (15 / weeklyHours));
 
   return {
     phases,

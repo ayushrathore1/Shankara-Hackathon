@@ -46,15 +46,23 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
             // Link Google account to existing user
             user.googleId = profile.id;
             user.avatarUrl = profile.photos[0]?.value;
+            if (!user.isOtpVerified) {
+              user.isOtpVerified = true; // Google-verified email
+            }
             await user.save();
             return done(null, user);
           }
 
-          // New users are not allowed during waitlist phase
-          return done(null, false, {
-            waitlistRedirect: true,
+          // Create new user via Google OAuth
+          user = await User.create({
+            name: profile.displayName || profile.name?.givenName || "User",
             email,
+            googleId: profile.id,
+            avatarUrl: profile.photos[0]?.value,
+            isOtpVerified: true, // Google-verified email
           });
+
+          return done(null, user);
         } catch (err) {
           done(err, null);
         }

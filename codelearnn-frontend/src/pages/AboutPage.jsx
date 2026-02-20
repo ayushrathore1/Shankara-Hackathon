@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 
 const AboutPage = () => {
   return (
-    <div className="pt-24 pb-16 px-4 md:px-8 max-w-4xl mx-auto">
+    <div className="pt-24 pb-16 px-4 md:px-8 max-w-4xl mx-auto relative overflow-hidden">
+      <div className="absolute inset-0 bg-tech-about pointer-events-none z-0" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -11,6 +11,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState('');
   const [loginMethod, setLoginMethod] = useState('password'); // 'password' or 'otp'
   const [otpStep, setOtpStep] = useState('email'); // 'email' or 'verify'
@@ -80,21 +81,21 @@ const LoginPage = () => {
   };
 
   const handleResendOTP = async () => {
-    if (countdown > 0) return;
-    setIsLoading(true);
+    if (countdown > 0 || isResending) return;
+    setIsResending(true);
     setError('');
+    setOtp('');
     
     try {
       await sendLoginOTP(email);
       setCountdown(60);
-      setOtp('');
     } catch (err) {
       if (err.waitTime) {
         setCountdown(err.waitTime);
       }
       setError(err.message || 'Failed to resend OTP');
     } finally {
-      setIsLoading(false);
+      setIsResending(false);
     }
   };
 
@@ -121,8 +122,8 @@ const LoginPage = () => {
         className="hidden lg:flex lg:w-1/2 bg-bg-surface border-r border-border flex-col justify-center px-16 relative overflow-hidden"
       >
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-secondary/10" />
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute inset-0 bg-tech-auth" />
         </div>
 
         <div className="relative z-10 max-w-md">
@@ -414,7 +415,7 @@ const LoginPage = () => {
                 <div className="space-y-3">
                   <button
                     type="submit"
-                    disabled={isLoading || otp.length !== 6}
+                    disabled={isLoading || isResending || otp.length !== 6}
                     className="btn-primary w-full py-3.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_0_20px_-5px_var(--primary-glow)] hover:shadow-[0_0_30px_-5px_var(--primary-glow)]"
                   >
                     {isLoading ? (
@@ -445,10 +446,10 @@ const LoginPage = () => {
                     <button
                       type="button"
                       onClick={handleResendOTP}
-                      disabled={countdown > 0 || isLoading}
+                      disabled={countdown > 0 || isLoading || isResending}
                       className="text-sm text-primary hover:text-primary-glow transition-colors disabled:text-text-dim disabled:cursor-not-allowed"
                     >
-                      {countdown > 0 ? `Resend in ${countdown}s` : 'Resend code'}
+                      {isResending ? 'Sending...' : countdown > 0 ? `Resend in ${countdown}s` : 'Resend code'}
                     </button>
                   </div>
                 </div>

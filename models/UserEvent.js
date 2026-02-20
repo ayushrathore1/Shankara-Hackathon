@@ -252,23 +252,26 @@ UserEventSchema.statics.getActivitySummary = async function(userId, startDate, e
   ]);
 };
 
-// Static: Get learning statistics
+// Static: Get learning statistics (field names match dashboard expectations)
 UserEventSchema.statics.getLearningStats = async function(userId) {
+  const userObjId = new mongoose.Types.ObjectId(userId);
+
+  // Aggregate learning + engagement events in one pass
   const stats = await this.aggregate([
     {
       $match: {
-        user: new mongoose.Types.ObjectId(userId),
-        category: 'learning'
+        user: userObjId,
+        category: { $in: ['learning', 'engagement'] }
       }
     },
     {
       $group: {
         _id: null,
+        completedResources: {
+          $sum: { $cond: [{ $eq: ['$eventType', 'resource_completed'] }, 1, 0] }
+        },
         resourcesStarted: {
           $sum: { $cond: [{ $eq: ['$eventType', 'resource_started'] }, 1, 0] }
-        },
-        resourcesCompleted: {
-          $sum: { $cond: [{ $eq: ['$eventType', 'resource_completed'] }, 1, 0] }
         },
         pathsEnrolled: {
           $sum: { $cond: [{ $eq: ['$eventType', 'path_enrolled'] }, 1, 0] }
@@ -276,17 +279,61 @@ UserEventSchema.statics.getLearningStats = async function(userId) {
         pathsCompleted: {
           $sum: { $cond: [{ $eq: ['$eventType', 'path_completed'] }, 1, 0] }
         },
-        totalTimeSpent: { $sum: '$data.timeSpent' }
+        totalXP: { $sum: { $ifNull: ['$data.xpEarned', 0] } },
+        totalTimeSpent: { $sum: { $ifNull: ['$data.timeSpent', 0] } }
       }
     }
   ]);
-  
-  return stats[0] || {
-    resourcesStarted: 0,
-    resourcesCompleted: 0,
-    pathsEnrolled: 0,
-    pathsCompleted: 0,
-    totalTimeSpent: 0
+
+  // Calculate current streak from daily_login events
+  let currentStreak = 0;
+  try {
+    const loginDays = await this.aggregate([
+      {
+        $match: {
+          user: userObjId,
+          eventType: 'daily_login'
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$timestamp' } }
+        }
+      },
+      { $sort: { _id: -1 } }
+    ]);
+
+    if (loginDays.length > 0) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      let checkDate = new Date(today);
+
+      for (const day of loginDays) {
+        const dayDate = new Date(day._id + 'T00:00:00');
+        const diffDays = Math.round((checkDate - dayDate) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 1) {
+          currentStreak++;
+          checkDate = dayDate;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+    }
+  } catch (err) {
+    // Streak calculation failure shouldn't break stats
+    console.error('Streak calculation error:', err.message);
+  }
+
+  const base = stats[0] || {};
+  return {
+    completedResources: base.completedResources || 0,
+    resourcesStarted: base.resourcesStarted || 0,
+    pathsEnrolled: base.pathsEnrolled || 0,
+    pathsCompleted: base.pathsCompleted || 0,
+    totalXP: base.totalXP || 0,
+    totalTimeSpent: base.totalTimeSpent || 0,
+    currentStreak
   };
 };
 

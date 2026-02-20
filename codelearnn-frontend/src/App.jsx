@@ -28,6 +28,8 @@ import AboutPage from "./pages/AboutPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsPage from "./pages/TermsPage";
 import CookiePolicyPage from "./pages/CookiePolicyPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 // Protected Pages
 import DashboardPage from "./pages/DashboardPage";
@@ -39,14 +41,18 @@ import AnalyzerPage from "./pages/AnalyzerPage";
 import LearningPathsPage from "./pages/LearningPathsPage";
 import CareerExplorerPage from "./pages/CareerExplorerPage";
 import CareerJourneyPage from "./pages/CareerJourneyPage";
+import LearningPlanPage from "./pages/LearningPlanPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import CharchaPage from "./pages/CharchaPage";
+import YouTubeTrackerPage from "./pages/YouTubeTrackerPage";
+import LearningPlayerPage from "./pages/LearningPlayerPage";
 import PostDetail from "./components/charcha/PostDetail";
 
 // Blog and Opportunity Pages (Public with auth for writing)
 import BlogsPage from "./pages/BlogsPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
+import VibeCodingGuidePage from "./pages/VibeCodingGuidePage";
 import OpportunitiesPage from "./pages/OpportunitiesPage";
 import OpportunityDetailPage from "./pages/OpportunityDetailPage";
 
@@ -79,6 +85,7 @@ const ProtectedRoute = ({ children }) => {
 };
 
 // Auth Route Wrapper - redirects to dashboard if already authenticated
+// In production, redirects to waitlist since signups are closed
 const AuthRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -90,7 +97,27 @@ const AuthRoute = ({ children }) => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // In production, block login/signup — redirect to waitlist
+  if (!isDevelopment) {
+    return <Navigate to="/#waitlist" replace />;
+  }
+
   return children;
+};
+
+// Home Redirect - logged-in users go to dashboard, guests see landing
+const HomeRedirect = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <Loader isLoading={true} />;
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <HomePage />;
 };
 
 // Conditional Header Component
@@ -220,6 +247,10 @@ function AppContent() {
             {/* OAuth Callback Route */}
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
+            {/* Password Reset Routes (public) */}
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+
             {/* Standalone Public Articles - No navbar, accessible without auth */}
             {/* These are special pages open during waitlist/coming soon phase */}
             <Route
@@ -241,20 +272,21 @@ function AppContent() {
               }
             />
 
-            {/* Public Pages */}
-            <Route path="/" element={<HomePage />} />
+            {/* Home: logged-in → dashboard, guest → landing */}
+            <Route path="/" element={<HomeRedirect />} />
+
+            {/* Public info pages - still accessible but redirect logged-in users */}
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/cookie-policy" element={<CookiePolicyPage />} />
-            <Route path="/blogs" element={<BlogsPage />} />
-            <Route path="/blogs/:slug" element={<BlogDetailPage />} />
-            <Route path="/opportunities" element={<OpportunitiesPage />} />
-            <Route
-              path="/opportunities/:slug"
-              element={<OpportunityDetailPage />}
-            />
+
+            {/* Content pages — protected */}
+            <Route path="/blogs" element={<ProtectedRoute><BlogsPage /></ProtectedRoute>} />
+            <Route path="/blogs/:slug" element={<ProtectedRoute><BlogDetailPage /></ProtectedRoute>} />
+            <Route path="/opportunities" element={<ProtectedRoute><OpportunitiesPage /></ProtectedRoute>} />
+            <Route path="/opportunities/:slug" element={<ProtectedRoute><OpportunityDetailPage /></ProtectedRoute>} />
 
             {/* Protected Routes */}
             <Route
@@ -291,6 +323,20 @@ function AppContent() {
             />
 
             {/* Learning Paths - New core page */}
+            <Route
+              path="/learning-paths"
+              element={
+                <ProtectedRoute>
+                  <LearningPathsPage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Learning Guides - Public, no auth required */}
+            <Route 
+              path="/learning-guides/vibe-coding" 
+              element={<VibeCodingGuidePage />} 
+            />
             <Route
               path="/learning-paths"
               element={
@@ -341,11 +387,39 @@ function AppContent() {
                 </ProtectedRoute>
               }
             />
+
+            {/* Learning Player — Course-like video player */}
+            <Route
+              path="/learn/:phaseId?/:resourceIndex?"
+              element={
+                <ProtectedRoute>
+                  <LearningPlayerPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/career/learning-plan/:keyword"
+              element={
+                <ProtectedRoute>
+                  <LearningPlanPage />
+                </ProtectedRoute>
+              }
+            />
             <Route
               path="/profile"
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* YouTube Watch Tracker */}
+            <Route
+              path="/youtube-tracker"
+              element={
+                <ProtectedRoute>
+                  <YouTubeTrackerPage />
                 </ProtectedRoute>
               }
             />
@@ -373,8 +447,8 @@ function AppContent() {
               element={<Navigate to="/vault" replace />}
             />
 
-            {/* Catch all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Catch all — smart redirect based on auth */}
+            <Route path="*" element={<HomeRedirect />} />
           </Routes>
         </AnimatePresence>
 

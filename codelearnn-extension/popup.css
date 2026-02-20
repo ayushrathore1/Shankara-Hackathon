@@ -1,0 +1,206 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 320px;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #0d0f17;
+  color: #e6e6e6;
+  padding: 20px;
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Logo */
+.logo {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: center;
+  color: #e6e6e6;
+}
+
+.bracket {
+  color: #00e5a0;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 12px;
+  color: #7a7f8e;
+  margin-top: -8px;
+}
+
+/* Form */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field label {
+  font-size: 11px;
+  color: #7a7f8e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field input {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #2a2d3a;
+  background: #161823;
+  color: #e6e6e6;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.field input:focus {
+  border-color: #00e5a0;
+}
+
+.field input::placeholder {
+  color: #4a4f5e;
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  background: #00e5a0;
+  color: #0d0f17;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: block;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #2a2d3a;
+  background: transparent;
+  color: #00e5a0;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #161823;
+}
+
+.btn-ghost {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #7a7f8e;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.btn-ghost:hover {
+  color: #e6e6e6;
+}
+
+/* Error */
+.error {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+  font-size: 12px;
+}
+
+/* Status Card */
+.status-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(0, 229, 160, 0.08);
+  border: 1px solid rgba(0, 229, 160, 0.2);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #00e5a0;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00e5a0;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* User Info */
+.user-info {
+  text-align: center;
+}
+
+.user-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #e6e6e6;
+}
+
+.user-email {
+  font-size: 12px;
+  color: #7a7f8e;
+  margin-top: 2px;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #00e5a0;
+}
+
+.stat-label {
+  font-size: 10px;
+  color: #7a7f8e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
