@@ -3,7 +3,7 @@ import axios from 'axios';
 // API URL - uses production on deployed site, localhost for development
 const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
 const API_URL = isProduction 
-  ? 'https://api.medha.com/api' 
+  ? 'https://api-medhaclarity.onrender.com/api' 
   : 'http://localhost:5000/api';
 
 const api = axios.create({
@@ -268,13 +268,31 @@ export const personalizedPathAPI = {
   delete: (id) => api.delete(`/personalized-path/${id}`)
 };
 
-// Waitlist API
-export const waitlistAPI = {
-  // Join waitlist
-  join: (email, source = 'homepage', refCode = null) => api.post('/waitlist', { email, source, refCode }),
+// Gamification API
+export const gamificationAPI = {
+  // Get gamification profile (XP, rank, streaks, achievements)
+  getProfile: () => api.get('/gamification/profile'),
   
-  // Get waitlist count
-  getCount: () => api.get('/waitlist/count')
+  // Record daily activity (updates streak)
+  heartbeat: () => api.post('/gamification/heartbeat'),
+  
+  // Get user's achievements
+  getAchievements: (params = {}) => api.get('/gamification/achievements', { params }),
+  
+  // Get all achievement definitions (for gallery)
+  getDefinitions: () => api.get('/gamification/achievements/definitions'),
+  
+  // Get career rank info
+  getRanks: () => api.get('/gamification/ranks'),
+  
+  // Get XP leaderboard
+  getLeaderboard: (limit = 20) => api.get('/gamification/leaderboard', { params: { limit } }),
+  
+  // Get referral info
+  getReferral: () => api.get('/gamification/referral'),
+  
+  // Track referral signup
+  trackReferral: (referralCode) => api.post('/gamification/referral/track', { referralCode })
 };
 
 // Blogs API

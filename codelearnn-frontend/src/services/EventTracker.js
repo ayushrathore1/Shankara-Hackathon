@@ -9,7 +9,7 @@
 
 const API_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:5000/api'
-  : 'https://codelearnn-backend.onrender.com/api';
+  : 'https://api-medhaclarity.onrender.com/api';
 
 class EventTrackerService {
   constructor() {

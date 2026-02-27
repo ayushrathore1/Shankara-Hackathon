@@ -200,6 +200,53 @@ const userSchema = new mongoose.Schema({
     pathsEnrolled: { type: Number, default: 0 }
   },
 
+  // Gamification
+  gamification: {
+    totalXP: { type: Number, default: 0 },
+    careerRank: {
+      type: String,
+      enum: ['intern', 'junior', 'mid', 'senior', 'lead', 'architect', 'cto'],
+      default: 'intern'
+    },
+    achievementsCount: { type: Number, default: 0 },
+    currentStreak: { type: Number, default: 0 },
+    longestStreak: { type: Number, default: 0 },
+    lastActiveDate: Date
+  },
+
+  // Badges (for public profile display)
+  badges: [{
+    badgeId: String,
+    name: String,
+    icon: String,
+    tier: String,
+    earnedAt: { type: Date, default: Date.now }
+  }],
+
+  // Project showcase (for public profile)
+  projectShowcase: [{
+    title: String,
+    description: String,
+    url: String,
+    skills: [String],
+    thumbnail: String,
+    addedAt: { type: Date, default: Date.now }
+  }],
+
+  // Onboarding
+  onboarding: {
+    completed: { type: Boolean, default: false },
+    currentStep: { type: Number, default: 0 },
+    completedAt: Date
+  },
+
+  // Referral
+  referralCode: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+
   // Password Reset
   resetPasswordToken: String,
   resetPasswordExpire: Date,

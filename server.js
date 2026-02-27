@@ -44,7 +44,7 @@ app.use(helmet({
 // Parse allowed origins from environment variable
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-  : ['https://codelearnn.com', 'https://www.codelearnn.com', 'http://localhost:5173', 'https://codelearnn.com/', 'https://www.codelearnn.com/', 'https://charcha.codelearnn.com/', 'https://www.charcha.codelearnn.com/', 'https://charcha.codelearnn.com', 'https://www.charcha.codelearnn.com', 'https://charcha.codelearnn.com/', 'https://www.charcha.codelearnn.com/'];
+  : ['https://medhagivesclarity.vercel.app', 'http://localhost:5173', 'http://localhost:3000'];
 
 console.log('CORS Allowed Origins:', allowedOrigins);
 
@@ -136,6 +136,7 @@ const aiSuggestionsRoutes = require('./routes/aiSuggestions');
 const recommendationRoutes = require('./routes/recommendationRoutes');
 const careerProfileRoutes = require('./routes/careerProfileRoutes');
 const youtubeHistoryRoutes = require('./routes/youtubeHistory');
+const gamificationRoutes = require('./routes/gamification');
 
 // Mount routers
 app.use('/api/auth', authRoutes);
@@ -160,6 +161,7 @@ app.use('/api/ai-suggestions', aiSuggestionsRoutes);
 app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/career-profile', careerProfileRoutes);
 app.use('/api/youtube-tracker', youtubeHistoryRoutes);
+app.use('/api/gamification', gamificationRoutes);
 
 // Career Readiness Routes
 const careerReadinessRoutes = require('./routes/careerReadiness');
@@ -177,7 +179,7 @@ initializeWorkers();
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'CodeLearnn API is running',
+    message: 'Medha API is running',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
   });
@@ -187,7 +189,7 @@ app.get('/api/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'Welcome to CodeLearnn API',
+    message: 'Welcome to Medha API',
     version: '2.0.0',
     documentation: '/api/health'
   });
