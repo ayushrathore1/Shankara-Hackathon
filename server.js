@@ -44,7 +44,7 @@ app.use(helmet({
 // Parse allowed origins from environment variable
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
-  : ['https://medhagivesclarity.vercel.app', 'http://localhost:5173', 'http://localhost:3000'];
+  : ['https://shankara-hackathon.vercel.app', 'https://medhagivesclarity.vercel.app', 'http://localhost:5173', 'http://localhost:3000'];
 
 console.log('CORS Allowed Origins:', allowedOrigins);
 
