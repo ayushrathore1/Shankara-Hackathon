@@ -56,8 +56,11 @@ import VibeCodingGuidePage from "./pages/VibeCodingGuidePage";
 import OpportunitiesPage from "./pages/OpportunitiesPage";
 import OpportunityDetailPage from "./pages/OpportunityDetailPage";
 
-// Standalone Public Articles (No navbar - for waitlist/coming soon mode)
+// Standalone Public Articles
 import JaipurInternshipsGuide from "./pages/JaipurInternshipsGuide";
+
+// Gamification
+import AchievementsPage from "./pages/AchievementsPage";
 
 // Development mode: localhost OR explicit dev mode
 const isDevelopment =
@@ -73,19 +76,14 @@ const ProtectedRoute = ({ children }) => {
     return <Loader isLoading={true} />;
   }
 
-  // In production, redirect to home with waitlist instead of login
   if (!isAuthenticated) {
-    if (isDevelopment) {
-      return <Navigate to="/login" replace />;
-    }
-    return <Navigate to="/#waitlist" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;
 };
 
 // Auth Route Wrapper - redirects to dashboard if already authenticated
-// In production, redirects to waitlist since signups are closed
 const AuthRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
@@ -95,11 +93,6 @@ const AuthRoute = ({ children }) => {
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
-  }
-
-  // In production, block login/signup — redirect to waitlist
-  if (!isDevelopment) {
-    return <Navigate to="/#waitlist" replace />;
   }
 
   return children;
@@ -445,6 +438,16 @@ function AppContent() {
             <Route
               path="/resources"
               element={<Navigate to="/vault" replace />}
+            />
+
+            {/* Achievements */}
+            <Route
+              path="/achievements"
+              element={
+                <ProtectedRoute>
+                  <AchievementsPage />
+                </ProtectedRoute>
+              }
             />
 
             {/* Catch all — smart redirect based on auth */}
