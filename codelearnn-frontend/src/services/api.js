@@ -673,4 +673,10 @@ export const youtubeTrackerAPI = {
   },
 };
 
+// Public Profile API
+export const publicProfileAPI = {
+  // Get public profile by slug or ID
+  getBySlug: (slug) => api.get(`/profile/${slug}`),
+};
+
 export default api;

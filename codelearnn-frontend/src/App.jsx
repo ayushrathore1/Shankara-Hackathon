@@ -61,6 +61,8 @@ import JaipurInternshipsGuide from "./pages/JaipurInternshipsGuide";
 
 // Gamification
 import AchievementsPage from "./pages/AchievementsPage";
+import GoalOnboardingPage from "./pages/GoalOnboardingPage";
+import PublicProfilePage from "./pages/PublicProfilePage";
 
 // Development mode: localhost OR explicit dev mode
 const isDevelopment =
@@ -118,10 +120,13 @@ const ConditionalHeader = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
 
-  // Standalone pages with NO header/navbar (for waitlist/coming soon mode)
+  // Standalone pages with NO header/navbar
   const standalonePages = [
     "/resources/jaipur-internships-guide",
     "/jaipur-internships-guide",
+    "/onboarding",
+    "/login",
+    "/signup",
   ];
   const isStandalonePage = standalonePages.some((path) =>
     location.pathname.startsWith(path),
@@ -244,6 +249,16 @@ function AppContent() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
+            {/* Onboarding */}
+            <Route
+              path="/onboarding"
+              element={
+                <ProtectedRoute>
+                  <GoalOnboardingPage />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Standalone Public Articles - No navbar, accessible without auth */}
             {/* These are special pages open during waitlist/coming soon phase */}
             <Route
@@ -274,6 +289,9 @@ function AppContent() {
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/cookie-policy" element={<CookiePolicyPage />} />
+
+            {/* Public Profile */}
+            <Route path="/u/:slug" element={<PublicProfilePage />} />
 
             {/* Content pages — protected */}
             <Route path="/blogs" element={<ProtectedRoute><BlogsPage /></ProtectedRoute>} />

@@ -163,6 +163,10 @@ app.use('/api/career-profile', careerProfileRoutes);
 app.use('/api/youtube-tracker', youtubeHistoryRoutes);
 app.use('/api/gamification', gamificationRoutes);
 
+// Public Profile
+const publicProfileRoutes = require('./routes/publicProfile');
+app.use('/api/profile', publicProfileRoutes);
+
 // Career Readiness Routes
 const careerReadinessRoutes = require('./routes/careerReadiness');
 app.use('/api/readiness', careerReadinessRoutes);

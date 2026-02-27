@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faUser, faArrowRight, faArrowLeft, faKey, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { faGoogle, faGithub } from '@fortawesome/free-brands-svg-icons';
 import { useAuth } from '../context/AuthContext';
+import { gamificationAPI } from '../services/api';
 
 const SignupPage = () => {
   const [name, setName] = useState('');
@@ -18,6 +19,8 @@ const SignupPage = () => {
   const [step, setStep] = useState(1); // 1: name+email, 2: OTP verify, 3: set password
   const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get('ref') || '';
   const { register, verifyLoginOTP, setUserPassword, sendLoginOTP } = useAuth();
 
   // Countdown timer for OTP resend
@@ -57,6 +60,15 @@ const SignupPage = () => {
       await verifyLoginOTP(email, otp);
       setStep(3);
       setSuccessMsg('Email verified! Now set your password.');
+
+      // Track referral if ref code exists
+      if (refCode) {
+        try {
+          await gamificationAPI.trackReferral(refCode);
+        } catch (e) {
+          // Non-critical — don't block signup
+        }
+      }
     } catch (err) {
       if (err.attemptsRemaining !== undefined) {
         setError(`${err.message}. ${err.attemptsRemaining} attempts remaining.`);
@@ -89,7 +101,7 @@ const SignupPage = () => {
 
     try {
       await setUserPassword(password);
-      navigate('/dashboard');
+      navigate('/onboarding');
     } catch (err) {
       setError(err.message || 'Failed to set password');
     } finally {
@@ -116,9 +128,9 @@ const SignupPage = () => {
     }
   };
 
-  // Skip password (go directly to dashboard)
+  // Skip password (go directly to onboarding)
   const handleSkipPassword = () => {
-    navigate('/dashboard');
+    navigate('/onboarding');
   };
 
   const benefits = [

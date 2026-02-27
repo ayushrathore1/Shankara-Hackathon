@@ -37,6 +37,7 @@ import {
   recommendationsAPI,
   careerAPI,
   youtubeTrackerAPI,
+  gamificationAPI,
 } from "../services/api";
 import AIThinkingIndicator from "../components/AIThinkingIndicator";
 import SetPasswordModal from "../components/modals/SetPasswordModal";
@@ -79,6 +80,9 @@ const DashboardPage = () => {
   const [ytNowWatching, setYtNowWatching] = useState(null);
   const [ytSseConnected, setYtSseConnected] = useState(false);
   const sseRef = useRef(null);
+
+  // Gamification state
+  const [gamProfile, setGamProfile] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -192,7 +196,15 @@ const DashboardPage = () => {
               const videos = r.data?.data?.videos || [];
               if (videos.length > 0) setYtRecentVideos(videos);
             })
-            .catch(() => {})
+            .catch(() => {}),
+          // Gamification profile + heartbeat
+          gamificationAPI
+            .heartbeat()
+            .catch(() => {}),
+          gamificationAPI
+            .getProfile()
+            .then((r) => setGamProfile(r.data?.data || null))
+            .catch(() => setGamProfile(null))
         );
 
         // Fetch learning plan if user has an active career
@@ -399,9 +411,10 @@ const DashboardPage = () => {
 
   const nextActions = journeyOverview?.nextActions || [];
 
-  const streak = learningStats?.currentStreak || 0;
-  const totalXP = learningStats?.totalXP || 0;
+  const streak = gamProfile?.streak?.current || learningStats?.currentStreak || 0;
+  const totalXP = gamProfile?.totalXP || learningStats?.totalXP || 0;
   const completedResources = learningStats?.completedResources || 0;
+  const careerRank = gamProfile?.rank || null;
 
   const careerName =
     journeyOverview?.career?.name ||
@@ -503,6 +516,60 @@ const DashboardPage = () => {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* ─── Rank & Achievements Card ─── */}
+        {careerRank && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={fadeIn}
+            transition={{ delay: 0.08 }}
+            className="mb-8"
+          >
+            <div className="card-bento p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{careerRank.icon || '🌱'}</span>
+                  <div>
+                    <div className="text-text-main font-bold">{careerRank.title || 'Intern'}</div>
+                    <div className="text-[11px] text-text-dim">Career Rank</div>
+                  </div>
+                </div>
+                {careerRank.nextRank && (
+                  <div className="text-right">
+                    <div className="text-xs text-text-dim">Next: {careerRank.nextRank.icon} {careerRank.nextRank.title}</div>
+                    <div className="text-[10px] text-primary font-mono">{careerRank.nextRank.xpNeeded?.toLocaleString()} XP needed</div>
+                  </div>
+                )}
+              </div>
+              {careerRank.nextRank && (
+                <div className="h-2 bg-bg-base rounded-full overflow-hidden border border-border">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${careerRank.progress || 0}%` }}
+                    transition={{ duration: 1, ease: 'easeOut' }}
+                    className="h-full bg-gradient-to-r from-primary to-secondary rounded-full"
+                  />
+                </div>
+              )}
+              <div className="flex items-center justify-between mt-3">
+                <Link
+                  to="/achievements"
+                  className="text-xs text-primary hover:underline flex items-center gap-1"
+                >
+                  <FontAwesomeIcon icon={faTrophy} className="text-[10px]" />
+                  View All Achievements
+                  <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
+                </Link>
+                {gamProfile?.streak?.longest > 0 && (
+                  <span className="text-[10px] text-text-dim">
+                    Longest streak: {gamProfile.streak.longest}d 🔥
+                  </span>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
 
 
         {/* ─── Learning Plan Preview ─── */}
