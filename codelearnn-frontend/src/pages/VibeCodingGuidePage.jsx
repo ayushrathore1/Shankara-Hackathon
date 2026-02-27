@@ -1621,7 +1621,7 @@ Fix all issues. Show me a summary of what you changed.`} />
 
             <div className="text-center py-12">
               <p className="text-sm" style={{ color: "#475569" }}>
-                Version 3.0 · Built for <strong style={{ color: "#64748b" }}>CodeLearnn</strong> · Updated Feb 2026
+                Version 3.0 · Built for <strong style={{ color: "#64748b" }}>Medha</strong> · Updated Feb 2026
               </p>
             </div>
           </Anim>

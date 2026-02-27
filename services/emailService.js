@@ -33,9 +33,9 @@ const sendOTPEmail = async (email, otp) => {
   }
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    from: process.env.SMTP_FROM || '"Medha" <noreply@medha.com>',
     to: email,
-    subject: 'Your CodeLearnn Login Code',
+    subject: 'Your Medha Login Code',
     html: `
       <!DOCTYPE html>
       <html>
@@ -53,7 +53,7 @@ const sendOTPEmail = async (email, otp) => {
                     <!-- Logo -->
                     <div style="text-align: center; margin-bottom: 32px;">
                       <span style="font-size: 28px; font-weight: bold; color: #ffffff;">
-                        <span style="color: #00d4ff;">&lt;</span>CodeLearnn<span style="color: #7c3aed;">/&gt;</span>
+                        <span style="color: #00d4ff;">&lt;</span>Medha<span style="color: #7c3aed;">/&gt;</span>
                       </span>
                     </div>
                     
@@ -63,7 +63,7 @@ const sendOTPEmail = async (email, otp) => {
                     </h1>
                     
                     <p style="color: #a0a0b0; font-size: 15px; line-height: 1.6; text-align: center; margin: 0 0 32px 0;">
-                      Enter this code to sign in to your CodeLearnn account. It expires in 10 minutes.
+                      Enter this code to sign in to your Medha account. It expires in 10 minutes.
                     </p>
                     
                     <!-- OTP Code -->
@@ -84,7 +84,7 @@ const sendOTPEmail = async (email, otp) => {
                   <td style="padding: 0 32px 32px 32px;">
                     <div style="border-top: 1px solid #2a2a3e; padding-top: 24px; text-align: center;">
                       <p style="color: #4a4a5a; font-size: 12px; margin: 0;">
-                        © ${new Date().getFullYear()} CodeLearnn. Learn like an engineer.
+                        © ${new Date().getFullYear()} Medha. Learn like an engineer.
                       </p>
                     </div>
                   </td>
@@ -96,7 +96,7 @@ const sendOTPEmail = async (email, otp) => {
       </body>
       </html>
     `,
-    text: `Your CodeLearnn verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this code, you can safely ignore this email.`
+    text: `Your Medha verification code is: ${otp}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this code, you can safely ignore this email.`
   };
 
   try {
@@ -123,16 +123,16 @@ const sendWaitlistEmail = async (email, referralCode) => {
     return false;
   }
 
-  const referralLink = `https://codelearnn.com/?ref=${referralCode}`;
-  const websiteUrl = 'https://codelearnn.com';
+  const referralLink = `https://medha.com/?ref=${referralCode}`;
+  const websiteUrl = 'https://medha.com';
   const twitterUrl = 'https://x.com/ayushrathore_27';
   const linkedinUrl = 'https://www.linkedin.com/in/ayushrathore1';
   const unsubscribeLink = `${websiteUrl}/unsubscribe?email=${encodeURIComponent(email)}`;
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    from: process.env.SMTP_FROM || '"Medha" <noreply@medha.com>',
     to: email,
-    subject: "You're on the list! Welcome to CodeLearnn 🚀",
+    subject: "You're on the list! Welcome to Medha 🚀",
     html: `
       <!DOCTYPE html>
       <html>
@@ -150,7 +150,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
                     <!-- Logo -->
                     <div style="text-align: center; margin-bottom: 32px;">
                       <span style="font-size: 28px; font-weight: bold; color: #ffffff;">
-                        <span style="color: #00d4ff;">&lt;</span>CodeLearnn<span style="color: #7c3aed;">/&gt;</span>
+                        <span style="color: #00d4ff;">&lt;</span>Medha<span style="color: #7c3aed;">/&gt;</span>
                       </span>
                     </div>
                     
@@ -160,7 +160,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
                     </h1>
                     
                     <p style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0;">
-                      You just joined the CodeLearnn waitlist, and we couldn't be more excited to have you here.
+                      You just joined the Medha waitlist, and we couldn't be more excited to have you here.
                     </p>
                     
                     <p style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0;">
@@ -199,7 +199,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
                     </h2>
                     
                     <p style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">
-                      Share CodeLearnn with 3 friends and get priority access when we launch.
+                      Share Medha with 3 friends and get priority access when we launch.
                     </p>
                     
                     <div style="background-color: #1e1e2e; padding: 16px; border-radius: 8px; border: 1px solid #3a3a4e; text-align: center; margin-bottom: 32px;">
@@ -231,7 +231,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
                     </h2>
                     
                     <p style="color: #cbd5e1; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0;">
-                      We want to build CodeLearnn around YOUR needs. Mind answering one quick question?
+                      We want to build Medha around YOUR needs. Mind answering one quick question?
                     </p>
                     
                     <p style="color: #ffffff; font-weight: 600; font-size: 16px; line-height: 1.6; margin: 0 0 16px 0; background-color: rgba(124, 58, 237, 0.1); padding: 16px; border-left: 3px solid #7c3aed; border-radius: 4px;">
@@ -244,7 +244,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
                     
                     <!-- Signature -->
                     <div style="margin-top: 40px;">
-                      <p style="color: #ffffff; font-weight: 600; margin: 0 0 4px 0;">CodeLearnn</p>
+                      <p style="color: #ffffff; font-weight: 600; margin: 0 0 4px 0;">Medha</p>
                       <p style="color: #94a3b8; font-size: 14px; margin: 0;">The Learning Operating System for Engineering Students</p>
                     </div>
                   </td>
@@ -260,7 +260,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
                         <a href="${linkedinUrl}" style="color: #94a3b8; text-decoration: none; font-size: 13px; margin: 0 10px;">LinkedIn</a>
                       </p>
                       <p style="color: #4a4a5a; font-size: 12px; margin: 0 0 8px 0;">
-                        You're receiving this because you joined the CodeLearnn waitlist.
+                        You're receiving this because you joined the Medha waitlist.
                       </p>
                       <a href="${unsubscribeLink}" style="color: #4a4a5a; font-size: 12px; text-decoration: underline;">Unsubscribe</a>
                     </div>
@@ -274,11 +274,11 @@ const sendWaitlistEmail = async (email, referralCode) => {
       </html>
     `,
     text: `
-      CodeLearnn - The Learning Operating System
+      Medha - The Learning Operating System
 
       Hey there! 👋
 
-      You just joined the CodeLearnn waitlist, and we couldn't be more excited to have you here.
+      You just joined the Medha waitlist, and we couldn't be more excited to have you here.
 
       You're officially on the list for early access when we launch in February 2026. But here's the best part: the first 500 students get lifetime free access to all PRO features.
 
@@ -301,7 +301,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
 
       WANT TO SKIP THE LINE?
 
-      Share CodeLearnn with 3 friends and get priority access when we launch.
+      Share Medha with 3 friends and get priority access when we launch.
 
       Get your referral link: ${referralLink}
 
@@ -319,7 +319,7 @@ const sendWaitlistEmail = async (email, referralCode) => {
 
       HELP US BUILD WHAT YOU NEED
 
-      We want to build CodeLearnn around YOUR needs. Mind answering one quick question?
+      We want to build Medha around YOUR needs. Mind answering one quick question?
 
       What's your biggest struggle when learning to code right now?
 
@@ -327,14 +327,14 @@ const sendWaitlistEmail = async (email, referralCode) => {
 
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-      CodeLearnn
+      Medha
       The Learning Operating System for Engineering Students
 
       Website: ${websiteUrl}
       Twitter: ${twitterUrl}
       LinkedIn: ${linkedinUrl}
 
-      You're receiving this because you joined the CodeLearnn waitlist.
+      You're receiving this because you joined the Medha waitlist.
       Unsubscribe: ${unsubscribeLink}
     `
   };
@@ -365,7 +365,7 @@ const sendAdminNotification = async (userEmail) => {
   const adminEmail = 'rathoreayush512@gmail.com';
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    from: process.env.SMTP_FROM || '"Medha" <noreply@medha.com>',
     to: adminEmail,
     subject: 'New Waitlist Signup! 🚀',
     html: `
@@ -374,7 +374,7 @@ const sendAdminNotification = async (userEmail) => {
         <p><strong>Email:</strong> ${userEmail}</p>
         <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
         <hr />
-        <p style="font-size: 12px; color: #666;">CodeLearnn Admin Notification</p>
+        <p style="font-size: 12px; color: #666;">Medha Admin Notification</p>
       </div>
     `,
     text: `New User Joined Waitlist\n\nEmail: ${userEmail}\nTime: ${new Date().toLocaleString()}`
@@ -404,14 +404,14 @@ const sendEarlyAccessEmail = async (email, name = '') => {
     return false;
   }
 
-  const websiteUrl = 'https://codelearnn.com';
+  const websiteUrl = 'https://medha.com';
   const loginUrl = `${websiteUrl}/login`;
   const twitterUrl = 'https://x.com/ayushrathore_27';
   const linkedinUrl = 'https://www.linkedin.com/in/ayushrathore1';
   const feedbackEmail = 'rathoreayush512@gmail.com';
   const greeting = name ? `Hey ${name}` : 'Hey there';
   
-  // CodeLearnn Brand Colors (matching dashboard)
+  // Medha Brand Colors (matching dashboard)
   const brandLime = '#c8fa3c';      // Primary lime/yellow-green accent
   const brandDark = '#0a0a0a';      // Deep dark background
   const brandCardBg = '#111111';    // Card background
@@ -421,9 +421,9 @@ const sendEarlyAccessEmail = async (email, name = '') => {
   const brandTeal = '#2dd4bf';      // Secondary accent (teal)
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    from: process.env.SMTP_FROM || '"Medha" <noreply@medha.com>',
     to: email,
-    subject: "⚡ Your Early Access to CodeLearnn is Ready!",
+    subject: "⚡ Your Early Access to Medha is Ready!",
     html: `
       <!DOCTYPE html>
       <html>
@@ -441,14 +441,14 @@ const sendEarlyAccessEmail = async (email, name = '') => {
                     <!-- Logo -->
                     <div style="text-align: center; margin-bottom: 40px;">
                       <span style="font-size: 32px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
-                        <span style="color: ${brandLime};">&lt;</span>CodeLearnn<span style="color: ${brandLime};">/&gt;</span>
+                        <span style="color: ${brandLime};">&lt;</span>Medha<span style="color: ${brandLime};">/&gt;</span>
                       </span>
                     </div>
                     
                     <!-- Early Access Badge -->
                     <div style="text-align: center; margin-bottom: 32px;">
                       <span style="display: inline-block; background-color: rgba(200, 250, 60, 0.1); border: 1px solid rgba(200, 250, 60, 0.3); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; color: ${brandLime}; text-transform: uppercase; letter-spacing: 1.5px;">
-                        ⚡ CodeLearnn OS 2.0 • Early Access Open
+                        ⚡ Medha OS 2.0 • Early Access Open
                       </span>
                     </div>
                     
@@ -458,11 +458,11 @@ const sendEarlyAccessEmail = async (email, name = '') => {
                     </p>
                     
                     <p style="color: ${brandText}; font-size: 16px; line-height: 1.7; margin: 0 0 16px 0;">
-                      <strong>Thank you for joining the CodeLearnn waitlist!</strong> We're thrilled to give you <span style="color: ${brandLime}; font-weight: 600;">exclusive early access</span> to our platform.
+                      <strong>Thank you for joining the Medha waitlist!</strong> We're thrilled to give you <span style="color: ${brandLime}; font-weight: 600;">exclusive early access</span> to our platform.
                     </p>
                     
                     <p style="color: ${brandMuted}; font-size: 15px; line-height: 1.7; margin: 0 0 32px 0;">
-                      You're one of the first to experience CodeLearnn – the only learning OS that transforms scattered YouTube videos and courses into structured, career-ready roadmaps—validated by AI, built for engineering students.
+                      You're one of the first to experience Medha – the only learning OS that transforms scattered YouTube videos and courses into structured, career-ready roadmaps—validated by AI, built for engineering students.
                     </p>
                     
                     <!-- CTA Button -->
@@ -545,7 +545,7 @@ const sendEarlyAccessEmail = async (email, name = '') => {
                       <p style="color: ${brandMuted}; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">
                         Thank you for being part of this journey!
                       </p>
-                      <p style="color: #ffffff; font-weight: 600; margin: 0 0 4px 0;">– Team CodeLearnn</p>
+                      <p style="color: #ffffff; font-weight: 600; margin: 0 0 4px 0;">– Team Medha</p>
                       <p style="color: ${brandMuted}; font-size: 13px; margin: 0;">The Learning OS for Engineering Students</p>
                     </div>
                   </td>
@@ -561,7 +561,7 @@ const sendEarlyAccessEmail = async (email, name = '') => {
                         <a href="${linkedinUrl}" style="color: ${brandMuted}; text-decoration: none; font-size: 13px; margin: 0 12px;">LinkedIn</a>
                       </p>
                       <p style="color: #404040; font-size: 11px; margin: 0;">
-                        © ${new Date().getFullYear()} CodeLearnn. Learn like an engineer.
+                        © ${new Date().getFullYear()} Medha. Learn like an engineer.
                       </p>
                     </div>
                   </td>
@@ -574,15 +574,15 @@ const sendEarlyAccessEmail = async (email, name = '') => {
       </html>
     `,
     text: `
-      <CodeLearnn/>
+      <Medha/>
       
-      CodeLearnn OS 2.0 • Early Access Open
+      Medha OS 2.0 • Early Access Open
 
       ${greeting}! 👋
 
-      Thank you for joining the CodeLearnn waitlist! We're thrilled to give you exclusive early access to our platform.
+      Thank you for joining the Medha waitlist! We're thrilled to give you exclusive early access to our platform.
 
-      You're one of the first to experience CodeLearnn – the only learning OS that transforms scattered YouTube videos and courses into structured, career-ready roadmaps—validated by AI, built for engineering students.
+      You're one of the first to experience Medha – the only learning OS that transforms scattered YouTube videos and courses into structured, career-ready roadmaps—validated by AI, built for engineering students.
 
       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -617,7 +617,7 @@ const sendEarlyAccessEmail = async (email, name = '') => {
 
       Thank you for being part of this journey!
 
-      – Team CodeLearnn
+      – Team Medha
       The Learning OS for Engineering Students
 
       Website: ${websiteUrl}
@@ -650,9 +650,9 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
   }
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    from: process.env.SMTP_FROM || '"Medha" <noreply@medha.com>',
     to: email,
-    subject: 'Reset Your CodeLearnn Password',
+    subject: 'Reset Your Medha Password',
     html: `
       <!DOCTYPE html>
       <html>
@@ -670,7 +670,7 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
                     <!-- Logo -->
                     <div style="text-align: center; margin-bottom: 32px;">
                       <span style="font-size: 28px; font-weight: bold; color: #ffffff;">
-                        <span style="color: #00d4ff;">&lt;</span>CodeLearnn<span style="color: #7c3aed;">/&gt;</span>
+                        <span style="color: #00d4ff;">&lt;</span>Medha<span style="color: #7c3aed;">/&gt;</span>
                       </span>
                     </div>
 
@@ -708,7 +708,7 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
                   <td style="padding: 0 32px 32px 32px;">
                     <div style="border-top: 1px solid #2a2a3e; padding-top: 24px; text-align: center;">
                       <p style="color: #4a4a5a; font-size: 12px; margin: 0;">
-                        © ${new Date().getFullYear()} CodeLearnn. Learn like an engineer.
+                        © ${new Date().getFullYear()} Medha. Learn like an engineer.
                       </p>
                     </div>
                   </td>
@@ -720,7 +720,7 @@ const sendPasswordResetEmail = async (email, resetUrl) => {
       </body>
       </html>
     `,
-    text: `Reset Your CodeLearnn Password\n\nWe received a request to reset your password. Visit this link to choose a new password:\n\n${resetUrl}\n\nThis link expires in 30 minutes.\n\nIf you didn't request a password reset, you can safely ignore this email.`
+    text: `Reset Your Medha Password\n\nWe received a request to reset your password. Visit this link to choose a new password:\n\n${resetUrl}\n\nThis link expires in 30 minutes.\n\nIf you didn't request a password reset, you can safely ignore this email.`
   };
 
   try {
@@ -744,10 +744,10 @@ const sendDistractionAlertEmail = async (email, data) => {
   if (!transporter) return false;
 
   const { userName, distractionCount, threshold } = data;
-  const dashboardUrl = 'https://codelearnn.com/dashboard';
+  const dashboardUrl = 'https://medha.com/dashboard';
 
   const mailOptions = {
-    from: process.env.SMTP_FROM || '"CodeLearnn" <noreply@codelearnn.com>',
+    from: process.env.SMTP_FROM || '"Medha" <noreply@medha.com>',
     to: email,
     subject: `Hey ${userName} — time to refocus! 🎯`,
     html: `
@@ -766,7 +766,7 @@ const sendDistractionAlertEmail = async (email, data) => {
                   <td style="padding: 40px 32px;">
                     <div style="text-align: center; margin-bottom: 32px;">
                       <span style="font-size: 28px; font-weight: bold; color: #ffffff;">
-                        <span style="color: #00d4ff;">&lt;</span>CodeLearnn<span style="color: #7c3aed;">/&gt;</span>
+                        <span style="color: #00d4ff;">&lt;</span>Medha<span style="color: #7c3aed;">/&gt;</span>
                       </span>
                     </div>
 
@@ -803,7 +803,7 @@ const sendDistractionAlertEmail = async (email, data) => {
                   <td style="padding: 0 32px 32px 32px;">
                     <div style="border-top: 1px solid #2a2a3e; padding-top: 24px; text-align: center;">
                       <p style="color: #4a4a5a; font-size: 12px; margin: 0;">
-                        © ${new Date().getFullYear()} CodeLearnn. Learn like an engineer.
+                        © ${new Date().getFullYear()} Medha. Learn like an engineer.
                       </p>
                     </div>
                   </td>

@@ -290,7 +290,7 @@ class GroqService extends BaseService {
    * @returns {string} System prompt
    */
   getSystemPrompt() {
-    return `You are a FAIR, EVIDENCE-BASED, and CRITICAL educational content evaluator for CodeLearnn, a platform that helps learners discover high-quality programming tutorials and avoid misleading, outdated, or low-value content.
+    return `You are a FAIR, EVIDENCE-BASED, and CRITICAL educational content evaluator for Medha, a platform that helps learners discover high-quality programming tutorials and avoid misleading, outdated, or low-value content.
 
 Your goal is ACCURATE assessment, not harshness and not hype.
 
@@ -555,7 +555,7 @@ Respond with your JSON evaluation now:`;
    * @param {Object} aiResponse - Raw AI response
    * @param {Object} videoData - Video metadata
    * @param {Object} commentAnalysis - Comment analysis data
-   * @returns {Object} Processed evaluation with CodeLearnn score
+   * @returns {Object} Processed evaluation with Medha score
    */
   processEvaluationResult(aiResponse, videoData, commentAnalysis) {
     const {
@@ -599,7 +599,7 @@ Respond with your JSON evaluation now:`;
         redFlags: [`This is not a programming tutorial. Detected category: ${detectedCategory}`],
         recommendedFor: 'N/A - Not a programming tutorial',
         notRecommendedFor: 'Anyone looking for coding tutorials',
-        summary: summary || `This video is not a programming tutorial. It appears to be about ${detectedCategory}. CodeLearnn is designed for coding and tech education content only.`,
+        summary: summary || `This video is not a programming tutorial. It appears to be about ${detectedCategory}. Medha is designed for coding and tech education content only.`,
         commentAnalysis: {
           sentiment: 'not_applicable',
           concerns: [],
@@ -626,7 +626,7 @@ Respond with your JSON evaluation now:`;
     if (confusionRatio > 0.2) confusionPenalty = 10;
     else if (confusionRatio > 0.1) confusionPenalty = 5;
 
-    // Calculate CodeLearnn Score (0-100) with weighted components
+    // Calculate Medha Score (0-100) with weighted components
     // Weights: teaching clarity is most important, then content quality
     let rawScore = (
       (engagementScore * 0.10) +          // 10% - Engagement (lower weight - popularity != quality)

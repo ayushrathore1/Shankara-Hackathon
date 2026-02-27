@@ -80,7 +80,7 @@ const Footer = () => {
               className="font-heading font-bold text-xl text-text-main inline-block mb-4"
             >
               <span className="text-primary">&lt;</span>
-              <span className="text-metallic">CodeLearnn</span>
+              <span className="text-metallic">Medha</span>
               <span className="text-secondary">/&gt;</span>
             </Link>
             <p className="text-text-muted text-sm leading-relaxed mb-6 max-w-sm">
@@ -248,15 +248,15 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-text-dim text-xs font-mono">
-            © {new Date().getFullYear()} CodeLearnn. Built by Elytron.
+            © {new Date().getFullYear()} Medha. Built by Elytron.
           </p>
           <div className="flex items-center gap-6 text-text-dim text-xs font-mono">
             <a
-              href="mailto:engineeratcodelearnn@gmail.com"
+              href="mailto:engineeratmedha@gmail.com"
               className="hover:text-primary transition-colors flex items-center gap-2"
             >
               <FontAwesomeIcon icon={faEnvelope} />
-              engineeratcodelearnn@gmail.com
+              engineeratmedha@gmail.com
             </a>
             <span className="flex items-center gap-2">
               <FontAwesomeIcon icon={faMapMarkerAlt} />

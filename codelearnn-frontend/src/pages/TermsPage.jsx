@@ -17,13 +17,13 @@ const TermsPage = () => {
         <div className="space-y-8 text-gray-300">
           <section>
             <p className="mb-4">
-              These Terms and Conditions govern your use of CodeLearnn, a product owned and operated by Elytron. By accessing or using the platform, you agree to these terms.
+              These Terms and Conditions govern your use of Medha, a product owned and operated by Elytron. By accessing or using the platform, you agree to these terms.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">1. Platform Purpose</h2>
-            <p className="mb-4">CodeLearnn provides:</p>
+            <p className="mb-4">Medha provides:</p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Career discovery and guidance</li>
               <li>Structured learning paths using publicly available content</li>
@@ -36,7 +36,7 @@ const TermsPage = () => {
 
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">2. User Responsibilities</h2>
-            <p className="mb-4">By using CodeLearnn, you agree to:</p>
+            <p className="mb-4">By using Medha, you agree to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide accurate information</li>
               <li>Use the platform for lawful and educational purposes only</li>
@@ -48,7 +48,7 @@ const TermsPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">3. Intellectual Property</h2>
             <ul className="list-disc pl-6 space-y-2">
-              <li>CodeLearnn’s platform design, systems, structure, and branding belong to Elytron</li>
+              <li>Medha’s platform design, systems, structure, and branding belong to Elytron</li>
               <li>Users retain ownership of their original projects and submissions</li>
               <li>Third-party learning content remains the property of its respective owners</li>
             </ul>
@@ -64,7 +64,7 @@ const TermsPage = () => {
 
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">5. Disclaimer & Limitation of Liability</h2>
-            <p className="mb-4">CodeLearnn is provided “as is”. Elytron is not liable for:</p>
+            <p className="mb-4">Medha is provided “as is”. Elytron is not liable for:</p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Learning outcomes or career decisions</li>
               <li>External content accuracy</li>
@@ -90,7 +90,7 @@ const TermsPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">8. Contact</h2>
             <p>
-              For any questions regarding these terms, please contact us at: <a href="mailto:engineeratcodelearnn@gmail.com" className="text-neon-green hover:underline">engineeratcodelearnn@gmail.com</a>
+              For any questions regarding these terms, please contact us at: <a href="mailto:engineeratmedha@gmail.com" className="text-neon-green hover:underline">engineeratmedha@gmail.com</a>
             </p>
           </section>
         </div>

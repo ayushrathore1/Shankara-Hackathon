@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -21,6 +21,7 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { theme, setTheme, themes } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
   const profileRef = useRef(null);
 
   // Handle scroll effect
@@ -80,14 +81,7 @@ const Navbar = () => {
               className="font-heading font-bold text-2xl text-text-main hover:text-primary transition-colors"
             >
               <span className="text-primary">&lt;</span>
-              <span className="logo-text group">
-                <span className="text-metallic group-hover:text-text-main">
-                  Code
-                </span>
-                <span className="text-metallic group-hover:text-primary">
-                  Learnn
-                </span>
-              </span>
+              <span className="text-metallic">Medha</span>
               <span className="text-secondary">/&gt;</span>
             </Link>
           </motion.div>
@@ -238,18 +232,18 @@ const Navbar = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    if (location.pathname === "/") {
-                      document
-                        .getElementById("waitlist")
-                        ?.scrollIntoView({ behavior: "smooth" });
-                    } else {
-                      window.location.href = "/#waitlist";
-                    }
-                  }}
+                  onClick={() => navigate('/login')}
+                  className="text-sm text-text-muted hover:text-primary transition-colors font-medium"
+                >
+                  Sign In
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => navigate('/signup')}
                   className="btn-primary text-sm h-10 px-6"
                 >
-                  Join Waitlist
+                  Sign Up
                 </motion.button>
               </div>
             )}
@@ -352,25 +346,20 @@ const Navbar = () => {
                       </div>
                     ) : (
                       <div className="flex flex-col gap-3">
-                        <button
-                          onClick={() => {
-                            setIsOpen(false);
-                            if (location.pathname === "/") {
-                              setTimeout(
-                                () =>
-                                  document
-                                    .getElementById("waitlist")
-                                    ?.scrollIntoView({ behavior: "smooth" }),
-                                100,
-                              );
-                            } else {
-                              window.location.href = "/#waitlist";
-                            }
-                          }}
+                        <Link
+                          to="/signup"
+                          onClick={() => setIsOpen(false)}
                           className="btn-primary w-full text-center py-3"
                         >
-                          Join Waitlist
-                        </button>
+                          Sign Up
+                        </Link>
+                        <Link
+                          to="/login"
+                          onClick={() => setIsOpen(false)}
+                          className="btn-secondary w-full text-center py-3"
+                        >
+                          Sign In
+                        </Link>
                       </div>
                     )}
                   </div>

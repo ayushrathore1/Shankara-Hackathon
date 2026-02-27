@@ -254,7 +254,7 @@ const CoursePage = () => {
                           <span
                             className={`text-sm font-bold ${getScoreColor(currentLecture.codeLearnnScore)}`}
                           >
-                            CodeLearnn: {currentLecture.codeLearnnScore}
+                            Medha: {currentLecture.codeLearnnScore}
                           </span>
                         )}
                       </div>

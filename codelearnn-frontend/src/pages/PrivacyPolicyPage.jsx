@@ -17,10 +17,10 @@ const PrivacyPolicyPage = () => {
         <div className="space-y-8 text-gray-300">
           <section>
             <p className="mb-4">
-              At Elytron, we respect your privacy and are committed to protecting the personal information of users of our product, CodeLearnn. This Privacy Policy explains how we collect, use, store, and safeguard information when you access or use the CodeLearnn platform.
+              At Elytron, we respect your privacy and are committed to protecting the personal information of users of our product, Medha. This Privacy Policy explains how we collect, use, store, and safeguard information when you access or use the Medha platform.
             </p>
             <p>
-              By using CodeLearnn, you agree to the practices described in this Privacy Policy.
+              By using Medha, you agree to the practices described in this Privacy Policy.
             </p>
           </section>
 
@@ -58,7 +58,7 @@ const PrivacyPolicyPage = () => {
             <h2 className="text-2xl font-semibold text-white mb-4">2. How We Use Your Information</h2>
             <p className="mb-4">We use collected information to:</p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>Provide, operate, and maintain the CodeLearnn platform</li>
+              <li>Provide, operate, and maintain the Medha platform</li>
               <li>Personalize learning paths and career recommendations</li>
               <li>Track learning progress and skill development</li>
               <li>Enable collaboration, project sharing, and profile creation</li>
@@ -72,10 +72,10 @@ const PrivacyPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">3. Third-Party Content & External Resources</h2>
             <p className="mb-4">
-              CodeLearnn organizes and recommends publicly available learning resources, including content hosted on third-party platforms such as YouTube.
+              Medha organizes and recommends publicly available learning resources, including content hosted on third-party platforms such as YouTube.
             </p>
             <ul className="list-disc pl-6 space-y-2">
-              <li>CodeLearnn does not host, store, download, reproduce, or modify third-party content.</li>
+              <li>Medha does not host, store, download, reproduce, or modify third-party content.</li>
               <li>All third-party content remains hosted on its original platforms.</li>
               <li>Ownership and rights remain with the original creators or rights holders.</li>
               <li>External platforms operate under their own privacy policies and terms.</li>
@@ -87,15 +87,15 @@ const PrivacyPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">4. Use of YouTube API Services</h2>
             <p className="mb-4">
-              CodeLearnn uses the YouTube Data API, provided by Google LLC, to access publicly available video metadata for content analysis, recommendation, and learning path structuring.
+              Medha uses the YouTube Data API, provided by Google LLC, to access publicly available video metadata for content analysis, recommendation, and learning path structuring.
             </p>
-            <p className="mb-4">By using CodeLearnn, you acknowledge and agree that:</p>
+            <p className="mb-4">By using Medha, you acknowledge and agree that:</p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
-              <li>CodeLearnn uses YouTube API Services in accordance with the YouTube API Services Terms of Service.</li>
-              <li>CodeLearnn's use and transfer of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements.</li>
-              <li>CodeLearnn does not store, download, or host YouTube videos.</li>
+              <li>Medha uses YouTube API Services in accordance with the YouTube API Services Terms of Service.</li>
+              <li>Medha's use and transfer of information received from Google APIs adheres to the Google API Services User Data Policy, including the Limited Use requirements.</li>
+              <li>Medha does not store, download, or host YouTube videos.</li>
               <li>Video playback, where applicable, occurs only through YouTube's official embedded player or by redirecting users to YouTube.</li>
-              <li>CodeLearnn does not block advertisements, modify playback, or bypass YouTube platform safeguards.</li>
+              <li>Medha does not block advertisements, modify playback, or bypass YouTube platform safeguards.</li>
               <li>Ownership and rights of all YouTube content remain with the original creators and YouTube.</li>
             </ul>
             <p className="mb-2">You may review:</p>
@@ -108,7 +108,7 @@ const PrivacyPolicyPage = () => {
           {/* Section 5: Data Accessed via YouTube API */}
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">5. Data Accessed via YouTube API</h2>
-            <p className="mb-4">Using the YouTube Data API, CodeLearnn may access publicly available metadata, including:</p>
+            <p className="mb-4">Using the YouTube Data API, Medha may access publicly available metadata, including:</p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Video titles and descriptions</li>
               <li>Channel names</li>
@@ -129,7 +129,7 @@ const PrivacyPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">6. Storage & Use of YouTube Data</h2>
             <ul className="list-disc pl-6 space-y-2">
-              <li>CodeLearnn stores only the minimum metadata necessary to provide its services.</li>
+              <li>Medha stores only the minimum metadata necessary to provide its services.</li>
               <li>YouTube data is not used for advertising, marketing, resale, or unauthorized profiling.</li>
               <li>Cached data is refreshed or removed in compliance with YouTube API policies.</li>
               <li>No private or non-public YouTube account data is accessed or stored.</li>
@@ -139,14 +139,14 @@ const PrivacyPolicyPage = () => {
           {/* Section 7: User Data & YouTube API Limitations */}
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">7. User Data & YouTube API Limitations</h2>
-            <p className="mb-4">CodeLearnn does not:</p>
+            <p className="mb-4">Medha does not:</p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Access private YouTube account information</li>
               <li>Access watch history, subscriptions, or playlists</li>
               <li>Post, upload, or modify content on behalf of users</li>
               <li>Modify or interact with YouTube user accounts</li>
             </ul>
-            <p>A YouTube account login is not required to use CodeLearnn's core features.</p>
+            <p>A YouTube account login is not required to use Medha's core features.</p>
           </section>
 
           {/* Section 8: Data Security */}
@@ -167,7 +167,7 @@ const PrivacyPolicyPage = () => {
               <li>Withdraw consent where applicable</li>
             </ul>
             <p>
-              Requests may be submitted by contacting: <a href="mailto:engineeratcodelearnn@gmail.com" className="text-neon-green hover:underline">engineeratcodelearnn@gmail.com</a>
+              Requests may be submitted by contacting: <a href="mailto:engineeratmedha@gmail.com" className="text-neon-green hover:underline">engineeratmedha@gmail.com</a>
             </p>
           </section>
 
@@ -175,10 +175,10 @@ const PrivacyPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">10. Independence & Disclaimer</h2>
             <p className="mb-4">
-              CodeLearnn is an independent platform and is not affiliated with, endorsed by, or sponsored by YouTube or Google.
+              Medha is an independent platform and is not affiliated with, endorsed by, or sponsored by YouTube or Google.
             </p>
             <p>
-              Any analysis, scoring, or recommendations provided by CodeLearnn represent independent assessments and do not reflect the opinions or positions of YouTube, Google, or content creators.
+              Any analysis, scoring, or recommendations provided by Medha represent independent assessments and do not reflect the opinions or positions of YouTube, Google, or content creators.
             </p>
           </section>
 
@@ -186,7 +186,7 @@ const PrivacyPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">11. Updates to This Privacy Policy</h2>
             <p>
-              This Privacy Policy may be updated periodically to reflect changes in technology, legal requirements, platform functionality, or third-party policies. Continued use of CodeLearnn after updates constitutes acceptance of the revised Privacy Policy.
+              This Privacy Policy may be updated periodically to reflect changes in technology, legal requirements, platform functionality, or third-party policies. Continued use of Medha after updates constitutes acceptance of the revised Privacy Policy.
             </p>
           </section>
 
@@ -194,7 +194,7 @@ const PrivacyPolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">12. Contact</h2>
             <p>
-              For privacy-related questions or concerns, please contact: <a href="mailto:engineeratcodelearnn@gmail.com" className="text-neon-green hover:underline">engineeratcodelearnn@gmail.com</a>
+              For privacy-related questions or concerns, please contact: <a href="mailto:engineeratmedha@gmail.com" className="text-neon-green hover:underline">engineeratmedha@gmail.com</a>
             </p>
           </section>
         </div>

@@ -11,13 +11,13 @@ const SEO = ({
   jsonLd,
 }) => {
   const location = useLocation();
-  const baseUrl = "https://codelearnn.com";
+  const baseUrl = "https://medha.com";
   const currentUrl = canonicalUrl || `${baseUrl}${location.pathname}`;
   const defaultImage = `${baseUrl}/og-image.jpg`; // Ensure you have this image in public/
 
   const siteTitle =
-    "CodeLearnn - The Learning Operating System for Engineering Students";
-  const fullTitle = title ? `${title} | CodeLearnn` : siteTitle;
+    "Medha - The Learning Operating System for Engineering Students";
+  const fullTitle = title ? `${title} | Medha` : siteTitle;
   const metaDescription =
     description ||
     "Stop learning random tutorials. Start building a real engineering career with structured learning paths, AI-powered roadmaps, and career intelligence.";
@@ -68,7 +68,7 @@ const SEO = ({
     upsertMeta("property", "og:title", fullTitle);
     upsertMeta("property", "og:description", metaDescription);
     upsertMeta("property", "og:image", image || defaultImage);
-    upsertMeta("property", "og:site_name", "CodeLearnn");
+    upsertMeta("property", "og:site_name", "Medha");
 
     // Twitter
     upsertMeta("name", "twitter:card", "summary_large_image");
@@ -86,7 +86,7 @@ const SEO = ({
     upsertJsonLd("seo-org-jsonld", {
       "@context": "https://schema.org",
       "@type": "Organization",
-      name: "CodeLearnn",
+      name: "Medha",
       url: baseUrl,
       logo: `${baseUrl}/logo.png`,
       sameAs: [
@@ -96,7 +96,7 @@ const SEO = ({
       ],
       contactPoint: {
         "@type": "ContactPoint",
-        email: "engineeratcodelearnn@gmail.com",
+        email: "engineeratmedha@gmail.com",
         contactType: "customer support",
       },
     });

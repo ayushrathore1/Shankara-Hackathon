@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -13,7 +12,6 @@ import {
   faGraduationCap,
   faLayerGroup,
   faCheck,
-  faSpinner,
   faBolt,
   faXmark,
   faCheckCircle,
@@ -22,86 +20,10 @@ import {
   faBriefcase
 } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube, faLinkedin} from '@fortawesome/free-brands-svg-icons';
-import { waitlistAPI } from '../services/api';
 import SEO from '../components/common/SEO';
-
-// Check if we're in development mode (localhost or Vite dev server)
-const isDevelopment = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       import.meta.env.DEV === true;
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [email, setEmail] = useState('');
-  const [waitlistStatus, setWaitlistStatus] = useState('idle'); // idle, loading, success, error
-  const [waitlistMessage, setWaitlistMessage] = useState('');
-  const [waitlistCount, setWaitlistCount] = useState(null);
-
-  // Fetch live waitlist count on mount
-  useEffect(() => {
-    const fetchCount = async () => {
-      try {
-        const response = await waitlistAPI.getCount();
-        if (response.data?.success) {
-          setWaitlistCount(response.data.count);
-        }
-      } catch (err) {
-        console.error('Failed to fetch waitlist count:', err);
-      }
-    };
-    fetchCount();
-  }, []);
-
-  // Handle redirect from OAuth rejection - scroll to waitlist
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    if (params.get('waitlist_redirect') === 'true' || location.hash === '#waitlist') {
-      setTimeout(() => {
-        document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-      // Clean up URL
-      if (params.get('waitlist_redirect')) {
-        navigate('/', { replace: true });
-      }
-    }
-  }, [location, navigate]);
-
-  // Capture referral code on mount
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const refCode = searchParams.get('ref');
-    if (refCode) {
-      localStorage.setItem('referralCode', refCode);
-    }
-  }, [location]);
-
-  const handleWaitlistSubmit = async (e) => {
-    e.preventDefault();
-    setWaitlistStatus('loading');
-    setWaitlistMessage('');
-    
-    try {
-      const source = window.innerWidth < 768 ? 'homepage-mobile' : 'homepage';
-      // Get referral code from storage
-      const refCode = localStorage.getItem('referralCode');
-      
-      const response = await waitlistAPI.join(email, source, refCode);
-      
-      setWaitlistStatus(response.data.alreadyExists ? 'success' : 'success');
-      setWaitlistMessage(response.data.message);
-      
-      // Increment the displayed count for new signups
-      if (!response.data.alreadyExists && waitlistCount !== null) {
-        setWaitlistCount(prev => prev + 1);
-      }
-      
-      setEmail('');
-    } catch (error) {
-      setWaitlistStatus('error');
-      setWaitlistMessage(error.response?.data?.message || 'Something went wrong. Please try again.');
-    }
-  };
 
   // Check for reduced motion preference (accessibility + performance)
   const prefersReducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -205,12 +127,12 @@ const HomePage = () => {
   ];
 
   const comparisonData = [
-    { traditional: 'Random tutorials, no structure', codelearnn: 'Career-aligned learning paths' },
-    { traditional: 'Certificates you can\'t use', codelearnn: 'Projects that prove competence' },
-    { traditional: 'Learn alone, fail alone', codelearnn: 'AI-guided, outcome-focused' },
-    { traditional: 'No idea if content is good', codelearnn: 'Every resource AI-validated' },
-    { traditional: 'Confusing jargon everywhere', codelearnn: 'Visual understanding first' },
-    { traditional: '"Complete the course"', codelearnn: '"Build something real"' },
+    { traditional: 'Random tutorials, no structure', medha: 'Career-aligned learning paths' },
+    { traditional: 'Certificates you can\'t use', medha: 'Projects that prove competence' },
+    { traditional: 'Learn alone, fail alone', medha: 'AI-guided, outcome-focused' },
+    { traditional: 'No idea if content is good', medha: 'Every resource AI-validated' },
+    { traditional: 'Confusing jargon everywhere', medha: 'Visual understanding first' },
+    { traditional: '"Complete the course"', medha: '"Build something real"' },
   ];
 
   return (
@@ -222,11 +144,11 @@ const HomePage = () => {
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "WebSite",
-          "name": "CodeLearnn",
-          "url": "https://codelearnn.com",
+          "name": "Medha",
+          "url": "https://medha.com",
           "potentialAction": {
             "@type": "SearchAction",
-            "target": "https://codelearnn.com/search?q={search_term_string}",
+            "target": "https://medha.com/search?q={search_term_string}",
             "query-input": "required name=search_term_string"
           }
         }}
@@ -279,7 +201,7 @@ const HomePage = () => {
               <motion.div variants={fadeInUp} className="mb-8 relative z-10">
                 <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-mono font-medium tracking-wide">
                   <FontAwesomeIcon icon={faBolt} className="text-yellow-400" />
-                  <span className="text-metallic">CodeLearnn OS 2.0 • Early Access Open</span>
+                  <span className="text-metallic">Medha OS 2.0 • Early Access Open</span>
                 </span>
               </motion.div>
 
@@ -306,45 +228,30 @@ const HomePage = () => {
                 className="flex flex-wrap gap-4 mb-6"
               >
                 <button 
-                  onClick={() => document.getElementById('waitlist')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() => navigate('/signup')}
                   className="btn-primary px-6 py-3 shadow-[0_0_40px_-5px_var(--primary-glow)] hover:shadow-[0_0_60px_-10px_var(--primary-glow)]"
                 >
                   <FontAwesomeIcon icon={faRocket} className="text-sm mr-2" />
-                  Get Early Access →
+                  Get Started Free →
                 </button>
-                {isDevelopment && (
-                  <button 
-                    onClick={() => navigate('/vault')}
-                    className="btn-secondary group"
-                  >
-                    <FontAwesomeIcon icon={faBookOpen} className="text-sm mr-2" />
-                    Explore Platform (Dev)
-                  </button>
-                )}
+                <button 
+                  onClick={() => navigate('/vault')}
+                  className="btn-secondary group"
+                >
+                  <FontAwesomeIcon icon={faBookOpen} className="text-sm mr-2" />
+                  Explore Platform
+                </button>
               </motion.div>
 
               {/* Trust Line */}
               <motion.div variants={fadeInUp} className="flex items-center gap-4 text-xs text-text-dim flex-wrap">
-                {waitlistCount !== null && (
-                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary font-medium">
-                    <FontAwesomeIcon icon={faUsers} className="text-primary" />
-                    <motion.span
-                      key={waitlistCount}
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      {waitlistCount.toLocaleString()}+ students waiting
-                    </motion.span>
-                  </span>
-                )}
                 <span className="flex items-center gap-1">
                   <FontAwesomeIcon icon={faCheckCircle} className="text-primary" />
-                  Free for first 500 students
+                  Free to get started
                 </span>
                 <span className="flex items-center gap-1">
                   <FontAwesomeIcon icon={faClock} className="text-secondary" />
-                  Launching Nov 2026
+                  No credit card required
                 </span>
               </motion.div>
 
@@ -526,7 +433,7 @@ const HomePage = () => {
               className="bg-bg-elevated/50 rounded-2xl p-8 border border-border text-left"
             >
               <p className="text-text-muted mb-6">
-                CodeLearnn isn't another learning platform. It's the <span className="text-text-main font-medium">operating system</span> that finally connects:
+                Medha isn't another learning platform. It's the <span className="text-text-main font-medium">operating system</span> that finally connects:
               </p>
               <div className="grid md:grid-cols-3 gap-6">
                 <div className="flex items-start gap-3">
@@ -628,7 +535,7 @@ const HomePage = () => {
         <div className="container mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-h2">
-              How CodeLearnn <span className="text-primary">Actually Works</span>
+              How Medha <span className="text-primary">Actually Works</span>
             </h2>
           </div>
 
@@ -687,7 +594,7 @@ const HomePage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          WHY CODELEARNN (COMPARISON)
+          WHY MEDHA (COMPARISON)
           ═══════════════════════════════════════════════════════════════════ */}
       <section className="section px-6">
         <div className="container mx-auto">
@@ -706,7 +613,7 @@ const HomePage = () => {
                   Traditional Platforms
                 </div>
                 <div className="px-6 py-4 bg-primary/5 border-b border-border text-sm font-mono text-primary uppercase tracking-wider">
-                  CodeLearnn OS
+                  Medha OS
                 </div>
               </div>
               {comparisonData.map((row, index) => (
@@ -717,7 +624,7 @@ const HomePage = () => {
                   </div>
                   <div className="px-6 py-4 border-b border-border text-text-main flex items-center gap-2">
                     <FontAwesomeIcon icon={faCheck} className="text-primary text-xs" />
-                    <span>{row.codelearnn}</span>
+                    <span>{row.medha}</span>
                   </div>
                 </div>
               ))}
@@ -743,19 +650,19 @@ const HomePage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          URGENCY SECTION
+          WHY CHOOSE MEDHA
           ═══════════════════════════════════════════════════════════════════ */}
       <section className="py-16 px-6 bg-primary/5 border-t border-b border-primary/10">
         <div className="container mx-auto">
           <div className="text-center mb-10">
-            <h3 className="text-h3 text-text-main mb-2">Why Join the Waitlist?</h3>
+            <h3 className="text-h3 text-text-main mb-2">Why Choose Medha?</h3>
           </div>
           <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {[
-              { icon: faGraduationCap, text: 'First 500 students get lifetime free access to PRO features' },
-              { icon: faBolt, text: 'Early access users shape the product roadmap' },
-              { icon: faUsers, text: 'Your feedback = your name in our Hall of Builders' },
-              { icon: faBriefcase, text: 'Priority access to our hiring partner network (launching 2026)' },
+              { icon: faGraduationCap, text: 'Structured learning paths aligned with real engineering careers' },
+              { icon: faBolt, text: 'AI-powered content evaluation saves you hundreds of hours' },
+              { icon: faUsers, text: 'Built by students, for students — your feedback shapes the product' },
+              { icon: faBriefcase, text: 'Career intelligence to bridge the gap from learning to landing offers' },
             ].map((item, i) => (
               <div key={i} className="text-center p-4">
                 <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4">
@@ -769,9 +676,9 @@ const HomePage = () => {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════════
-          FINAL CTA - WAITLIST
+          FINAL CTA - SIGN UP
           ═══════════════════════════════════════════════════════════════════ */}
-      <section id="waitlist" className="section px-6 relative overflow-hidden">
+      <section className="section px-6 relative overflow-hidden">
         {/* Background glow */}
         <div className="absolute inset-0 bg-primary/5 radial-gradient" />
         
@@ -787,73 +694,40 @@ const HomePage = () => {
               <span className="text-primary">Start Building?</span>
             </h2>
             <p className="text-body-lg text-text-muted max-w-2xl mx-auto mb-10">
-              {waitlistCount !== null ? (
-                <>Join <motion.span
-                  key={waitlistCount}
-                  initial={{ opacity: 0, y: 5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-primary font-semibold"
-                >{waitlistCount.toLocaleString()}+</motion.span> engineering students who are done with random tutorials and ready for structured growth.</>
-              ) : (
-                'Join engineering students who are done with random tutorials and ready for structured growth.'
-              )}
+              Join engineering students who are done with random tutorials and ready for structured growth.
             </p>
             
-            {waitlistStatus === 'success' ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center gap-4"
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                onClick={() => navigate('/signup')}
+                className="btn-primary px-8 py-4 text-lg shadow-[0_0_40px_-5px_var(--primary-glow)] hover:shadow-[0_0_60px_-10px_var(--primary-glow)]"
               >
-                <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center">
-                  <FontAwesomeIcon icon={faCheck} className="text-2xl text-primary" />
-                </div>
-                <p className="text-lg text-text-main font-medium">{waitlistMessage}</p>
-                <p className="text-sm text-text-muted">Share with friends to skip the waitlist line!</p>
-              </motion.div>
-            ) : (
-              <form onSubmit={handleWaitlistSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-                <input
-                  type="email"
-                  placeholder="your.email@college.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="flex-1 px-4 py-3 rounded-lg bg-bg-elevated border border-border text-text-main placeholder:text-text-dim focus:outline-none focus:border-primary transition-colors"
-                />
-                <button 
-                  type="submit"
-                  disabled={waitlistStatus === 'loading'}
-                  className="btn-primary px-6 py-3 shadow-[0_0_40px_-5px_var(--primary-glow)] hover:shadow-[0_0_60px_-10px_var(--primary-glow)] disabled:opacity-50"
-                >
-                  {waitlistStatus === 'loading' ? (
-                    <FontAwesomeIcon icon={faSpinner} className="animate-spin" />
-                  ) : (
-                    'Get Early Access →'
-                  )}
-                </button>
-              </form>
-            )}
+                <FontAwesomeIcon icon={faRocket} className="mr-2" />
+                Create Free Account →
+              </button>
+              <button 
+                onClick={() => navigate('/login')}
+                className="btn-secondary px-8 py-4 text-lg"
+              >
+                Sign In
+              </button>
+            </div>
 
             {/* Trust signals */}
             <div className="flex items-center justify-center gap-6 mt-6 text-xs text-text-dim">
               <span className="flex items-center gap-1">
                 <FontAwesomeIcon icon={faCheck} className="text-primary" />
-                No spam, ever
+                No credit card needed
               </span>
               <span className="flex items-center gap-1">
                 <FontAwesomeIcon icon={faCheck} className="text-primary" />
-                Free early access
+                Free to get started
               </span>
               <span className="flex items-center gap-1">
                 <FontAwesomeIcon icon={faCheck} className="text-primary" />
                 Cancel anytime
               </span>
             </div>
-            
-            {waitlistStatus === 'error' && (
-              <p className="text-red-500 text-sm mt-4">{waitlistMessage}</p>
-            )}
           </motion.div>
         </div>
       </section>

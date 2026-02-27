@@ -1077,7 +1077,7 @@ const JaipurInternshipsGuide = () => {
               Curated with ❤️ for early-year students in Jaipur
             </p>
             <p className="text-text-tertiary text-xs mt-2">
-              © {new Date().getFullYear()} CodeLearnn. Coming Soon.
+              © {new Date().getFullYear()} Medha. Coming Soon.
             </p>
           </div>
         </div>

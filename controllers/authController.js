@@ -453,7 +453,7 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   // Build reset URL (frontend page)
   const isProduction = process.env.NODE_ENV === "production";
   const frontendUrl = isProduction
-    ? "https://codelearnn.com"
+    ? "https://medha.com"
     : "http://localhost:5173";
   const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 

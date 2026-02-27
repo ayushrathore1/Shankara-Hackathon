@@ -20,7 +20,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faYoutube } from "@fortawesome/free-brands-svg-icons";
 import PropTypes from "prop-types";
-import CodeLearnnScore from "../common/CodeLearnnScore";
+import MedhaScore from "../common/MedhaScore";
 import { freeResourcesAPI } from "../../services/api";
 
 /**
@@ -365,7 +365,7 @@ const VideoAnalyzer = ({ onAnalysisComplete }) => {
                       </div>
                     </div>
                     <div className="flex-shrink-0 text-center">
-                      <CodeLearnnScore
+                      <MedhaScore
                         score={result.evaluation?.codeLearnnScore || 0}
                         size="lg"
                         showLabel={true}
@@ -576,7 +576,7 @@ const VideoAnalyzer = ({ onAnalysisComplete }) => {
                         </div>
                         <div className="flex-shrink-0">
                           {video.isProgrammingTutorial ? (
-                            <CodeLearnnScore
+                            <MedhaScore
                               score={video.score}
                               size="sm"
                               showLabel={false}
@@ -777,7 +777,7 @@ const VideoAnalyzer = ({ onAnalysisComplete }) => {
 
                     {/* Score */}
                     <div className="flex-shrink-0 text-center">
-                      <CodeLearnnScore
+                      <MedhaScore
                         score={evaluation?.codeLearnnScore || 0}
                         size="lg"
                         breakdown={evaluation?.breakdown}

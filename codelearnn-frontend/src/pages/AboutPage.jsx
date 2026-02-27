@@ -9,17 +9,17 @@ const AboutPage = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl font-bold mb-8 text-white">About CodeLearnn</h1>
+        <h1 className="text-4xl font-bold mb-8 text-white">About Medha</h1>
 
         <div className="space-y-12 text-gray-300">
           <section>
             <p className="text-lg leading-relaxed mb-6">
-              CodeLearnn is a career discovery and learning pathway platform
+              Medha is a career discovery and learning pathway platform
               built for a world where skills evolve faster than traditional
               education systems.
             </p>
             <p className="leading-relaxed">
-              Instead of creating new courses, CodeLearnn structures the vast
+              Instead of creating new courses, Medha structures the vast
               amount of free learning content already available across the
               internet and YouTube into clear, goal-oriented learning paths
               aligned with real careers. The platform helps users explore career
@@ -59,7 +59,7 @@ const AboutPage = () => {
                 </li>
               </ul>
               <p className="mt-4 font-medium text-white">
-                CodeLearnn was created to solve this problem at a system level.
+                Medha was created to solve this problem at a system level.
               </p>
             </div>
 
@@ -82,7 +82,7 @@ const AboutPage = () => {
             <h2 className="text-2xl font-semibold text-white mb-4">Company</h2>
             <p className="mb-2 text-lg">
               <span className="font-bold text-white">Elytron</span> is the
-              company behind CodeLearnn, focused on building long-term,
+              company behind Medha, focused on building long-term,
               impact-driven technology solutions for education and
               employability.
             </p>

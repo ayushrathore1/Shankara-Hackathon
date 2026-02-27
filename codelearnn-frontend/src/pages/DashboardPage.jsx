@@ -437,7 +437,7 @@ const DashboardPage = () => {
               ? `Your ${careerName || "learning"} journey is ${journeyProgress}% complete`
               : isAuthenticated
                 ? "Let's start your learning journey today"
-                : "Explore what's trending on CodeLearnn"}
+                : "Explore what's trending on Medha"}
           </p>
         </motion.div>
 
@@ -820,7 +820,7 @@ const DashboardPage = () => {
                 if (total === 0) return (
                   <div className="text-center py-6">
                     <FontAwesomeIcon icon={faYoutubeBrand} className="text-3xl text-text-dim mb-2" />
-                    <p className="text-sm text-text-muted">Install the CodeLearnn extension and watch YouTube videos to see your activity here.</p>
+                    <p className="text-sm text-text-muted">Install the Medha extension and watch YouTube videos to see your activity here.</p>
                     <p className="text-xs text-text-dim mt-1">The extension tracks what you watch and classifies it automatically.</p>
                   </div>
                 );
@@ -907,7 +907,7 @@ const DashboardPage = () => {
               {!ytStats?.categoryBreakdown && ytRecentVideos.length === 0 && (
                 <div className="text-center py-6">
                   <FontAwesomeIcon icon={faYoutubeBrand} className="text-3xl text-text-dim mb-2" />
-                  <p className="text-sm text-text-muted">Install the CodeLearnn extension to track your YouTube activity.</p>
+                  <p className="text-sm text-text-muted">Install the Medha extension to track your YouTube activity.</p>
                   <p className="text-xs text-text-dim mt-1">Auto-detect programming tutorials, tech content, and distractions.</p>
                 </div>
               )}

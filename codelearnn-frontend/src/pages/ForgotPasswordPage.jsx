@@ -50,7 +50,7 @@ const ForgotPasswordPage = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-heading font-bold text-text-main">
-              <span className="text-primary">&lt;</span>CodeLearnn<span className="text-secondary">/&gt;</span>
+              <span className="text-primary">&lt;</span>Medha<span className="text-secondary">/&gt;</span>
             </h1>
           </div>
 

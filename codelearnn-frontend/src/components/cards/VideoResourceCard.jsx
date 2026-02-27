@@ -11,7 +11,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faYoutube } from "@fortawesome/free-brands-svg-icons";
 import PropTypes from "prop-types";
-import CodeLearnnScore from "../common/CodeLearnnScore";
+import MedhaScore from "../common/MedhaScore";
 
 /**
  * VideoResourceCard - Displays a YouTube video resource with metrics
@@ -118,7 +118,7 @@ const VideoResourceCard = ({ resource, onWatch, showDetails = false }) => {
 
           {/* Score badge */}
           <div className="absolute top-2 right-2">
-            <CodeLearnnScore
+            <MedhaScore
               score={resource.codeLearnnScore}
               size="sm"
               showLabel={false}

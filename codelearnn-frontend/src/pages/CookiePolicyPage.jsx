@@ -17,10 +17,10 @@ const CookiePolicyPage = () => {
         <div className="space-y-8 text-gray-300">
           <section>
             <p className="mb-4">
-              This Cookie Policy explains how Elytron uses cookies and similar technologies on CodeLearnn to provide, improve, and secure the platform.
+              This Cookie Policy explains how Elytron uses cookies and similar technologies on Medha to provide, improve, and secure the platform.
             </p>
             <p className="font-medium text-white">
-              By continuing to use CodeLearnn, you agree to the use of cookies as described in this policy.
+              By continuing to use Medha, you agree to the use of cookies as described in this policy.
             </p>
           </section>
 
@@ -33,7 +33,7 @@ const CookiePolicyPage = () => {
 
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">2. How We Use Cookies</h2>
-            <p className="mb-4">CodeLearnn uses cookies for the following purposes:</p>
+            <p className="mb-4">Medha uses cookies for the following purposes:</p>
             
             <h3 className="text-xl font-medium text-white mb-2">a. Essential Cookies</h3>
             <p className="mb-2">These cookies are required for basic platform functionality, including:</p>
@@ -45,7 +45,7 @@ const CookiePolicyPage = () => {
             <p className="mb-4 text-sm text-gray-400">Without these cookies, the platform may not function properly.</p>
 
             <h3 className="text-xl font-medium text-white mb-2">b. Performance & Analytics Cookies</h3>
-            <p className="mb-2">These cookies help us understand how users interact with CodeLearnn by collecting anonymized usage data such as:</p>
+            <p className="mb-2">These cookies help us understand how users interact with Medha by collecting anonymized usage data such as:</p>
             <ul className="list-disc pl-6 mb-4 space-y-2">
               <li>Pages visited</li>
               <li>Time spent on the platform</li>
@@ -65,7 +65,7 @@ const CookiePolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">3. Third-Party Cookies</h2>
             <p>
-              CodeLearnn may use limited third-party services (such as analytics or embedded content platforms) that set their own cookies. We do not control these cookies and recommend reviewing the privacy policies of those third-party services.
+              Medha may use limited third-party services (such as analytics or embedded content platforms) that set their own cookies. We do not control these cookies and recommend reviewing the privacy policies of those third-party services.
             </p>
           </section>
 
@@ -92,14 +92,14 @@ const CookiePolicyPage = () => {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">6. Updates to This Cookie Policy</h2>
             <p>
-              We may update this Cookie Policy from time to time to reflect changes in technology, law, or platform functionality. Continued use of CodeLearnn after updates constitutes acceptance of the revised policy.
+              We may update this Cookie Policy from time to time to reflect changes in technology, law, or platform functionality. Continued use of Medha after updates constitutes acceptance of the revised policy.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">7. Contact</h2>
             <p>
-              If you have questions about our use of cookies, please contact: <a href="mailto:engineeratcodelearnn@gmail.com" className="text-neon-green hover:underline">engineeratcodelearnn@gmail.com</a>
+              If you have questions about our use of cookies, please contact: <a href="mailto:engineeratmedha@gmail.com" className="text-neon-green hover:underline">engineeratmedha@gmail.com</a>
             </p>
           </section>
         </div>

@@ -14,7 +14,7 @@ import PropTypes from "prop-types";
 
 /**
  * VaultTutorialCard - Premium card for cached tutorials with glassmorphic hover overlay
- * Shows thumbnail, title, channel, duration, CodeLearnn score
+ * Shows thumbnail, title, channel, duration, Medha score
  * On hover: reveals detailed AI analysis with glassmorphic effect
  */
 const VaultTutorialCard = ({ tutorial, onClick }) => {
@@ -322,7 +322,7 @@ const VaultTutorialCard = ({ tutorial, onClick }) => {
                     <p className="text-white font-semibold">
                       {getQualityLabel(score)}
                     </p>
-                    <p className="text-slate text-sm">CodeLearnn Score</p>
+                    <p className="text-slate text-sm">Medha Score</p>
                   </div>
                 </div>
 

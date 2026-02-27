@@ -97,7 +97,7 @@ const CategoryTabs = ({
               (cat) =>
                 cat.avgScore > 0 && (
                   <p key={cat.id} className="text-slate text-xs font-mono">
-                    Average CodeLearnn Score:
+                    Average Medha Score:
                     <span className="text-green ml-1 font-semibold">
                       {cat.avgScore}
                     </span>

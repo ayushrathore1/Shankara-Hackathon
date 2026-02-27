@@ -946,7 +946,7 @@ const YouTubeTrackerPage = () => {
               </div>
               <div className="flex-1">
                 <h3 className="text-sm font-semibold text-text-main mb-1">
-                  CodeLearnn Chrome Extension
+                  Medha Chrome Extension
                 </h3>
                 <p className="text-xs text-text-muted mb-3">
                   Install our Chrome extension to automatically track every YouTube video you watch — across any device using Chrome. No manual URL pasting needed.
@@ -957,7 +957,7 @@ const YouTubeTrackerPage = () => {
                     Load via chrome://extensions (Developer Mode)
                   </span>
                   <span className="text-[10px] text-text-dim">
-                    Extension folder: <code className="text-cyan-400/70">codelearnn-extension/</code>
+                    Extension folder: <code className="text-cyan-400/70">medha-extension/</code>
                   </span>
                 </div>
               </div>

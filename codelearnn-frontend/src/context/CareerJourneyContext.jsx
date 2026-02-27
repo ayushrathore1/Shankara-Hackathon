@@ -16,7 +16,7 @@ export const useCareerJourney = () => {
 };
 
 // Local storage key for offline fallback
-const JOURNEY_STORAGE_KEY = "codelearnn_career_journey";
+const JOURNEY_STORAGE_KEY = "medha_career_journey";
 
 /**
  * Convert AI learning plan phases into the journey roadmap phase format.

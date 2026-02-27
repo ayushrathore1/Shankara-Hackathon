@@ -17,9 +17,9 @@ const charchaApi = axios.create({
 
 /**
  * Sync user to Charcha - Creates or updates user in Charcha database
- * Called after registration or OAuth signup on CodeLearnn
+ * Called after registration or OAuth signup on Medha
  * 
- * @param {Object} user - CodeLearnn user object
+ * @param {Object} user - Medha user object
  * @returns {Promise<Object>} - Charcha user data and token
  */
 const syncUserToCharcha = async (user) => {
@@ -29,7 +29,7 @@ const syncUserToCharcha = async (user) => {
       name: user.name,
       avatarUrl: user.avatarUrl || null,
       codelearnId: user._id.toString(),
-      platform: 'CODELEARNN'
+      platform: 'MEDHA'
     }, {
       headers: {
         'X-SSO-Secret': CHARCHA_SSO_SECRET
@@ -52,10 +52,10 @@ const syncUserToCharcha = async (user) => {
 };
 
 /**
- * Get Charcha token for an already authenticated CodeLearnn user
+ * Get Charcha token for an already authenticated Medha user
  * Uses SSO secret for secure cross-platform authentication
  * 
- * @param {Object} user - CodeLearnn user object
+ * @param {Object} user - Medha user object
  * @returns {Promise<Object>} - Charcha token
  */
 const getCharchaToken = async (user) => {
@@ -63,7 +63,7 @@ const getCharchaToken = async (user) => {
     const response = await charchaApi.post('/auth/sso-login', {
       email: user.email,
       codelearnId: user._id.toString(),
-      platform: 'CODELEARNN'
+      platform: 'MEDHA'
     }, {
       headers: {
         'X-SSO-Secret': CHARCHA_SSO_SECRET

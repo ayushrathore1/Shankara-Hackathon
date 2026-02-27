@@ -38,7 +38,7 @@ charchaApi.interceptors.response.use(
 // AUTH API
 // ============================================================================
 export const charchaAuthAPI = {
-  register: (data) => charchaApi.post('/auth/register', { ...data, platform: 'CODELEARNN' }),
+  register: (data) => charchaApi.post('/auth/register', { ...data, platform: 'MEDHA' }),
   
   login: (data) => charchaApi.post('/auth/login', data),
   
@@ -50,7 +50,7 @@ export const charchaAuthAPI = {
   
   getLeaderboard: (type = 'aura', limit = 20) => 
     charchaApi.get('/auth/leaderboard', { 
-      params: { type, platform: 'CODELEARNN', limit } 
+      params: { type, platform: 'MEDHA', limit } 
     }),
 };
 
@@ -61,12 +61,12 @@ export const charchaPostsAPI = {
   // Get posts with filters
   getPosts: (params = {}) => 
     charchaApi.get('/posts', { 
-      params: { platform: 'CODELEARNN', ...params } 
+      params: { platform: 'MEDHA', ...params } 
     }),
   
   // Create a new post
   createPost: (data) => 
-    charchaApi.post('/posts', { ...data, platform: 'CODELEARNN' }),
+    charchaApi.post('/posts', { ...data, platform: 'MEDHA' }),
   
   // Get single post by ID or slug
   getPost: (idOrSlug) => charchaApi.get(`/posts/${idOrSlug}`),

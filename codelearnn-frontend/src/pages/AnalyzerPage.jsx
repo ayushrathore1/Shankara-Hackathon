@@ -443,12 +443,12 @@ const AnalyzerPage = () => {
                 />
               )}
 
-              {/* CodeLearnn Score Breakdown */}
+              {/* Medha Score Breakdown */}
               {result.insights.breakdown &&
                 Object.keys(result.insights.breakdown).length > 0 && (
                   <InsightCard
                     icon={faList}
-                    title="CodeLearnn Score Breakdown"
+                    title="Medha Score Breakdown"
                     variant="default"
                     content={
                       <div className="space-y-2">

@@ -223,7 +223,7 @@ class BulkImportService extends BaseService {
       const response = await groqService.chat([
         {
           role: 'system',
-          content: `You are an educational content analyst for CodeLearnn. Your job is to analyze programming tutorial videos and generate helpful descriptions for learners.
+          content: `You are an educational content analyst for Medha. Your job is to analyze programming tutorial videos and generate helpful descriptions for learners.
 
 For C programming content, you must:
 1. Clearly identify if the video is SPECIFICALLY about C language or RELATED to C (general programming concepts useful for C)

@@ -16,7 +16,7 @@ import VideoResourceCard from "../components/cards/VideoResourceCard";
 import VaultTutorialCard from "../components/cards/VaultTutorialCard";
 import VideoAnalyzer from "../components/forms/VideoAnalyzer";
 import CategoryTabs from "../components/common/CategoryTabs";
-import CodeLearnnScore from "../components/common/CodeLearnnScore";
+import MedhaScore from "../components/common/MedhaScore";
 
 // API
 import { freeResourcesAPI } from "../services/api";
@@ -147,7 +147,7 @@ const FreeResourcesPage = () => {
 
   // Sort options
   const sortOptions = [
-    { value: "codeLearnnScore", label: "CodeLearnn Score" },
+    { value: "codeLearnnScore", label: "Medha Score" },
     { value: "statistics.viewCount", label: "Views" },
     { value: "statistics.likeCount", label: "Likes" },
     { value: "createdAt", label: "Recently Added" },
@@ -459,7 +459,7 @@ const FreeResourcesPage = () => {
           className="max-w-4xl mx-auto"
         >
           <h2 className="text-2xl font-heading font-bold text-white text-center mb-12">
-            How <span className="text-green">CodeLearnn Score</span> Works
+            How <span className="text-green">Medha Score</span> Works
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

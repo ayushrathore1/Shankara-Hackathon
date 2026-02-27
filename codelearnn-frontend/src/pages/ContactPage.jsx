@@ -45,8 +45,8 @@ const ContactPage = () => {
                     </div>
                     <div>
                     <h4 className="text-text-main font-medium text-lg mb-1">Email</h4>
-                    <a href="mailto:engineeratcodelearnn@gmail.com" className="text-primary hover:underline">
-                        engineeratcodelearnn@gmail.com
+                    <a href="mailto:engineeratmedha@gmail.com" className="text-primary hover:underline">
+                        engineeratmedha@gmail.com
                     </a>
                     </div>
                 </div>
@@ -79,7 +79,7 @@ const ContactPage = () => {
                     <div>
                     <h4 className="text-text-main font-medium text-lg mb-1">Company</h4>
                     <p className="text-white">Elytron</p>
-                    <p className="text-sm">(Product: CodeLearnn)</p>
+                    <p className="text-sm">(Product: Medha)</p>
                     </div>
                 </div>
                 </div>

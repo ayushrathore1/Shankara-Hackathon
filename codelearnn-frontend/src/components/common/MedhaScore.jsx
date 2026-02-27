@@ -69,17 +69,17 @@ ScoreCircle.propTypes = {
 };
 
 /**
- * CodeLearnnScore - Displays the quality score with visual indicators
+ * MedhaScore - Displays the quality score with visual indicators
  * Enhanced for honest assessments with color-coded quality tiers
  *
  * @param {Object} props - Component props
  * @param {number} props.score - Score from 0-100
  * @param {string} [props.size='md'] - Size variant (sm, md, lg)
- * @param {boolean} [props.showLabel=true] - Whether to show "CodeLearnn" label
+ * @param {boolean} [props.showLabel=true] - Whether to show "Medha" label
  * @param {Object} [props.breakdown] - Score breakdown details
  * @param {boolean} [props.animated=true] - Enable animations
  */
-const CodeLearnnScore = ({
+const MedhaScore = ({
   score = 0,
   size = "md",
   showLabel = true,
@@ -177,7 +177,7 @@ const CodeLearnnScore = ({
       {showLabel && (
         <div className="text-center">
           <p className={`${config.label} font-mono text-light-slate`}>
-            CodeLearnn Score
+            Medha Score
           </p>
           <p
             className={`${config.label} font-semibold flex items-center justify-center gap-1`}
@@ -265,7 +265,7 @@ const CodeLearnnScore = ({
   );
 };
 
-CodeLearnnScore.propTypes = {
+MedhaScore.propTypes = {
   score: PropTypes.number,
   size: PropTypes.oneOf(["sm", "md", "lg"]),
   showLabel: PropTypes.bool,
@@ -280,4 +280,4 @@ CodeLearnnScore.propTypes = {
   animated: PropTypes.bool,
 };
 
-export default CodeLearnnScore;
+export default MedhaScore;

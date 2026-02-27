@@ -130,7 +130,7 @@ const LoginPage = () => {
           {/* Logo */}
           <Link to="/" className="font-heading font-bold text-3xl text-text-main inline-block mb-8">
             <span className="text-primary">&lt;</span>
-            CodeLearnn
+            Medha
             <span className="text-secondary">/&gt;</span>
           </Link>
 
@@ -180,7 +180,7 @@ const LoginPage = () => {
           <div className="lg:hidden text-center mb-8">
             <Link to="/" className="font-heading font-bold text-2xl text-text-main inline-block">
               <span className="text-primary">&lt;</span>
-              CodeLearnn
+              Medha
               <span className="text-secondary">/&gt;</span>
             </Link>
           </div>

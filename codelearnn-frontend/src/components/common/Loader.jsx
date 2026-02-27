@@ -19,7 +19,7 @@ const Loader = ({ isLoading = true }) => {
               className="mb-8 font-heading font-bold text-4xl"
             >
               <span className="text-primary">&lt;</span>
-              <span className="text-metallic mx-1">CodeLearnn</span>
+              <span className="text-metallic mx-1">Medha</span>
               <span className="text-secondary">/&gt;</span>
             </motion.div>
 

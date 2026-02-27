@@ -24,7 +24,7 @@ const AuthCallbackPage = () => {
     }
 
     if (token) {
-      // Store the CodeLearnn token
+      // Store the Medha token
       localStorage.setItem('token', token);
       
       // Store the Charcha token if available (SSO integration)
