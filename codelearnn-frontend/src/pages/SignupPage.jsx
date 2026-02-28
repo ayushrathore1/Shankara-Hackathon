@@ -101,7 +101,9 @@ const SignupPage = () => {
 
     try {
       await setUserPassword(password);
-      navigate('/onboarding');
+      const returnTo = sessionStorage.getItem('medhaFlowReturn');
+      if (returnTo) { sessionStorage.removeItem('medhaFlowReturn'); navigate(returnTo); }
+      else navigate('/onboarding');
     } catch (err) {
       setError(err.message || 'Failed to set password');
     } finally {
@@ -130,7 +132,9 @@ const SignupPage = () => {
 
   // Skip password (go directly to onboarding)
   const handleSkipPassword = () => {
-    navigate('/onboarding');
+    const returnTo = sessionStorage.getItem('medhaFlowReturn');
+    if (returnTo) { sessionStorage.removeItem('medhaFlowReturn'); navigate(returnTo); }
+    else navigate('/onboarding');
   };
 
   const benefits = [

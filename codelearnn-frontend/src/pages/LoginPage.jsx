@@ -34,7 +34,9 @@ const LoginPage = () => {
 
     try {
       await login(email, password);
-      navigate('/dashboard');
+      const returnTo = sessionStorage.getItem('medhaFlowReturn');
+      if (returnTo) { sessionStorage.removeItem('medhaFlowReturn'); navigate(returnTo); }
+      else navigate('/dashboard');
     } catch (err) {
       setError(err.message || 'Failed to log in');
     } finally {
@@ -68,7 +70,9 @@ const LoginPage = () => {
 
     try {
       await verifyLoginOTP(email, otp);
-      navigate('/dashboard');
+      const returnTo = sessionStorage.getItem('medhaFlowReturn');
+      if (returnTo) { sessionStorage.removeItem('medhaFlowReturn'); navigate(returnTo); }
+      else navigate('/dashboard');
     } catch (err) {
       if (err.attemptsRemaining !== undefined) {
         setError(`${err.message}. ${err.attemptsRemaining} attempts remaining.`);

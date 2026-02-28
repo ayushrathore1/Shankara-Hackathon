@@ -44,19 +44,12 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Main navigation links - Careers first, then Learning Paths, Vault, Charcha
-  // Note: Visualizations disabled, Analyzer moved to footer
-  const mainNavLinks = [
-    { path: "/career", label: "Careers" },
-    { path: "/learning-paths", label: "Learning Paths" },
-    { path: "/vault", label: "Vault" },
-    { path: "/youtube-tracker", label: "YT Tracker" },
-    { path: "/charcha", label: "Charcha" },
+  // Main navigation links — Core features
+  const navLinks = [
+    { path: "/dashboard", label: "Dashboard" },
+    { path: "/career-discovery", label: "Career Discovery" },
+    { path: "/learning-paths", label: "Learning Plan" },
   ];
-
-  const navLinks = isAuthenticated
-    ? [{ path: "/dashboard", label: "Dashboard" }, ...mainNavLinks]
-    : mainNavLinks;
 
   const toggleMenu = () => setIsOpen(!isOpen);
 

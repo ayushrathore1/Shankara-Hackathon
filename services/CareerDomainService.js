@@ -357,10 +357,10 @@ class CareerDomainService extends BaseService {
           {
             model: 'llama-3.3-70b-versatile',
             messages: [
-              { role: 'system', content: 'You are a tech industry expert. Return JSON only.' },
+              { role: 'system', content: 'You are a career industry expert covering ALL professional fields — technology, business, marketing, design, finance, healthcare, creative arts, education, and more. Return JSON only.' },
               { 
                 role: 'user', 
-                content: `List the top 10 trending tech domains for 2025-2026 with high job demand.
+                content: `List the top 12 trending career domains for 2025-2026 with high job demand. Include a MIX of: 5-6 technology domains (AI, Cloud, Cybersecurity, etc.), 2-3 business/marketing domains (Digital Marketing, Product Management, etc.), 2-3 other high-demand domains (UX Design, Healthcare, Finance, Content Creation, etc.).
                 
                 Return JSON format:
                 {
@@ -412,17 +412,17 @@ class CareerDomainService extends BaseService {
 
   // System prompts
   getSystemPrompt() {
-    return `You are an expert career counselor and tech industry analyst. Your job is to analyze technology keywords and identify ALL possible career domains, job opportunities, and career paths related to that keyword.
+    return `You are an expert career counselor and industry analyst covering ALL professional fields — technology, business, marketing, design, finance, healthcare, law, education, creative arts, sciences, trades, and more. Your job is to analyze ANY keyword and identify ALL possible career domains, job opportunities, and career paths related to it.
 
-FIRST: Determine if the keyword is career/tech related. If it's about cooking, weather, entertainment, or non-professional topics, set isCareerRelated to false.
+FIRST: Determine if the keyword is career/profession related. Almost everything has career connections — cooking (culinary arts, food tech), music (audio engineering, music production), sports (sports management, coaching), fashion (fashion design, merchandising), etc. Only set isCareerRelated to false for truly offensive or meaningless inputs.
 
 IMPORTANT: Think beyond the obvious. Students often only know common domains like "web development" or "data science". Your goal is to reveal HIDDEN and NICHE domains that have real job opportunities.
 
 You must return a JSON object with this exact structure:
 {
   "isCareerRelated": true/false,
-  "primaryCategory": "web-dev|python|java|data-science|dsa|devops|mobile|other",
-  "subcategory": "frontend|backend|fullstack|core|automation|enterprise|android|ios|ml|etc",
+  "primaryCategory": "technology|business|marketing|design|finance|healthcare|engineering|creative-arts|education|law|sciences|trades|hospitality|media|other",
+  "subcategory": "frontend|backend|fullstack|digital-marketing|seo|branding|ui-ux|graphic-design|accounting|investment|nursing|biotech|civil|mechanical|film|music|writing|teaching|legal|research|culinary|fashion|etc",
   "tags": ["specific", "technology", "tags"],
   "keyword": "the analyzed keyword",
   "summary": "Brief overview of career landscape for this skill",
@@ -463,7 +463,7 @@ You must return a JSON object with this exact structure:
   }
 
   getDomainDetailSystemPrompt() {
-    return `You are a career expert. Provide detailed information about a specific tech domain including job roles, skills, and companies. Return JSON only.`;
+    return `You are a career expert covering ALL industries — tech, business, marketing, design, finance, healthcare, creative arts, and more. Provide detailed information about a specific career domain including job roles, skills, and companies. Return JSON only.`;
   }
 
   getJobRoleSystemPrompt() {
@@ -603,7 +603,7 @@ Return JSON:
         return {
           isAppropriate: false,
           reason: 'This keyword contains inappropriate content.',
-          suggestion: 'Please search for a technology, skill, or career field.'
+          suggestion: 'Please search for a skill, career field, or industry.'
         };
       }
     }
@@ -792,11 +792,11 @@ Return JSON:
    * System prompt for roadmap generation
    */
   getRoadmapSystemPrompt() {
-    return `You are an expert career counselor with real-time knowledge of the tech industry.
-    Generate comprehensive, actionable career roadmaps for students.
+    return `You are an expert career counselor with real-time knowledge of ALL industries — technology, business, marketing, design, finance, healthcare, creative arts, law, education, and more.
+    Generate comprehensive, actionable career roadmaps for students in ANY field.
     
     Your roadmaps should include:
-    1. Technology overview with LATEST version info
+    1. Field/industry overview with current landscape
     2. Current market demand and salary ranges (focus on India market)
     3. ALL related domains and career paths (be expansive, not narrow)
     4. Step-by-step learning path with realistic timelines
@@ -804,14 +804,14 @@ Return JSON:
     6. Top companies actively hiring
     
     IMPORTANT: 
-    - Always relate ANY keyword to tech/career opportunities
+    - Always relate ANY keyword to professional career opportunities
     - Show ALL related fields, not just the obvious ones
     - Include both traditional and emerging career paths
     - Be specific with salary ranges (in both INR and USD)
     
     Return JSON with this structure:
     {
-      "name": "Technology/Field Name",
+      "name": "Field/Career Name",
       "description": "Comprehensive description",
       "latestVersion": "Current version if applicable",
       "category": "Primary category",

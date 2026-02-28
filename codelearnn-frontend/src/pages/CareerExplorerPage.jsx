@@ -230,8 +230,8 @@ const CareerExplorerPage = () => {
           </h1>
 
           <p className="text-text-muted text-lg max-w-2xl mx-auto mb-10 font-light">
-            Input target skill. System will compile optimal career paths, salary
-            metrics, and required dependencies.
+            Input any skill or field. System will compile optimal career paths, salary
+            metrics, and required dependencies — tech, business, design, or beyond.
           </p>
 
           {/* Command Palette Input */}
@@ -254,7 +254,7 @@ const CareerExplorerPage = () => {
                 onChange={(e) => setKeyword(e.target.value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
-                placeholder="> Enter stack or skill (e.g., Python, DevOps, AWS)..."
+                placeholder="> Enter any skill or field (e.g., Marketing, Python, Design, Finance)..."
                 className="flex-1 bg-transparent border-none text-text-main font-mono placeholder:text-text-dim focus:ring-0 py-4 text-lg"
               />
 
@@ -287,6 +287,24 @@ const CareerExplorerPage = () => {
             )}
           </motion.form>
         </motion.div>
+      </section>
+
+      {/* Quick Nav — Career Hub sub-pages */}
+      <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide justify-center">
+          {[
+            { to: '/my-career-journey', label: '📍 My Journey', show: hasActiveJourney },
+            { to: '/learning-paths', label: '📚 Learning Paths', show: true },
+            { to: '/analytics', label: '📊 Analytics', show: true },
+            { to: '/certificates', label: '🎓 Certificates', show: true },
+          ].filter(l => l.show).map(link => (
+            <Link key={link.to} to={link.to}
+              className="px-4 py-2 rounded-lg text-sm whitespace-nowrap bg-bg-surface text-text-muted border border-border hover:border-primary/30 hover:text-primary transition-all"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Main Content Area */}

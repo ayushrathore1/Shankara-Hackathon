@@ -167,6 +167,26 @@ app.use('/api/gamification', gamificationRoutes);
 const publicProfileRoutes = require('./routes/publicProfile');
 app.use('/api/profile', publicProfileRoutes);
 
+// AI Mentor
+const mentorRoutes = require('./routes/mentor');
+app.use('/api/mentor', mentorRoutes);
+
+// Collaborative Projects
+const projectRoutes = require('./routes/projects');
+app.use('/api/projects', projectRoutes);
+
+// Certificates
+const certificateRoutes = require('./routes/certificates');
+app.use('/api/certificates', certificateRoutes);
+
+// Code Review
+const codeReviewRoutes = require('./routes/codeReview');
+app.use('/api/reviews', codeReviewRoutes);
+
+// Charcha Forum
+const charchaRoutes = require('./routes/charcha');
+app.use('/api/charcha', charchaRoutes);
+
 // Career Readiness Routes
 const careerReadinessRoutes = require('./routes/careerReadiness');
 app.use('/api/readiness', careerReadinessRoutes);
@@ -174,6 +194,10 @@ app.use('/api/readiness', careerReadinessRoutes);
 // Admin Routes (system stats, cache management)
 const adminRoutes = require('./routes/admin');
 app.use('/api/admin', adminRoutes);
+
+// MedhaFlow — AI Career Discovery (no auth required)
+const medhaFlowRoutes = require('./routes/medhaFlow');
+app.use('/api/medha-flow', medhaFlowRoutes);
 
 // Initialize background workers
 const { initializeWorkers } = require('./services/BackgroundWorkers');

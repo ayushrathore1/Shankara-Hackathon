@@ -675,8 +675,66 @@ export const youtubeTrackerAPI = {
 
 // Public Profile API
 export const publicProfileAPI = {
-  // Get public profile by slug or ID
   getBySlug: (slug) => api.get(`/profile/${slug}`),
+};
+
+// AI Mentor API
+export const mentorAPI = {
+  chat: (message) => api.post('/mentor/chat', { message }),
+  getHistory: (limit = 50) => api.get(`/mentor/history?limit=${limit}`),
+  getPrompts: () => api.get('/mentor/prompts'),
+  clearHistory: () => api.delete('/mentor/history'),
+};
+
+// Collaborative Projects API
+export const projectsAPI = {
+  browse: (params = {}) => api.get('/projects', { params }),
+  getById: (id) => api.get(`/projects/${id}`),
+  create: (data) => api.post('/projects', data),
+  apply: (id, message = '') => api.post(`/projects/${id}/apply`, { message }),
+  accept: (id, userId) => api.put(`/projects/${id}/accept/${userId}`),
+  complete: (id, data = {}) => api.put(`/projects/${id}/complete`, data),
+  myProjects: () => api.get('/projects/me/list'),
+};
+
+// Certificates API
+export const certificatesAPI = {
+  getMine: () => api.get('/certificates/me'),
+  generate: (data) => api.post('/certificates/generate', data),
+  verify: (code) => api.get(`/certificates/verify/${code}`),
+};
+
+// Code Review API
+export const codeReviewAPI = {
+  getPending: (params = {}) => api.get('/reviews/pending', { params }),
+  getById: (id) => api.get(`/reviews/${id}`),
+  submit: (data) => api.post('/reviews', data),
+  submitReview: (id, data) => api.put(`/reviews/${id}/review`, data),
+  myReviews: () => api.get('/reviews/me/list'),
+};
+
+// Native Charcha API (same auth as main platform)
+export const charchaAPI = {
+  browse: (params = {}) => api.get('/charcha', { params }),
+  getById: (id) => api.get(`/charcha/${id}`),
+  create: (data) => api.post('/charcha', data),
+  comment: (id, body) => api.post(`/charcha/${id}/comment`, { body }),
+  vote: (id, type) => api.post(`/charcha/${id}/vote`, { type }),
+  upvoteComment: (commentId) => api.post(`/charcha/comment/${commentId}/upvote`),
+  deletePost: (id) => api.delete(`/charcha/${id}`),
+};
+
+// MedhaFlow — AI Career Discovery (authenticated)
+export const medhaFlowAPI = {
+  recommend: (answers) => api.post('/medha-flow/recommend', { answers }),
+  dayInLife: (career) => api.post('/medha-flow/dayinlife', { career }),
+  roadmap: (career) => api.post('/medha-flow/roadmap', { career }),
+  updateProgress: (stepId, completed) => api.post('/medha-flow/progress', { stepId, completed }),
+  generateChallenge: (stepId) => api.post('/medha-flow/generate-challenge', { stepId }),
+  validateChallenge: (stepId, answers) => api.post('/medha-flow/validate-challenge', { stepId, answers }),
+  searchYouTubeVideo: (query) => api.get(`/medha-flow/youtube-video?q=${encodeURIComponent(query)}`),
+  quizFollowup: (data) => api.post('/medha-flow/followup', data),
+  getMyFlow: () => api.get('/medha-flow/me'),
 };
 
 export default api;
