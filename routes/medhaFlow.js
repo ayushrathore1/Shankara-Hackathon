@@ -536,6 +536,185 @@ Return ONLY a JSON object. No markdown. No backticks:
   }
 });
 
+// ═══════════════════════════════════════════════════════════
+// EXERCISE & VALIDATION SYSTEM
+// ═══════════════════════════════════════════════════════════
+
+// ─── POST /exercises ─── Generate 3 exercises for a roadmap step (auth required)
+router.post('/exercises', protect, async (req, res) => {
+  try {
+    const { career, stage, step_skill, step_description, youtube_search, user_name, user_profile } = req.body;
+    if (!step_skill || !career) return res.status(400).json({ success: false, error: 'Missing step_skill or career' });
+
+    const systemPrompt = `You are an expert educational content designer specializing in career-focused skill development. You create practical exercises that force active application of concepts — not passive recall. Your exercises are specific, achievable in 30-60 minutes, and produce a tangible output the learner can review and keep. You personalize difficulty and context based on the learner's cognitive style. You MUST return valid JSON only.`;
+
+    const userPrompt = `Generate exactly 3 exercises for ${user_name || 'the student'} who is learning ${step_skill} as part of their ${career} roadmap.
+
+About this learning step:
+${step_description || step_skill}
+
+The learning resource for this step covers:
+${youtube_search || step_skill + ' tutorial'}
+
+${user_profile ? `${user_name}'s learning profile:
+- Cognitive style: ${user_profile.cognitive_style || 'analytical'}
+- Motivated by: ${user_profile.motivation_source || 'growth'}
+- Thrives in: ${user_profile.environment_preference || 'structured'}` : ''}
+
+Generate 3 exercises of different types:
+
+EXERCISE 1 — CONCEPTUAL (15-20 minutes)
+Tests whether they understood the core concept.
+Output: a written answer, definition, or explanation.
+Personalize the scenario to their cognitive style.
+
+EXERCISE 2 — APPLIED (30-45 minutes)
+Tests whether they can use the concept in practice.
+Output: something tangible they create or produce.
+Make it relevant to real ${career} work.
+
+EXERCISE 3 — REFLECTIVE (10-15 minutes)
+Tests whether they can connect this concept to their own experience or the career reality.
+Output: a short personal reflection or observation.
+Connect it to their motivation source.
+
+Return ONLY valid JSON:
+{
+  "step_skill": "${step_skill}",
+  "exercises": [
+    {
+      "id": "ex-1",
+      "type": "conceptual",
+      "title": "exercise title in 5 words max",
+      "instruction": "clear instruction paragraph explaining exactly what to do",
+      "context": "1 sentence explaining why this exercise matters for ${career}",
+      "output_format": "exactly what to produce — be specific about format and length",
+      "time_estimate": "X minutes",
+      "evaluation_criteria": ["criterion 1", "criterion 2", "criterion 3"]
+    },
+    {
+      "id": "ex-2",
+      "type": "applied",
+      "title": "...", "instruction": "...", "context": "...", "output_format": "...", "time_estimate": "...", "evaluation_criteria": ["...", "...", "..."]
+    },
+    {
+      "id": "ex-3",
+      "type": "reflective",
+      "title": "...", "instruction": "...", "context": "...", "output_format": "...", "time_estimate": "...", "evaluation_criteria": ["...", "...", "..."]
+    }
+  ]
+}`;
+
+    let result;
+    try {
+      result = await callGroq([{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], { temperature: 0.7, max_tokens: 2000 });
+    } catch (firstErr) {
+      // Retry once
+      try {
+        result = await callGroq([{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], { temperature: 0.7, max_tokens: 2000 });
+      } catch (retryErr) {
+        return res.json({ success: false, error: 'Exercise generation unavailable', retry: true });
+      }
+    }
+
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Exercise generation error:', error.message);
+    res.json({ success: false, error: 'Exercise generation unavailable', retry: true });
+  }
+});
+
+// ─── POST /validate ─── Evaluate exercise submission (auth required)
+router.post('/validate-exercise', protect, async (req, res) => {
+  const FALLBACK = {
+    verdict: 'Adequate',
+    what_worked: 'Your response showed engagement with the material.',
+    what_was_missing: 'We couldn\'t fully evaluate this submission right now.',
+    one_thing_to_do: 'Review your response and consider if you covered all aspects.',
+    unlock: true,
+    encouragement: 'Keep going — consistency matters more than perfection.'
+  };
+
+  try {
+    const { career, step_skill, exercise, user_response, user_name } = req.body;
+    if (!user_response || user_response.trim().length < 10) {
+      return res.json({ success: true, data: { ...FALLBACK, verdict: 'Needs Revision', unlock: false, what_was_missing: 'Your response was too short to evaluate. Please write at least a few sentences.' } });
+    }
+
+    const systemPrompt = `You are a supportive but honest mentor reviewing a student's exercise submission. You give specific, actionable feedback — not generic praise or criticism. You identify exactly what was strong, exactly what was missing, and exactly what the student should do to improve. You never say 'good job' without explaining specifically what was good. You never say 'needs improvement' without explaining exactly what to improve and how. Your tone is warm but direct. You MUST return valid JSON only.`;
+
+    const userPrompt = `Review ${user_name || 'the student'}'s submission for this exercise:
+
+Exercise: ${exercise.title}
+Type: ${exercise.type}
+Instruction given: ${exercise.instruction}
+Expected output: ${exercise.output_format}
+Career context: ${career} — ${step_skill}
+
+Evaluation criteria:
+${(exercise.evaluation_criteria || []).map((c, i) => `${i + 1}. ${c}`).join('\n')}
+
+${user_name || 'Student'}'s submission:
+"${user_response}"
+
+Provide feedback structured as:
+
+1. VERDICT: one of these exactly:
+   "Strong" — met all criteria well
+   "Adequate" — met basic criteria, room to grow
+   "Needs Revision" — missed important criteria
+
+2. WHAT WORKED: 1-2 specific sentences about what was genuinely strong. Reference their actual words.
+
+3. WHAT WAS MISSING: 1-2 specific sentences about what was incomplete or incorrect. Be direct. If nothing was missing, say so honestly.
+
+4. ONE THING TO DO: Single most impactful action they can take right now. Specific and immediately actionable.
+
+5. UNLOCK: boolean — true if verdict is Strong or Adequate, false if Needs Revision
+
+Return ONLY valid JSON:
+{
+  "verdict": "Strong" | "Adequate" | "Needs Revision",
+  "what_worked": "specific feedback text",
+  "what_was_missing": "specific feedback text or 'Nothing significant was missing'",
+  "one_thing_to_do": "specific actionable instruction",
+  "unlock": true | false,
+  "encouragement": "one sentence — specific to what they demonstrated, not generic"
+}`;
+
+    const result = await callGroq([{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], { temperature: 0.4, max_tokens: 600 });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Validation error:', error.message);
+    // Never block step completion due to API failure
+    res.json({ success: true, data: FALLBACK });
+  }
+});
+
+// ─── POST /hint ─── Give a guided hint without revealing the answer (auth required)
+router.post('/hint', protect, async (req, res) => {
+  try {
+    const { step_skill, exercise, user_partial } = req.body;
+
+    const systemPrompt = `Give a hint for this exercise that guides without giving away the answer. If the user has partial work, build the hint from where they are. If they have nothing, give a starting point only. Maximum 3 sentences. Socratic — ask a question that points them in the right direction rather than telling them what to do. Return valid JSON only.`;
+
+    const userPrompt = `Exercise on ${step_skill}:
+Type: ${exercise?.type || 'conceptual'}
+Instruction: ${exercise?.instruction || 'Complete this exercise'}
+Expected output: ${exercise?.output_format || 'A written response'}
+
+User's current work: "${user_partial || '(nothing yet)'}"
+
+Return ONLY valid JSON: { "hint": "hint text max 3 sentences" }`;
+
+    const result = await callGroq([{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }], { temperature: 0.6, max_tokens: 150 });
+    res.json({ success: true, data: result });
+  } catch (error) {
+    console.error('Hint error:', error.message);
+    res.json({ success: true, data: { hint: 'Think about the core concept being tested here. What would you explain to a friend who asked you about this topic? Start there.' } });
+  }
+});
+
 // ─── GET /youtube-video ─── Find a real YouTube video via Google CSE (auth required)
 router.get('/youtube-video', protect, async (req, res) => {
   try {

@@ -9,7 +9,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import { MedhaFlowProvider } from "./context/MedhaFlowContext";
+import { MedhaFlowProvider, useMedhaFlow } from "./context/MedhaFlowContext";
+import CareerJourneyProvider from "./context/CareerJourneyContext";
 
 // MedhaFlow Career Discovery Pages
 import FlowLandingPage from "./pages/flow/FlowLandingPage";
@@ -103,11 +104,20 @@ const ConditionalFooter = () => {
 
 function AppContent() {
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { restoreFromDatabase, isDataLoaded } = useMedhaFlow();
 
   useEffect(() => {
     const timer = setTimeout(() => setLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
+
+  // Restore user data from DB on mount when authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && !isDataLoaded) {
+      restoreFromDatabase();
+    }
+  }, [authLoading, isAuthenticated, isDataLoaded, restoreFromDatabase]);
 
   return (
     <>
@@ -172,9 +182,11 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <MedhaFlowProvider>
-          <Router>
-            <AppContent />
-          </Router>
+          <CareerJourneyProvider>
+            <Router>
+              <AppContent />
+            </Router>
+          </CareerJourneyProvider>
         </MedhaFlowProvider>
       </ThemeProvider>
     </AuthProvider>

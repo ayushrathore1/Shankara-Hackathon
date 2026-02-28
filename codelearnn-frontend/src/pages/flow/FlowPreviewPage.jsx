@@ -10,15 +10,18 @@ import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import { useMedhaFlow } from '../../context/MedhaFlowContext';
 import { medhaFlowAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import MentorChat, { MentorTrigger } from '../../components/mentor/MentorChat';
 
 const FlowPreviewPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { userName, careerResults, setSelectedCareer } = useMedhaFlow();
+  const { userName, careerResults, setSelectedCareer, quizAnswers } = useMedhaFlow();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [mentorOpen, setMentorOpen] = useState(false);
+  const [showPulse, setShowPulse] = useState(true);
 
   const career = careerResults.find(c => c.slug === slug);
 
@@ -40,6 +43,18 @@ const FlowPreviewPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Stop pulse after 30s
+  useEffect(() => { const t = setTimeout(() => setShowPulse(false), 30000); return () => clearTimeout(t); }, []);
+
+  const userProfile = {
+    name: userName || 'Student',
+    cognitive_style: quizAnswers?.q1?.dimension || 'analytical',
+    motivation_source: quizAnswers?.q2?.dimension || 'growth',
+    environment_preference: quizAnswers?.q3?.dimension || 'structured',
+    resilience_pattern: quizAnswers?.q4?.dimension || 'persistent',
+    self_description: typeof quizAnswers?.q6 === 'string' ? quizAnswers.q6 : '',
   };
 
   if (loading) {
@@ -160,6 +175,10 @@ const FlowPreviewPage = () => {
           </button>
         </div>
       </div>
+
+      {/* Career Mentor */}
+      <MentorTrigger onClick={() => setMentorOpen(!mentorOpen)} isOpen={mentorOpen} showPulse={showPulse} />
+      <MentorChat career={career} userProfile={userProfile} isOpen={mentorOpen} onClose={() => setMentorOpen(false)} />
     </main>
   );
 };

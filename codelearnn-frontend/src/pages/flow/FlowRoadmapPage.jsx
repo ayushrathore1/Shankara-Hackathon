@@ -1,37 +1,59 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faSpinner, faChevronDown, faCheck, faFire, faCheckCircle,
   faArrowLeft, faPlay, faExternalLinkAlt, faTimes,
-  faThumbsUp, faExclamationCircle, faCode, faQuestionCircle,
   faPaperPlane, faBrain, faLightbulb,
+  faFlask, faBookOpen, faPen, faRedo, faEye,
 } from '@fortawesome/free-solid-svg-icons';
 import { faYoutube } from '@fortawesome/free-brands-svg-icons';
 import { useMedhaFlow } from '../../context/MedhaFlowContext';
 import { medhaFlowAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import MentorChat, { MentorTrigger } from '../../components/mentor/MentorChat';
 
-const LABELS = ['A', 'B', 'C', 'D'];
+const TYPE_META = {
+  conceptual: { icon: faBookOpen, label: 'Conceptual', color: 'blue', time: '15-20 min' },
+  applied: { icon: faFlask, label: 'Applied', color: 'purple', time: '30-45 min' },
+  reflective: { icon: faPen, label: 'Reflective', color: 'amber', time: '10-15 min' },
+};
+
+const VERDICT_COLORS = {
+  'Strong': { bg: 'bg-green-500/10', border: 'border-green-500/30', text: 'text-green-400', badge: 'bg-green-500/20' },
+  'Adequate': { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400', badge: 'bg-blue-500/20' },
+  'Needs Revision': { bg: 'bg-amber-500/10', border: 'border-amber-500/30', text: 'text-amber-400', badge: 'bg-amber-500/20' },
+};
 
 const FlowRoadmapPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { userName, selectedCareer, careerResults, roadmapData, setRoadmapData, roadmapProgress, setRoadmapProgress, streakCount } = useMedhaFlow();
+  const {
+    userName, selectedCareer, careerResults, quizAnswers,
+    roadmapData, setRoadmapData, roadmapProgress,
+    streakCount, exerciseData, storeExercises, recordSubmission, completeStepViaExercise,
+  } = useMedhaFlow();
+
   const [loading, setLoading] = useState(!roadmapData);
   const [expandedStages, setExpandedStages] = useState(new Set(['stage-1']));
   const [error, setError] = useState('');
+  const [mentorOpen, setMentorOpen] = useState(false);
+  const [showMentorPulse, setShowMentorPulse] = useState(true);
 
-  // Challenge state
-  const [challengeStep, setChallengeStep] = useState(null); // stepId being challenged
-  const [challengeQuestions, setChallengeQuestions] = useState([]);
-  const [challengeLoading, setChallengeLoading] = useState(false);
-  const [challengeAnswers, setChallengeAnswers] = useState({ q1: null, q2: '', q3: '' });
-  const [challengeSubmitting, setChallengeSubmitting] = useState(false);
-  const [challengeResults, setChallengeResults] = useState({}); // { stepId: { passed, results, overall_feedback } }
+  // Exercise panel state
+  const [openExerciseStep, setOpenExerciseStep] = useState(null); // stepId with exercise panel open
+  const [exerciseLoading, setExerciseLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('ex-1'); // which exercise tab is active
+  const [responseText, setResponseText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [hintText, setHintText] = useState('');
+  const [hintLoading, setHintLoading] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [retrying, setRetrying] = useState(false); // user clicked "Try Again"
 
+  const textareaRef = useRef(null);
   const career = selectedCareer || careerResults.find(c => c.slug === slug);
 
   useEffect(() => {
@@ -39,6 +61,9 @@ const FlowRoadmapPage = () => {
     if (!userName || !career) { navigate('/results', { replace: true }); return; }
     if (!roadmapData) fetchRoadmap();
   }, [slug, authLoading]);
+
+  // Stop mentor pulse after 30s
+  useEffect(() => { const t = setTimeout(() => setShowMentorPulse(false), 30000); return () => clearTimeout(t); }, []);
 
   const fetchRoadmap = async () => {
     setLoading(true);
@@ -60,51 +85,127 @@ const FlowRoadmapPage = () => {
     });
   };
 
-  // ─── Challenge Flow ───
-  const startChallenge = async (stepId) => {
-    setChallengeStep(stepId);
-    setChallengeQuestions([]);
-    setChallengeAnswers({ q1: null, q2: '', q3: '' });
-    setChallengeLoading(true);
-    try {
-      const res = await medhaFlowAPI.generateChallenge(stepId);
-      setChallengeQuestions(res.data?.data?.questions || []);
-    } catch (err) {
-      console.error('Challenge gen failed:', err);
-      setChallengeStep(null);
-    } finally {
-      setChallengeLoading(false);
-    }
+  // Build user profile from quiz answers for exercise personalization
+  const getUserProfile = () => {
+    const q1 = typeof quizAnswers?.q1 === 'object' ? quizAnswers.q1.text : (quizAnswers?.q1 || '');
+    const q2 = typeof quizAnswers?.q2 === 'object' ? quizAnswers.q2.text : (quizAnswers?.q2 || '');
+    const q3 = typeof quizAnswers?.q3 === 'object' ? quizAnswers.q3.text : (quizAnswers?.q3 || '');
+    return {
+      cognitive_style: q1.length > 10 ? q1.substring(0, 80) : 'analytical',
+      motivation_source: q2.length > 10 ? q2.substring(0, 80) : 'growth',
+      environment_preference: q3.length > 10 ? q3.substring(0, 80) : 'structured',
+    };
   };
 
-  const submitChallenge = async () => {
-    if (challengeAnswers.q1 === null || challengeAnswers.q2.length < 10 || challengeAnswers.q3.length < 10) return;
-    setChallengeSubmitting(true);
+  // ─── Get Exercises ───
+  const handleGetExercises = async (step) => {
+    if (exerciseData[step.id]?.exercises?.length) {
+      // Already generated — just toggle panel
+      setOpenExerciseStep(prev => prev === step.id ? null : step.id);
+      setActiveTab('ex-1');
+      setResponseText('');
+      setShowHint(false);
+      setHintText('');
+      setRetrying(false);
+      return;
+    }
+
+    setOpenExerciseStep(step.id);
+    setExerciseLoading(true);
+    setActiveTab('ex-1');
+    setResponseText('');
+    setShowHint(false);
+    setRetrying(false);
+
     try {
-      const res = await medhaFlowAPI.validateChallenge(challengeStep, challengeAnswers);
-      const result = res.data?.data;
-      setChallengeResults(prev => ({ ...prev, [challengeStep]: result }));
-      if (result.passed) {
-        setRoadmapProgress(prev => ({ ...prev, [challengeStep]: true }));
+      const res = await medhaFlowAPI.getExercises({
+        career: career.title,
+        stage: 'Learning',
+        step_skill: step.skill,
+        step_description: step.description,
+        youtube_search: step.youtube_search,
+        user_name: userName,
+        user_profile: getUserProfile(),
+      });
+
+      if (res.data?.success && res.data.data?.exercises) {
+        storeExercises(step.id, res.data.data.exercises);
+      } else {
+        setError('Could not generate exercises. Try again in a moment.');
+        setOpenExerciseStep(null);
       }
     } catch (err) {
-      console.error('Validate failed:', err);
+      setError('Could not generate exercises. Try again in a moment.');
+      setOpenExerciseStep(null);
     } finally {
-      setChallengeSubmitting(false);
+      setExerciseLoading(false);
     }
   };
 
-  const closeChallenge = () => {
-    setChallengeStep(null);
-    setChallengeQuestions([]);
-    setChallengeAnswers({ q1: null, q2: '', q3: '' });
+  // ─── Submit Exercise ───
+  const handleSubmit = async (step, exercise) => {
+    if (responseText.trim().length < 50) return;
+    setSubmitting(true);
+
+    try {
+      const isRevision = (exerciseData[step.id]?.submissions?.[exercise.id]?.attempts || 0) > 0;
+      const res = await medhaFlowAPI.validateExercise({
+        career: career.title,
+        step_skill: step.skill,
+        exercise,
+        user_response: responseText.trim(),
+        user_name: userName,
+      });
+
+      let feedback = res.data?.data;
+      // On revision attempt, always unlock
+      if (isRevision && feedback) {
+        feedback = { ...feedback, unlock: true, verdict: feedback.verdict === 'Needs Revision' ? 'Adequate' : feedback.verdict };
+      }
+
+      recordSubmission(step.id, exercise.id, responseText.trim(), feedback);
+
+      // If unlock is true, complete the step
+      if (feedback?.unlock) {
+        completeStepViaExercise(step.id);
+      }
+    } catch (err) {
+      // Fallback — never block progress
+      const fallback = {
+        verdict: 'Adequate', unlock: true,
+        what_worked: 'Your response showed engagement.',
+        what_was_missing: 'We could not fully evaluate right now.',
+        one_thing_to_do: 'Review your response.',
+        encouragement: 'Keep going!',
+      };
+      recordSubmission(step.id, exercise.id, responseText.trim(), fallback);
+      completeStepViaExercise(step.id);
+    } finally {
+      setSubmitting(false);
+      setRetrying(false);
+    }
   };
 
-  const retryChallenge = (stepId) => {
-    setChallengeResults(prev => { const n = { ...prev }; delete n[stepId]; return n; });
-    startChallenge(stepId);
+  // ─── Get Hint ───
+  const handleGetHint = async (step, exercise) => {
+    if (hintLoading) return;
+    setHintLoading(true);
+    setShowHint(true);
+    try {
+      const res = await medhaFlowAPI.getHint({
+        step_skill: step.skill,
+        exercise,
+        user_partial: responseText,
+      });
+      setHintText(res.data?.data?.hint || 'Think about the core concept. What would you explain to a friend?');
+    } catch {
+      setHintText('Think about the core concept. What would you explain to a friend?');
+    } finally {
+      setHintLoading(false);
+    }
   };
 
+  // ─── Loading ───
   if (loading) {
     return (
       <main className="min-h-screen bg-bg-base flex items-center justify-center px-4">
@@ -116,7 +217,7 @@ const FlowRoadmapPage = () => {
     );
   }
 
-  if (error || !roadmapData) {
+  if (error && !roadmapData) {
     return (
       <main className="min-h-screen bg-bg-base flex items-center justify-center px-4">
         <div className="text-center">
@@ -127,12 +228,10 @@ const FlowRoadmapPage = () => {
     );
   }
 
-  const allSteps = roadmapData.stages?.flatMap(s => s.steps) || [];
+  const allSteps = roadmapData?.stages?.flatMap(s => s.steps) || [];
   const completedCount = allSteps.filter(s => roadmapProgress[s.id]).length;
   const totalSteps = allSteps.length;
   const progressPct = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
-
-  const canSubmitChallenge = challengeAnswers.q1 !== null && challengeAnswers.q2.trim().length >= 10 && challengeAnswers.q3.trim().length >= 10;
 
   return (
     <main className="min-h-screen bg-bg-base pt-10 pb-20 px-4">
@@ -144,12 +243,12 @@ const FlowRoadmapPage = () => {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
-            <span className="text-primary font-mono text-xs">{roadmapData.total_duration}</span>
+            <span className="text-primary font-mono text-xs">{roadmapData?.total_duration}</span>
           </div>
           <h1 className="text-3xl font-heading font-bold text-text-main mb-2">
-            {userName}'s <span className="text-primary">{career.title}</span> Roadmap
+            {userName}'s <span className="text-primary">{career?.title}</span> Roadmap
           </h1>
-          <p className="text-text-muted">Learn each skill, then prove it by answering AI-generated questions.</p>
+          <p className="text-text-muted">Complete exercises to verify each skill and unlock your progress.</p>
         </motion.div>
 
         {/* Progress & Streak */}
@@ -174,7 +273,7 @@ const FlowRoadmapPage = () => {
 
         {/* Stages */}
         <div className="space-y-4">
-          {roadmapData.stages?.map((stage, stageIdx) => {
+          {roadmapData?.stages?.map((stage, stageIdx) => {
             const isExpanded = expandedStages.has(stage.id);
             const stageSteps = stage.steps || [];
             const stageCompleted = stageSteps.filter(s => roadmapProgress[s.id]).length;
@@ -211,19 +310,18 @@ const FlowRoadmapPage = () => {
                       <div className="px-5 pb-5 space-y-3 border-t border-border pt-3">
                         {stageSteps.map((step) => {
                           const isComplete = roadmapProgress[step.id];
-                          const result = challengeResults[step.id];
-                          const isActive = challengeStep === step.id;
+                          const stepExData = exerciseData[step.id];
+                          const hasExercises = stepExData?.exercises?.length > 0;
+                          const isPanelOpen = openExerciseStep === step.id;
                           const ytUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(step.youtube_search || step.skill)}`;
 
                           return (
                             <div key={step.id} className={`rounded-xl border p-4 transition-all ${isComplete ? 'border-primary/30 bg-primary/5' : 'border-border bg-bg-elevated'}`}>
+                              {/* Step header */}
                               <div className="flex items-start gap-3">
-                                <div className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${
-                                  isComplete ? 'bg-primary border-primary' : 'border-border'
-                                }`}>
+                                <div className={`mt-0.5 w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 ${isComplete ? 'bg-primary border-primary' : 'border-border'}`}>
                                   {isComplete && <FontAwesomeIcon icon={faCheck} className="text-bg-base text-[8px]" />}
                                 </div>
-
                                 <div className="flex-1 min-w-0">
                                   <h4 className={`font-bold text-sm mb-1 ${isComplete ? 'text-primary' : 'text-text-main'}`}>{step.skill}</h4>
                                   <p className="text-text-dim text-xs leading-relaxed mb-3">{step.description}</p>
@@ -254,169 +352,191 @@ const FlowRoadmapPage = () => {
                                     <p className="text-text-muted text-sm">{step.milestone}</p>
                                   </div>
 
-                                  {/* Completed badge */}
-                                  {isComplete && !result && (
-                                    <div className="flex items-center gap-2 text-primary text-xs font-medium py-1">
-                                      <FontAwesomeIcon icon={faCheckCircle} /> Skill verified ✓
-                                    </div>
-                                  )}
-
-                                  {/* Challenge Result */}
-                                  {result && (
-                                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                                      className={`rounded-xl border p-4 mb-2 ${result.passed ? 'bg-green-500/5 border-green-500/30' : 'bg-yellow-500/5 border-yellow-500/30'}`}>
-                                      <div className="flex items-center gap-2 mb-3">
-                                        <FontAwesomeIcon icon={result.passed ? faThumbsUp : faExclamationCircle}
-                                          className={result.passed ? 'text-green-400' : 'text-yellow-400'} />
-                                        <span className={`text-sm font-bold ${result.passed ? 'text-green-400' : 'text-yellow-400'}`}>
-                                          {result.passed ? `✅ Passed (${result.passCount}/3)` : `🔄 ${result.passCount}/3 — Need 2 to pass`}
-                                        </span>
-                                      </div>
-
-                                      {/* Per-question feedback */}
-                                      {['q1', 'q2', 'q3'].map((qk, qi) => {
-                                        const r = result.results?.[qk];
-                                        if (!r) return null;
-                                        return (
-                                          <div key={qk} className={`flex items-start gap-2 py-1.5 ${qi < 2 ? 'border-b border-border/50' : ''}`}>
-                                            <span className={`text-xs mt-0.5 ${r.pass ? 'text-green-400' : 'text-red-400'}`}>
-                                              {r.pass ? '✓' : '✗'}
-                                            </span>
-                                            <div>
-                                              <span className="text-text-dim text-xs font-mono">Q{qi + 1}:</span>
-                                              <span className="text-text-muted text-xs ml-1">{r.feedback}</span>
-                                            </div>
-                                          </div>
-                                        );
-                                      })}
-
-                                      <p className="text-text-muted text-sm mt-3 pt-2 border-t border-border/50">{result.overall_feedback}</p>
-
-                                      {!result.passed && (
-                                        <button onClick={() => retryChallenge(step.id)}
-                                          className="mt-3 w-full py-2.5 bg-yellow-500/10 text-yellow-400 rounded-lg text-xs font-medium hover:bg-yellow-500/20 border border-yellow-500/20">
-                                          <FontAwesomeIcon icon={faBrain} className="mr-1" /> Retry Challenge
-                                        </button>
+                                  {/* Exercise Button / Completed State */}
+                                  {isComplete ? (
+                                    <button onClick={() => handleGetExercises(step)}
+                                      className="w-full py-2.5 bg-primary/10 text-primary font-medium text-xs rounded-lg transition-all border border-primary/20 flex items-center justify-center gap-2">
+                                      <FontAwesomeIcon icon={isPanelOpen ? faEye : faCheckCircle} />
+                                      {isPanelOpen ? 'Hide Exercises ↑' : 'Completed ✓ — Review Exercises'}
+                                    </button>
+                                  ) : (
+                                    <button onClick={() => handleGetExercises(step)}
+                                      disabled={exerciseLoading && openExerciseStep === step.id}
+                                      className="w-full py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-medium text-xs rounded-lg transition-all border border-primary/20 hover:border-primary/40 flex items-center justify-center gap-2 disabled:opacity-50">
+                                      {exerciseLoading && openExerciseStep === step.id ? (
+                                        <><FontAwesomeIcon icon={faSpinner} spin /> Generating your exercises...</>
+                                      ) : isPanelOpen ? (
+                                        <>Hide Exercises ↑</>
+                                      ) : (
+                                        <><FontAwesomeIcon icon={faBrain} /> Get Exercises →</>
                                       )}
-                                    </motion.div>
-                                  )}
-
-                                  {/* Start Challenge Button */}
-                                  {!isComplete && !result && !isActive && (
-                                    <button onClick={() => startChallenge(step.id)}
-                                      className="w-full py-2.5 bg-primary/10 hover:bg-primary/20 text-primary font-medium text-xs rounded-lg transition-all border border-primary/20 hover:border-primary/40 flex items-center justify-center gap-2">
-                                      <FontAwesomeIcon icon={faBrain} /> Verify This Skill
                                     </button>
                                   )}
+                                  {!isComplete && !isPanelOpen && (
+                                    <p className="text-text-dim text-[10px] text-center mt-1.5">Complete exercises to unlock this step</p>
+                                  )}
 
-                                  {/* ─── Challenge Questions (Inline) ─── */}
+                                  {/* ═══ EXERCISE PANEL ═══ */}
                                   <AnimatePresence>
-                                    {isActive && !result && (
+                                    {isPanelOpen && hasExercises && (
                                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
                                         exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }} className="overflow-hidden">
-                                        <div className="bg-bg-base rounded-xl border border-primary/30 p-4 mt-2 space-y-5">
-                                          <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-2">
-                                              <FontAwesomeIcon icon={faBrain} className="text-primary text-sm" />
-                                              <p className="text-xs font-mono text-primary">SKILL CHALLENGE</p>
-                                            </div>
-                                            <button onClick={closeChallenge} className="text-text-dim hover:text-text-muted">
-                                              <FontAwesomeIcon icon={faTimes} className="text-xs" />
-                                            </button>
+                                        <div className="mt-4 border-t border-border pt-4">
+                                          {/* Tabs */}
+                                          <div className="flex gap-2 mb-4">
+                                            {stepExData.exercises.map((ex) => {
+                                              const meta = TYPE_META[ex.type] || TYPE_META.conceptual;
+                                              const sub = stepExData.submissions?.[ex.id];
+                                              const isDone = sub?.feedback?.unlock;
+                                              return (
+                                                <button key={ex.id} onClick={() => { setActiveTab(ex.id); setResponseText(sub?.response || ''); setShowHint(false); setHintText(''); setRetrying(false); }}
+                                                  className={`flex-1 py-2 px-2 rounded-lg text-xs font-medium transition-all border flex items-center justify-center gap-1.5 ${
+                                                    activeTab === ex.id
+                                                      ? `bg-${meta.color}-500/10 border-${meta.color}-500/30 text-${meta.color}-400`
+                                                      : 'border-border text-text-dim hover:text-text-muted'
+                                                  } ${isDone ? 'opacity-70' : ''}`}>
+                                                  <FontAwesomeIcon icon={isDone ? faCheckCircle : meta.icon} className="text-[10px]" />
+                                                  {meta.label}
+                                                </button>
+                                              );
+                                            })}
                                           </div>
 
-                                          {challengeLoading ? (
-                                            <div className="text-center py-8">
-                                              <FontAwesomeIcon icon={faSpinner} spin className="text-primary text-xl mb-3" />
-                                              <p className="text-text-muted text-sm">Generating questions for you...</p>
-                                            </div>
-                                          ) : (
-                                            <>
-                                              {challengeQuestions.map((q, qi) => (
-                                                <div key={q.id} className="space-y-2">
-                                                  {/* Question header */}
-                                                  <div className="flex items-center gap-2 mb-2">
-                                                    <span className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-bold ${
-                                                      q.type === 'mcq' ? 'bg-blue-500/15 text-blue-400' :
-                                                      q.type === 'short_answer' ? 'bg-purple-500/15 text-purple-400' :
-                                                      'bg-orange-500/15 text-orange-400'
-                                                    }`}>
-                                                      <FontAwesomeIcon icon={q.type === 'code' ? faCode : q.type === 'mcq' ? faQuestionCircle : faLightbulb} className="text-[10px]" />
-                                                    </span>
-                                                    <span className="text-[10px] font-mono text-text-dim uppercase">
-                                                      {q.type === 'mcq' ? 'Conceptual' : q.type === 'short_answer' ? 'Short Answer' : 'Code / Practical'}
-                                                    </span>
-                                                  </div>
+                                          {/* Active Exercise */}
+                                          {stepExData.exercises.map((ex) => {
+                                            if (ex.id !== activeTab) return null;
+                                            const meta = TYPE_META[ex.type] || TYPE_META.conceptual;
+                                            const sub = stepExData.submissions?.[ex.id];
+                                            const hasFeedback = sub?.feedback;
+                                            const isReadOnly = isComplete && !retrying;
 
-                                                  <p className="text-text-main text-sm font-medium leading-relaxed">{q.question}</p>
-
-                                                  {/* MCQ */}
-                                                  {q.type === 'mcq' && (
-                                                    <div className="space-y-1.5">
-                                                      {q.options?.map((opt, oi) => (
-                                                        <button key={oi} onClick={() => setChallengeAnswers(p => ({ ...p, q1: oi }))}
-                                                          className={`w-full text-left px-3.5 py-2.5 rounded-lg border text-xs flex items-center gap-3 transition-all ${
-                                                            challengeAnswers.q1 === oi
-                                                              ? 'border-primary bg-primary/10 text-text-main'
-                                                              : 'border-border bg-bg-surface hover:border-primary/30 text-text-muted'
-                                                          }`}>
-                                                          <span className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-bold flex-shrink-0 ${
-                                                            challengeAnswers.q1 === oi ? 'bg-primary text-bg-base' : 'bg-bg-elevated text-text-dim'
-                                                          }`}>{LABELS[oi]}</span>
-                                                          {opt}
-                                                        </button>
-                                                      ))}
-                                                    </div>
-                                                  )}
-
-                                                  {/* Short Answer */}
-                                                  {q.type === 'short_answer' && (
-                                                    <textarea value={challengeAnswers.q2}
-                                                      onChange={(e) => setChallengeAnswers(p => ({ ...p, q2: e.target.value }))}
-                                                      placeholder="Explain in 1-3 sentences..."
-                                                      rows={3}
-                                                      className="w-full px-3.5 py-3 bg-bg-surface border border-border rounded-lg text-text-main text-sm placeholder:text-text-dim focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none resize-none leading-relaxed transition-all" />
-                                                  )}
-
-                                                  {/* Code */}
-                                                  {q.type === 'code' && (
-                                                    <div className="space-y-2">
-                                                      {q.hint && (
-                                                        <p className="text-text-dim text-xs flex items-center gap-1">
-                                                          <FontAwesomeIcon icon={faLightbulb} className="text-yellow-400 text-[10px]" />
-                                                          Hint: {q.hint}
-                                                        </p>
-                                                      )}
-                                                      <textarea value={challengeAnswers.q3}
-                                                        onChange={(e) => setChallengeAnswers(p => ({ ...p, q3: e.target.value }))}
-                                                        placeholder={`Write your ${q.language || 'code'} here...`}
-                                                        rows={6}
-                                                        className="w-full px-3.5 py-3 bg-bg-surface border border-border rounded-lg text-text-main text-sm placeholder:text-text-dim focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none resize-none font-mono leading-relaxed transition-all" />
-                                                    </div>
-                                                  )}
-
-                                                  {qi < challengeQuestions.length - 1 && <div className="border-t border-border/30 my-1" />}
+                                            return (
+                                              <motion.div key={ex.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                                                {/* Exercise Info */}
+                                                <div className="mb-4">
+                                                  <h5 className="font-bold text-text-main text-sm mb-1">{ex.title}</h5>
+                                                  <p className="text-text-dim text-xs mb-2 italic">{ex.context}</p>
+                                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-bg-base border border-border text-text-dim text-[10px]">
+                                                    ⏱ {ex.time_estimate}
+                                                  </span>
                                                 </div>
-                                              ))}
 
-                                              {/* Submit */}
-                                              <button onClick={submitChallenge}
-                                                disabled={!canSubmitChallenge || challengeSubmitting}
-                                                className="w-full py-3 bg-primary hover:bg-primary/90 text-bg-base font-bold text-sm rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
-                                                {challengeSubmitting ? (
-                                                  <><FontAwesomeIcon icon={faSpinner} spin /> Grading your answers...</>
+                                                {/* Instruction */}
+                                                <div className="bg-bg-base rounded-lg p-3 border border-border mb-3">
+                                                  <p className="text-text-muted text-sm leading-relaxed">{ex.instruction}</p>
+                                                </div>
+
+                                                {/* Output Format */}
+                                                <div className="bg-primary/5 rounded-lg p-3 border border-primary/20 mb-4">
+                                                  <p className="text-[10px] font-mono text-primary mb-1">WHAT TO PRODUCE</p>
+                                                  <p className="text-text-main text-sm">{ex.output_format}</p>
+                                                </div>
+
+                                                {/* Feedback card (if submitted) */}
+                                                {hasFeedback && !retrying ? (
+                                                  <div className={`rounded-xl border p-4 mb-3 ${VERDICT_COLORS[hasFeedback.verdict]?.bg || 'bg-bg-base'} ${VERDICT_COLORS[hasFeedback.verdict]?.border || 'border-border'}`}>
+                                                    {/* Verdict badge */}
+                                                    <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mb-3 ${VERDICT_COLORS[hasFeedback.verdict]?.badge || ''} ${VERDICT_COLORS[hasFeedback.verdict]?.text || 'text-text-main'}`}>
+                                                      {hasFeedback.verdict === 'Strong' && '✓ '}
+                                                      {hasFeedback.verdict}
+                                                    </div>
+
+                                                    <div className="space-y-3 text-sm">
+                                                      <div>
+                                                        <p className="text-text-dim text-[10px] font-mono mb-1">WHAT WORKED</p>
+                                                        <p className="text-text-muted">{hasFeedback.what_worked}</p>
+                                                      </div>
+                                                      <div>
+                                                        <p className="text-text-dim text-[10px] font-mono mb-1">WHAT WAS MISSING</p>
+                                                        <p className="text-text-muted">{hasFeedback.what_was_missing}</p>
+                                                      </div>
+                                                      <div className="bg-bg-base rounded-lg p-3 border border-border">
+                                                        <p className="text-text-dim text-[10px] font-mono mb-1">ONE THING TO DO</p>
+                                                        <p className="text-text-main font-medium">{hasFeedback.one_thing_to_do}</p>
+                                                      </div>
+                                                      <p className="text-text-dim text-xs italic pt-1">{hasFeedback.encouragement}</p>
+                                                    </div>
+
+                                                    {/* Unlock banner */}
+                                                    {hasFeedback.unlock ? (
+                                                      <div className="mt-3 py-2 px-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-400 text-xs font-medium flex items-center gap-2">
+                                                        <FontAwesomeIcon icon={faCheckCircle} /> Step Unlocked ✓
+                                                      </div>
+                                                    ) : (
+                                                      <div className="mt-3 space-y-2">
+                                                        <div className="py-2 px-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-medium">
+                                                          Revise and resubmit
+                                                        </div>
+                                                        <button onClick={() => { setRetrying(true); setResponseText(sub.response || ''); }}
+                                                          className="w-full py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg text-xs font-medium border border-amber-500/20 flex items-center justify-center gap-2">
+                                                          <FontAwesomeIcon icon={faRedo} /> Try Again →
+                                                        </button>
+                                                      </div>
+                                                    )}
+
+                                                    {/* Show submitted response (read-only) */}
+                                                    <div className="mt-3 pt-3 border-t border-border/50">
+                                                      <p className="text-text-dim text-[10px] font-mono mb-1">YOUR RESPONSE</p>
+                                                      <p className="text-text-muted text-xs leading-relaxed whitespace-pre-wrap">{sub.response}</p>
+                                                    </div>
+                                                  </div>
                                                 ) : (
-                                                  <><FontAwesomeIcon icon={faPaperPlane} /> Submit Answers</>
-                                                )}
-                                              </button>
+                                                  /* Textarea + submit */
+                                                  <>
+                                                    <textarea
+                                                      ref={textareaRef}
+                                                      value={responseText}
+                                                      onChange={(e) => setResponseText(e.target.value)}
+                                                      placeholder="Write your response here..."
+                                                      rows={5}
+                                                      disabled={isReadOnly && !retrying}
+                                                      className="w-full px-4 py-3 bg-bg-base border border-border rounded-xl text-text-main text-sm placeholder:text-text-dim focus:border-primary focus:ring-1 focus:ring-primary/50 outline-none resize-none leading-relaxed transition-all min-h-[120px]"
+                                                    />
 
-                                              {!canSubmitChallenge && challengeQuestions.length > 0 && (
-                                                <p className="text-text-dim text-xs text-center">
-                                                  Answer all 3 questions to submit (min 10 chars for text answers)
-                                                </p>
-                                              )}
-                                            </>
-                                          )}
+                                                    <div className="flex items-center justify-between mt-2 mb-3">
+                                                      {/* Hint button */}
+                                                      <button onClick={() => handleGetHint(step, ex)}
+                                                        disabled={hintLoading}
+                                                        className="text-text-dim text-xs hover:text-text-muted transition-colors flex items-center gap-1">
+                                                        <FontAwesomeIcon icon={faLightbulb} className="text-yellow-400/60 text-[10px]" />
+                                                        {hintLoading ? 'Getting hint...' : "I'm stuck"}
+                                                      </button>
+                                                      <span className="text-text-dim text-[10px]">{responseText.length} chars{responseText.length < 50 ? ` · ${50 - responseText.length} more needed` : ''}</span>
+                                                    </div>
+
+                                                    {/* Hint area */}
+                                                    <AnimatePresence>
+                                                      {showHint && hintText && (
+                                                        <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }}
+                                                          exit={{ height: 0, opacity: 0 }} className="overflow-hidden mb-3">
+                                                          <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-lg p-3 flex items-start gap-2">
+                                                            <FontAwesomeIcon icon={faLightbulb} className="text-yellow-400 text-xs mt-0.5 flex-shrink-0" />
+                                                            <div className="flex-1">
+                                                              <p className="text-text-muted text-xs leading-relaxed">{hintText}</p>
+                                                            </div>
+                                                            <button onClick={() => setShowHint(false)} className="text-text-dim text-xs hover:text-text-muted">
+                                                              <FontAwesomeIcon icon={faTimes} />
+                                                            </button>
+                                                          </div>
+                                                        </motion.div>
+                                                      )}
+                                                    </AnimatePresence>
+
+                                                    {/* Submit button */}
+                                                    <button onClick={() => handleSubmit(step, ex)}
+                                                      disabled={responseText.trim().length < 50 || submitting}
+                                                      className="w-full py-3 bg-primary hover:bg-primary/90 text-bg-base font-bold text-sm rounded-xl transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                                                      {submitting ? (
+                                                        <><FontAwesomeIcon icon={faSpinner} spin /> Evaluating...</>
+                                                      ) : (
+                                                        <><FontAwesomeIcon icon={faPaperPlane} /> Submit Response →</>
+                                                      )}
+                                                    </button>
+                                                  </>
+                                                )}
+                                              </motion.div>
+                                            );
+                                          })}
                                         </div>
                                       </motion.div>
                                     )}
@@ -429,7 +549,7 @@ const FlowRoadmapPage = () => {
 
                         {stageComplete && (
                           <div className="text-center py-3 text-primary text-sm font-medium">
-                            ✅ All skills verified — stage complete!
+                            All skills verified — stage complete!
                           </div>
                         )}
                       </div>
@@ -441,6 +561,25 @@ const FlowRoadmapPage = () => {
           })}
         </div>
       </div>
+
+      {/* Career Mentor */}
+      {(() => {
+        const career = selectedCareer || careerResults?.find(c => c.slug === slug) || { title: slug, slug };
+        const userProfile = {
+          name: userName || 'Student',
+          cognitive_style: quizAnswers?.q1?.dimension || 'analytical',
+          motivation_source: quizAnswers?.q2?.dimension || 'growth',
+          environment_preference: quizAnswers?.q3?.dimension || 'structured',
+          resilience_pattern: quizAnswers?.q4?.dimension || 'persistent',
+          self_description: typeof quizAnswers?.q6 === 'string' ? quizAnswers.q6 : '',
+        };
+        return (
+          <>
+            <MentorTrigger onClick={() => setMentorOpen(!mentorOpen)} isOpen={mentorOpen} showPulse={showMentorPulse} />
+            <MentorChat career={career} userProfile={userProfile} isOpen={mentorOpen} onClose={() => setMentorOpen(false)} />
+          </>
+        );
+      })()}
     </main>
   );
 };

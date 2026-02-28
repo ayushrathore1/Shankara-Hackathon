@@ -1,10 +1,11 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
+import { loadQuiz, loadCareers, loadProgress } from '../services/persistenceService';
 
 const MedhaFlowContext = createContext(null);
 
 export const MedhaFlowProvider = ({ children }) => {
   const [userName, setUserName] = useState('');
-  const [userDegree, setUserDegree] = useState(null); // { degree, degreeLabel, year }
+  const [userDegree, setUserDegree] = useState(null);
   const [quizAnswers, setQuizAnswers] = useState({
     q1: { text: '', dimension: '', followup_q: '', followup_a: '' },
     q2: { text: '', dimension: '', followup_q: '', followup_a: '' },
@@ -21,19 +22,60 @@ export const MedhaFlowProvider = ({ children }) => {
   const [streakCount, setStreakCount] = useState(0);
   const [lastActiveDate, setLastActiveDate] = useState('');
 
-  const toggleStepComplete = (stepId) => {
-    setRoadmapProgress(prev => {
-      const next = { ...prev, [stepId]: !prev[stepId] };
-      const today = new Date().toISOString().split('T')[0];
-      if (today !== lastActiveDate) {
-        setStreakCount(s => s + 1);
-        setLastActiveDate(today);
-      }
-      return next;
-    });
+  // Exercise & validation state
+  // Shape: { [stepId]: { exercises: [], submissions: { "ex-1": { response, feedback, verdict, attempts } }, step_status, completed_at } }
+  const [exerciseData, setExerciseData] = useState({});
+
+  // Complete step via exercise validation
+  const completeStepViaExercise = (stepId) => {
+    setRoadmapProgress(prev => ({ ...prev, [stepId]: true }));
+    setExerciseData(prev => ({
+      ...prev,
+      [stepId]: { ...prev[stepId], step_status: 'completed', completed_at: new Date().toISOString() },
+    }));
+    const today = new Date().toISOString().split('T')[0];
+    if (today !== lastActiveDate) {
+      setStreakCount(s => s + 1);
+      setLastActiveDate(today);
+    }
   };
 
-  // Load saved flow from DB
+  // Record exercise submission (increments streak on any attempt)
+  const recordSubmission = (stepId, exerciseId, response, feedback) => {
+    setExerciseData(prev => {
+      const stepD = prev[stepId] || { exercises: [], submissions: {}, step_status: 'in_progress', completed_at: null };
+      const sub = stepD.submissions[exerciseId] || { response: '', feedback: null, verdict: '', attempts: 0 };
+      return {
+        ...prev,
+        [stepId]: {
+          ...stepD,
+          submissions: {
+            ...stepD.submissions,
+            [exerciseId]: { response, feedback, verdict: feedback?.verdict || '', attempts: sub.attempts + 1 },
+          },
+        },
+      };
+    });
+    const today = new Date().toISOString().split('T')[0];
+    if (today !== lastActiveDate) {
+      setStreakCount(s => s + 1);
+      setLastActiveDate(today);
+    }
+  };
+
+  // Store generated exercises for a step
+  const storeExercises = (stepId, exercises) => {
+    setExerciseData(prev => ({
+      ...prev,
+      [stepId]: {
+        exercises,
+        submissions: prev[stepId]?.submissions || {},
+        step_status: 'in_progress',
+        completed_at: prev[stepId]?.completed_at || null,
+      },
+    }));
+  };
+
   const loadFromDB = (flowData) => {
     if (!flowData) return;
     if (flowData.quizAnswers) setQuizAnswers(flowData.quizAnswers);
@@ -45,6 +87,7 @@ export const MedhaFlowProvider = ({ children }) => {
     if (flowData.streakCount) setStreakCount(flowData.streakCount);
     if (flowData.lastActiveDate) setLastActiveDate(flowData.lastActiveDate);
     if (flowData.userDegree) setUserDegree(flowData.userDegree);
+    if (flowData.exerciseData) setExerciseData(flowData.exerciseData);
   };
 
   const resetFlow = () => {
@@ -54,7 +97,58 @@ export const MedhaFlowProvider = ({ children }) => {
     setSelectedCareer(null);
     setRoadmapData(null);
     setRoadmapProgress({});
+    setExerciseData({});
   };
+
+  // Data loaded flag — prevents showing loading states on return visits
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
+
+  // Restore all user data from database on app mount
+  const restoreFromDatabase = useCallback(async () => {
+    try {
+      const [quizRes, careerRes, progressRes] = await Promise.all([
+        loadQuiz(), loadCareers(), loadProgress(),
+      ]);
+
+      if (quizRes?.quizData?.completedAt) {
+        setQuizAnswers(prev => quizRes.quizData.questions?.length ? {
+          ...prev,
+          ...quizRes.quizData.questions.reduce((acc, q, i) => {
+            acc[`q${i + 1}`] = { text: q.selectedText || '', dimension: q.dimension || '', followup_q: q.followupQuestion || '', followup_a: q.followupAnswer || '' };
+            return acc;
+          }, {}),
+          q6: quizRes.quizData.selfDescription || '',
+        } : prev);
+      }
+
+      if (careerRes?.careerResults?.careers?.length) {
+        setCareerResults(careerRes.careerResults.careers);
+        if (careerRes.careerResults.selectedCareer?.slug) {
+          setSelectedCareer(careerRes.careerResults.selectedCareer);
+        }
+      }
+
+      if (progressRes?.roadmapProgress) {
+        const rp = progressRes.roadmapProgress;
+        if (rp.streakCount) setStreakCount(rp.streakCount);
+        if (rp.lastActiveDate) setLastActiveDate(rp.lastActiveDate);
+        // Restore step completion states
+        if (rp.stages?.length) {
+          const progress = {};
+          rp.stages.forEach(stage => {
+            stage.steps?.forEach(step => {
+              if (step.status === 'completed') progress[step.stepId] = true;
+            });
+          });
+          setRoadmapProgress(progress);
+        }
+      }
+    } catch (err) {
+      console.error('Database restore failed (using fresh state):', err.message);
+    } finally {
+      setIsDataLoaded(true);
+    }
+  }, []);
 
   return (
     <MedhaFlowContext.Provider value={{
@@ -65,8 +159,10 @@ export const MedhaFlowProvider = ({ children }) => {
       careerDomains, setCareerDomains,
       selectedCareer, setSelectedCareer,
       roadmapData, setRoadmapData,
-      roadmapProgress, setRoadmapProgress, toggleStepComplete,
+      roadmapProgress, setRoadmapProgress,
       streakCount, lastActiveDate,
+      exerciseData, storeExercises, recordSubmission, completeStepViaExercise,
+      isDataLoaded, restoreFromDatabase,
       loadFromDB, resetFlow,
     }}>
       {children}

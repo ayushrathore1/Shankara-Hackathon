@@ -199,6 +199,15 @@ app.use('/api/admin', adminRoutes);
 const medhaFlowRoutes = require('./routes/medhaFlow');
 app.use('/api/medha-flow', medhaFlowRoutes);
 
+// Career Mentor Chat
+app.use('/api/career-mentor', require('./routes/careerMentor'));
+
+// User Persistence — Quiz, Careers, Roadmap, Mentor
+app.use('/api/user/quiz', require('./routes/userQuiz'));
+app.use('/api/user/careers', require('./routes/userCareers'));
+app.use('/api/user/roadmap', require('./routes/userRoadmap'));
+app.use('/api/user/mentor', require('./routes/userMentor'));
+
 // Initialize background workers
 const { initializeWorkers } = require('./services/BackgroundWorkers');
 initializeWorkers();

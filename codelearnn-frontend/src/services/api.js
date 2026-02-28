@@ -734,7 +734,17 @@ export const medhaFlowAPI = {
   validateChallenge: (stepId, answers) => api.post('/medha-flow/validate-challenge', { stepId, answers }),
   searchYouTubeVideo: (query) => api.get(`/medha-flow/youtube-video?q=${encodeURIComponent(query)}`),
   quizFollowup: (data) => api.post('/medha-flow/followup', data),
+  getExercises: (data) => api.post('/medha-flow/exercises', data),
+  validateExercise: (data) => api.post('/medha-flow/validate-exercise', data),
+  getHint: (data) => api.post('/medha-flow/hint', data),
   getMyFlow: () => api.get('/medha-flow/me'),
+};
+
+// Career Mentor Chat
+export const careerMentorAPI = {
+  initialize: (data) => api.post('/career-mentor/initialize', data),
+  message: (data) => api.post('/career-mentor/message', data),
+  suggest: (data) => api.post('/career-mentor/suggest', data),
 };
 
 export default api;

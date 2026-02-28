@@ -254,7 +254,91 @@ const userSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+
+  // ═══ Medha Career Discovery Persistence ═══
+
+  quizData: {
+    completedAt: { type: Date, default: null },
+    questions: [{
+      dimension: String,
+      questionText: String,
+      selectedTrait: String,
+      selectedText: String,
+      customText: { type: String, default: '' },
+      followupQuestion: { type: String, default: '' },
+      followupAnswer: { type: String, default: '' },
+    }],
+    selfDescription: { type: String, default: '' },
+  },
+
+  careerResults: {
+    generatedAt: { type: Date, default: null },
+    careers: [{
+      rank: Number,
+      title: String,
+      slug: String,
+      fit_label: String,
+      why: String,
+      reality_check: String,
+      salary_range: String,
+      market_demand: String,
+      time_to_first_role: String,
+    }],
+    selectedCareer: {
+      slug: { type: String, default: '' },
+      title: { type: String, default: '' },
+      chosenAt: { type: Date, default: null },
+    },
+  },
+
+  roadmapProgress: {
+    activeCareerSlug: { type: String, default: '' },
+    streakCount: { type: Number, default: 0 },
+    lastActiveDate: { type: String, default: '' },
+    totalStepsCompleted: { type: Number, default: 0 },
+    stages: [{
+      stageId: String,
+      stageTitle: String,
+      completed: { type: Boolean, default: false },
+      completedAt: { type: Date, default: null },
+      steps: [{
+        stepId: String,
+        skill: String,
+        status: {
+          type: String,
+          enum: ['available', 'in_progress', 'needs_revision', 'completed'],
+          default: 'available',
+        },
+        completedAt: { type: Date, default: null },
+        exercises: [{
+          exerciseId: String,
+          type: String,
+          attempts: { type: Number, default: 0 },
+          lastResponse: { type: String, default: '' },
+          verdict: { type: String, default: '' },
+          feedback: {
+            what_worked: String,
+            what_was_missing: String,
+            one_thing_to_do: String,
+            encouragement: String,
+          },
+          completedAt: { type: Date, default: null },
+        }],
+      }],
+    }],
+  },
+
+  mentorChat: [{
+    careerSlug: String,
+    messages: [{
+      role: { type: String, enum: ['user', 'assistant'] },
+      content: String,
+      timestamp: { type: Date, default: Date.now },
+    }],
+    startedAt: { type: Date, default: Date.now },
+  }],
+
 }, {
   timestamps: true
 });
