@@ -200,14 +200,15 @@ router.post('/roadmap', protect, async (req, res) => {
   try {
     const { career } = req.body;
     const name = req.user.name || 'User';
+    if (!career?.title) return res.status(400).json({ success: false, message: 'Career title required' });
+
     const flow = await MedhaFlow.findOne({ userId: req.user._id }).lean();
-    if (!flow?.quizAnswers || !career?.title) return res.status(400).json({ success: false, message: 'Career and quiz data required' });
-    const answers = flow.quizAnswers;
+    const answers = flow?.quizAnswers || {};
 
     const systemPrompt = `You are an expert career roadmap designer and learning curator. You create structured, actionable learning paths that take someone from zero to job-ready. Your milestones are always output-based. You know the best free educational YouTube channels and can recommend specific, real video topics with accurate titles. Return valid JSON only.`;
     const userPrompt = `Generate a 4-stage learning roadmap for ${name} becoming a ${career.title}.
 
-${buildAnswersBlock(answers)}
+${answers?.q1 ? buildAnswersBlock(answers) : `The student wants to become a ${career.title}. Create a roadmap from beginner to job-ready.`}
 
 For EACH step, provide a real YouTube video recommendation. Use well-known educational channels like:
 - For tech: freeCodeCamp, Fireship, Traversy Media, The Net Ninja, CS50

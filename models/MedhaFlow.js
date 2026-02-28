@@ -13,11 +13,8 @@ const medhaFlowSchema = new mongoose.Schema({
   },
   // Quiz
   quizAnswers: {
-    q1: String,
-    q2: String,
-    q3: String,
-    q4: String,
-    q5: String,
+    type: mongoose.Schema.Types.Mixed,
+    default: {},
   },
   // AI-generated career recommendations
   careerResults: [{
