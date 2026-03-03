@@ -1,268 +1,79 @@
 import { Link } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faMapMarkerAlt } from "@fortawesome/free-solid-svg-icons";
-import {
-  faTwitter,
-  faInstagram,
-  faGithub,
-  faLinkedin,
-} from "@fortawesome/free-brands-svg-icons";
 
 const Footer = () => {
-  const productLinks = [
-    { label: "Careers", path: "/career" },
-    { label: "Learning Paths", path: "/learning-paths" },
-    { label: "Vault", path: "/vault" },
-    { label: "Charcha", path: "/charcha" },
-  ];
-
-  // Utility tools accessible from footer
-  const toolLinks = [{ label: "Analyzer", path: "/analyzer" }];
-
-  const companyLinks = [
-    { label: "About", path: "/about" },
-    { label: "Contact", path: "/contact" },
-    { label: "Privacy Policy", path: "/privacy-policy" },
-    { label: "Terms & Conditions", path: "/terms" },
-    { label: "Cookie Policy", path: "/cookie-policy" },
-  ];
-
-  const otherProductsLinks = [
-    { label: "Medha Revision", href: "https://medha-revision.vercel.app/" },
-  ];
-
-  const resourceLinks = [
-    { label: "Blogs", path: "/blogs" },
-    { label: "Opportunities", path: "/opportunities" },
-    {
-      label: "Jaipur Internships Guide",
-      path: "/resources/jaipur-internships-guide",
-    },
-  ];
-
-  const learningGuideLinks = [
-    { label: "The Vibe Coding Playbook", path: "/learning-guides/vibe-coding" },
-  ];
-
-  const socialLinks = [
-    {
-      icon: faTwitter,
-      href: "https://x.com/ayushrathore_27",
-      label: "Twitter",
-    },
-    {
-      icon: faInstagram,
-      href: "https://www.instagram.com/ayush.rathore27",
-      label: "Instagram",
-    },
-    {
-      icon: faGithub,
-      href: "https://github.com/ayushrathore1",
-      label: "GitHub",
-    },
-    {
-      icon: faLinkedin,
-      href: "https://www.linkedin.com/in/ayushrathore1",
-      label: "LinkedIn",
-    },
-  ];
-
-  // Footer links are always clickable; protected routes handle auth gating.
-
   return (
-    <footer className="bg-bg-base border-t border-border pt-16 pb-8">
-      <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-16">
-          {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <Link
-              to="/"
-              className="font-heading font-bold text-xl text-text-main inline-block mb-4"
-            >
-              <span className="text-primary">&lt;</span>
-              <span className="text-metallic">Medha</span>
-              <span className="text-secondary">/&gt;</span>
+    <footer className="bg-bg-dark border-t border-glass-border pt-16 pb-8">
+      <div className="max-w-[1280px] mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          
+          {/* Brand Column */}
+          <div className="md:col-span-1">
+            <Link to="/" className="inline-flex items-center gap-1 group mb-4">
+              <span className="font-mono text-text-muted-dark group-hover:text-white transition-colors">&lt;</span>
+              <span className="font-mono text-white text-lg font-medium group-hover:text-accent-cyan transition-colors">Medha</span>
+              <span className="font-mono text-text-muted-dark group-hover:text-white transition-colors">/&gt;</span>
             </Link>
-            <p className="text-text-muted text-sm leading-relaxed mb-6 max-w-sm">
-              The Learning Operating System for developers. Structure your
-              learning, understand deeply, build your career.
+            <p className="font-sans text-text-muted-dark text-sm max-w-[200px]">
+              The Learning OS for Developers
             </p>
-            <div className="flex gap-3">
-              {socialLinks.map((social, index) => (
-                <a
-                  key={index}
-                  href={social.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={social.label}
-                  className="w-9 h-9 rounded-lg bg-bg-elevated border border-border flex items-center justify-center text-text-muted hover:text-primary hover:border-primary transition-all shadow-sm"
-                >
-                  <FontAwesomeIcon icon={social.icon} className="text-sm" />
-                </a>
-              ))}
-            </div>
           </div>
 
-          {/* Product Links */}
+          {/* Product Column */}
           <div>
-            <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mb-4">
-              Product
-            </h4>
-            <div className="space-y-3">
-              {productLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  to={link.path}
-                  className="block text-text-muted text-sm hover:text-primary transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <h4 className="font-mono text-white text-xs uppercase tracking-wider mb-6">Product</h4>
+            <div className="flex flex-col gap-4">
+              <Link to="/dashboard" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Dashboard</Link>
+              <Link to="/career-discovery" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Career Discovery</Link>
+              <Link to="/rag-mentor" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">AI Mentor</Link>
+              <Link to="/learning-paths" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Learning Plan</Link>
+              <Link to="/leaderboard" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Leaderboard</Link>
+              <Link to="/charcha" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Charcha Forum</Link>
+              <Link to="/opportunities" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Opportunities Board</Link>
             </div>
           </div>
 
-          {/* Tools Links - Utility tools like Analyzer */}
+          {/* Company Column */}
           <div>
-            <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mb-4">
-              Tools
-            </h4>
-            <div className="space-y-3">
-              {toolLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  to={link.path}
-                  className="block text-text-muted text-sm hover:text-primary transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <h4 className="font-mono text-white text-xs uppercase tracking-wider mb-6">Company</h4>
+            <div className="flex flex-col gap-4">
+              <Link to="/about" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">About Us</Link>
+              <Link to="/our-story" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Our Story</Link>
+              <Link to="/blog" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Blog</Link>
+              <Link to="/outcomes" className="font-sans text-text-muted-dark text-sm group flex items-center gap-2 transition-colors hover:text-white">
+                Outcomes Report
+                <span className="text-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity text-xs relative -left-2 top-px">←</span>
+              </Link>
+              <Link to="/contact" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Contact Us</Link>
             </div>
           </div>
 
-          {/* Company Links */}
+          {/* Trust Column */}
           <div>
-            <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mb-4">
-              Company
-            </h4>
-            <div className="space-y-3">
-              {companyLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  to={link.path}
-                  className="block text-text-muted text-sm hover:text-primary transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-              ))}
+            <h4 className="font-mono text-white text-xs uppercase tracking-wider mb-6">Trust</h4>
+            <div className="flex flex-col gap-4">
+              <Link to="/privacy-policy" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/terms" className="font-sans text-text-muted-dark text-sm hover:text-white transition-colors">Terms of Service</Link>
+              <Link to="/verify" className="font-sans text-text-muted-dark text-sm group flex items-center gap-2 transition-colors hover:text-white">
+                Certificate Verify
+                <span className="text-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity text-xs relative -left-2 top-px">←</span>
+              </Link>
+              <Link to="/how-ai-works" className="font-sans text-text-muted-dark text-sm group flex items-center gap-2 transition-colors hover:text-white">
+                How Our AI Works
+                <span className="text-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity text-xs relative -left-2 top-px">←</span>
+              </Link>
             </div>
           </div>
 
-          {/* Resources Links */}
-          <div>
-            <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mb-4">
-              Resources
-            </h4>
-            <div className="space-y-3">
-              {resourceLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  to={link.path}
-                  className="block text-text-muted text-sm hover:text-primary transition-colors duration-200"
-                >
-                  {link.label}
-                </Link>
-              ))}
-
-              <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mt-6 mb-4">
-                Learning Guides
-              </h4>
-              <div className="space-y-3">
-                {learningGuideLinks.map((link, index) => (
-                  <Link
-                    key={index}
-                    to={link.path}
-                    className="block text-text-muted text-sm hover:text-primary transition-colors duration-200"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-
-              <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mt-6 mb-4">
-                Other
-              </h4>
-              <div className="space-y-3">
-                {otherProductsLinks.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block text-text-muted text-sm hover:text-primary transition-colors duration-200"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Newsletter */}
-          <div>
-            <h4 className="font-heading font-semibold text-text-main text-sm uppercase tracking-wider mb-4">
-              Newsletter
-            </h4>
-            <div className="bg-bg-elevated/50 p-4 rounded-xl border border-border/50">
-              <p className="text-text-muted text-sm mb-4">
-                Get updates on new paths.
-              </p>
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const email = e.target.email.value;
-                  window.open(
-                    `https://supascribe.com/subscribe/HZMknBal8Ccqxhli1c2yImX8PDb2?email=${encodeURIComponent(email)}`,
-                    "_blank",
-                  );
-                }}
-                className="flex flex-col gap-3"
-              >
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Enter email"
-                  required
-                  className="w-full px-3 py-2 rounded-lg bg-bg-base border border-border text-text-main placeholder:text-text-dim focus:outline-none focus:border-primary/50 text-sm"
-                />
-                <button
-                  type="submit"
-                  className="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-secondary text-bg-base font-semibold text-sm hover:opacity-90 transition-opacity"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-          </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-text-dim text-xs font-mono">
-            © {new Date().getFullYear()} Medha. Built by Elytron.
+        <div className="pt-8 flex flex-col items-center justify-center gap-2">
+          <p className="font-sans text-text-muted-dark text-sm">
+            © {new Date().getFullYear()} Medha. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-text-dim text-xs font-mono">
-            <a
-              href="mailto:engineeratmedha@gmail.com"
-              className="hover:text-primary transition-colors flex items-center gap-2"
-            >
-              <FontAwesomeIcon icon={faEnvelope} />
-              engineeratmedha@gmail.com
-            </a>
-            <span className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faMapMarkerAlt} />
-              Jaipur, India
-            </span>
-          </div>
+          <p className="font-sans text-text-muted-dark text-sm flex items-center gap-1">
+            Built in India for every developer who deserves a clear path. <span className="text-lg leading-none">🇮🇳</span>
+          </p>
         </div>
       </div>
     </footer>

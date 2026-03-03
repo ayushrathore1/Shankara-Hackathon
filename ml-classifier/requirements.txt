@@ -5,3 +5,4 @@ scikit-learn
 pymongo
 numpy
 python-dotenv
+edge-tts

@@ -39,3 +39,8 @@ SERVICE_PORT = 8100
 # ─── Index Rebuild ───────────────────────────────────────────────────
 # How often to auto-rebuild course index (seconds)
 INDEX_REBUILD_INTERVAL = 3600  # 1 hour
+
+# ─── RAG (Career Mentor) ────────────────────────────────────────────
+CHROMA_PERSIST_DIR = Path(__file__).resolve().parent / "chroma_data"
+RAG_COLLECTION_NAME = "careers"
+RAG_N_RESULTS = 3  # Number of careers to retrieve per query

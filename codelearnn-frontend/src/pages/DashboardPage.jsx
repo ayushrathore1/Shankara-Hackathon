@@ -422,6 +422,19 @@ const DashboardPage = () => {
     user?.careerGoal?.name ||
     null;
 
+  // ── Motivational message by progress ──
+  const getMotivationalMessage = (pct) => {
+    if (pct === 0) return "Day 1. Every expert was here once.";
+    if (pct <= 20) return "You're moving. Most people never start.";
+    if (pct <= 50) return "You're in the top 30% of developers who started this week.";
+    if (pct <= 80) return "You're closer than you think.";
+    return "You're almost there. Don't stop now.";
+  };
+
+  const rankTitle = careerRank?.title || 'Intern';
+  const nextRankTitle = careerRank?.nextRank?.title || 'Junior Developer';
+  const xpToNext = careerRank?.nextRank?.xpNeeded || 495;
+
   // ──────────── Render ────────────
 
   return (
@@ -429,92 +442,170 @@ const DashboardPage = () => {
       {showPasswordModal && (
         <SetPasswordModal onClose={() => setShowPasswordModal(false)} />
       )}
-      <main className="min-h-screen pt-28 pb-16 px-6 bg-bg-base relative overflow-hidden">
+      <main className="min-h-screen pt-28 pb-16 px-6 relative overflow-hidden" style={{ backgroundColor: '#0A0A0F' }}>
+      {/* Ambient cyan glow — top right */}
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] rounded-full pointer-events-none z-0"
+        style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.03) 0%, transparent 70%)' }} />
       <div className="absolute inset-0 bg-tech-dashboard pointer-events-none z-0" />
-      <div className="container mx-auto max-w-5xl">
-        {/* ─── Header ─── */}
+
+      <div className="container mx-auto max-w-6xl flex gap-6">
+        {/* ═══ MAIN COLUMN ═══ */}
+        <div className="flex-1 min-w-0">
+
+        {/* ─── Welcome Header ─── */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeIn}
-          className="mb-10"
+          className="mb-8"
         >
-          <h1 className="text-2xl md:text-3xl font-heading font-bold text-text-main mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold mb-1" style={{ fontFamily: '"Fraunces", serif', color: '#fff' }}>
             Welcome back,{" "}
-            <span className="text-gradient-primary">
+            <span style={{ color: '#39FF14' }}>
               {user?.name || "Developer"}
             </span>
           </h1>
-          <p className="text-text-muted">
+          <p className="text-sm mb-1" style={{ color: 'rgba(255,255,255,0.5)' }}>
             {hasJourney
-              ? `Your ${careerName || "learning"} journey is ${journeyProgress}% complete`
+              ? getMotivationalMessage(journeyProgress)
               : isAuthenticated
-                ? "Let's start your learning journey today"
+                ? "Day 1. Every expert was here once."
                 : "Explore what's trending on Medha"}
+          </p>
+          <p className="font-mono text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            {rankTitle} · {totalXP} XP · {xpToNext} XP to {nextRankTitle}
           </p>
         </motion.div>
 
-        {/* ─── Stats Bar (always visible) ─── */}
+        {/* ─── Stat Cards — 2×2 Hierarchical Grid ─── */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={fadeIn}
           transition={{ delay: 0.05 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+          className="grid grid-cols-2 gap-4 mb-8"
         >
-          {[
-            {
-              icon: faFire,
-              label: "Day Streak",
-              value: streak || "—",
-              color: "text-orange-400",
-              bg: "bg-orange-500/10",
-            },
-            {
-              icon: faBolt,
-              label: "Total XP",
-              value: totalXP || "—",
-              color: "text-primary",
-              bg: "bg-primary/10",
-            },
-            {
-              icon: faCheckCircle,
-              label: "Completed",
-              value: completedResources || "—",
-              color: "text-green-400",
-              bg: "bg-green-500/10",
-            },
-            {
-              icon: faGraduationCap,
-              label: "Career",
-              value: careerName || "Not set",
-              color: "text-secondary",
-              bg: "bg-secondary/10",
-              isText: true,
-            },
-          ].map((stat, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + i * 0.05 }}
-              className="card-bento p-4 flex items-center gap-3"
-            >
-              <div
-                className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center`}
-              >
-                <FontAwesomeIcon icon={stat.icon} className={`${stat.color}`} />
+          {/* XP + Rank — Hero Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-xl p-5 relative overflow-hidden"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderTop: '2px solid #39FF14',
+              background: 'linear-gradient(135deg, rgba(57,255,20,0.04) 0%, rgba(255,255,255,0.02) 100%)',
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>Career Rank</p>
+                <p className="text-2xl font-bold text-white">{rankTitle}</p>
               </div>
-              <div className="min-w-0">
-                <div
-                  className={`font-bold ${stat.isText ? "text-sm truncate" : "text-xl"} text-text-main`}
-                >
-                  {stat.value}
-                </div>
-                <div className="text-[11px] text-text-dim">{stat.label}</div>
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(57,255,20,0.1)' }}>
+                <FontAwesomeIcon icon={faBolt} style={{ color: '#39FF14' }} />
               </div>
-            </motion.div>
-          ))}
+            </div>
+            {/* Progress to next rank */}
+            <div className="mb-1.5">
+              <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: 'rgba(255,255,255,0.06)' }}>
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${careerRank?.progress || 1}%` }}
+                  transition={{ duration: 1, ease: 'easeOut' }}
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: '#39FF14' }}
+                />
+              </div>
+            </div>
+            <p className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              {xpToNext} XP to {nextRankTitle} →
+            </p>
+          </motion.div>
+
+          {/* Day Streak — Amber */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="rounded-xl p-5"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderTop: '2px solid #F5A623',
+            }}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>Day Streak</p>
+                <p className="text-2xl font-bold text-white">{streak || 0}</p>
+              </div>
+              <span className="text-3xl">🔥</span>
+            </div>
+            <p className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.35)' }}>
+              {streak > 0 && gamProfile?.streak?.longest
+                ? `Longest: ${gamProfile.streak.longest}d 🔥 — beat it today.`
+                : streak > 0
+                  ? 'Keep it going!'
+                  : 'Start learning to build your streak'}
+            </p>
+          </motion.div>
+
+          {/* Career Goal — Cyan */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="rounded-xl p-5"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderTop: '2px solid #00D4FF',
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <p className="font-mono text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>Career Goal</p>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(0,212,255,0.1)' }}>
+                <FontAwesomeIcon icon={faGraduationCap} style={{ color: '#00D4FF' }} className="text-sm" />
+              </div>
+            </div>
+            {careerName ? (
+              <p className="text-sm font-semibold text-white truncate">{careerName}</p>
+            ) : (
+              <Link to="/career" className="text-sm font-medium flex items-center gap-1" style={{ color: '#00D4FF' }}>
+                Set your career goal →
+              </Link>
+            )}
+          </motion.div>
+
+          {/* Completed */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25 }}
+            className="rounded-xl p-5"
+            style={{
+              backgroundColor: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(255,255,255,0.06)',
+              borderTop: '2px solid #22C55E',
+            }}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <p className="font-mono text-[10px] uppercase tracking-wider" style={{ color: 'rgba(255,255,255,0.35)' }}>Completed</p>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'rgba(34,197,94,0.1)' }}>
+                <FontAwesomeIcon icon={faCheckCircle} style={{ color: '#22C55E' }} className="text-sm" />
+              </div>
+            </div>
+            {completedResources > 0 ? (
+              <p className="text-xl font-bold text-white">{completedResources}</p>
+            ) : (
+              <p className="text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                0 checkpoints ·{' '}
+                <Link to="/learning-paths" style={{ color: '#00D4FF' }}>Your first one is 12 min away →</Link>
+              </p>
+            )}
+          </motion.div>
         </motion.div>
 
         {/* ─── Rank & Achievements Card ─── */}
@@ -1135,7 +1226,110 @@ const DashboardPage = () => {
             </Link>
           </div>
         </motion.section>
-      </div>
+
+        </div>{/* END main column */}
+
+        {/* ═══ RIGHT SIDEBAR (280px) ═══ */}
+        <aside className="hidden xl:block w-[280px] flex-shrink-0 pt-1 space-y-6">
+
+          {/* Mini Leaderboard */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="font-mono text-[10px] uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>This Week</p>
+            <div className="space-y-2">
+              {/* Person above */}
+              <div className="flex items-center gap-2 p-2 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <span className="font-mono text-xs w-5 text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>#4</span>
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px]" style={{ backgroundColor: 'rgba(0,212,255,0.1)', color: '#00D4FF' }}>A</div>
+                <span className="text-xs text-white flex-1 truncate">Ankit_dev</span>
+                <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>210 XP</span>
+              </div>
+              {/* Current user — highlighted */}
+              <div className="flex items-center gap-2 p-2 rounded-lg" style={{ backgroundColor: 'rgba(57,255,20,0.05)', border: '1px solid rgba(57,255,20,0.15)' }}>
+                <span className="font-mono text-xs w-5 text-center" style={{ color: '#39FF14' }}>#5</span>
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px]" style={{ backgroundColor: 'rgba(57,255,20,0.15)', color: '#39FF14' }}>
+                  {(user?.name || 'Y')[0].toUpperCase()}
+                </div>
+                <span className="text-xs font-medium flex-1 truncate" style={{ color: '#39FF14' }}>{user?.name || 'You'}</span>
+                <span className="font-mono text-[10px]" style={{ color: '#39FF14' }}>{totalXP} XP</span>
+              </div>
+              {/* Person below */}
+              <div className="flex items-center gap-2 p-2 rounded-lg" style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}>
+                <span className="font-mono text-xs w-5 text-center" style={{ color: 'rgba(255,255,255,0.3)' }}>#6</span>
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-[10px]" style={{ backgroundColor: 'rgba(124,58,237,0.1)', color: '#7C3AED' }}>R</div>
+                <span className="text-xs text-white flex-1 truncate">Riya_codes</span>
+                <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>180 XP</span>
+              </div>
+            </div>
+            <Link to="/leaderboard" className="font-mono text-[10px] mt-3 block text-center" style={{ color: '#00D4FF' }}>
+              View full leaderboard →
+            </Link>
+          </div>
+
+          {/* Today's Actions */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="font-mono text-[10px] uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>Today's Actions</p>
+            <div className="space-y-2">
+              {[
+                { text: "Review someone's code", xp: 30, icon: faCode, color: '#00D4FF', link: '/charcha' },
+                { text: "Complete Phase 1 checkpoint", xp: 50, icon: faCheckCircle, color: '#39FF14', link: '/learning-paths' },
+                { text: "Post in Charcha forum", xp: 10, icon: faLightbulb, color: '#F5A623', link: '/charcha' },
+              ].map((action, i) => (
+                <Link key={i} to={action.link} className="flex items-center gap-2.5 p-2 rounded-lg transition-all group"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
+                  onMouseEnter={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'}
+                  onMouseLeave={e => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)'}
+                >
+                  <FontAwesomeIcon icon={action.icon} className="text-xs" style={{ color: action.color }} />
+                  <span className="text-xs text-white flex-1 leading-tight">{action.text}</span>
+                  <span className="font-mono text-[10px] font-bold" style={{ color: '#39FF14' }}>+{action.xp}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* 7-Day Streak Calendar */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <p className="font-mono text-[10px] uppercase tracking-wider mb-3" style={{ color: 'rgba(255,255,255,0.35)' }}>This Week</p>
+            <div className="flex gap-1 justify-between">
+              {(() => {
+                const days = [];
+                const today = new Date();
+                const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                for (let i = 6; i >= 0; i--) {
+                  const d = new Date(today);
+                  d.setDate(d.getDate() - i);
+                  const key = d.toISOString().split('T')[0];
+                  const isToday = i === 0;
+                  const wasActive = heatmapData.find(h => h._id === key)?.count > 0;
+                  days.push(
+                    <div key={i} className="flex flex-col items-center gap-1">
+                      <span className="text-[9px] font-mono" style={{ color: 'rgba(255,255,255,0.25)' }}>
+                        {dayNames[d.getDay()]}
+                      </span>
+                      <div
+                        className="w-7 h-7 rounded-md flex items-center justify-center text-[10px] font-mono"
+                        style={{
+                          backgroundColor: isToday
+                            ? 'rgba(0,212,255,0.15)'
+                            : wasActive
+                              ? 'rgba(57,255,20,0.12)'
+                              : 'rgba(255,255,255,0.04)',
+                          border: isToday ? '1px solid rgba(0,212,255,0.3)' : '1px solid transparent',
+                          color: isToday ? '#00D4FF' : wasActive ? '#39FF14' : 'rgba(255,255,255,0.2)',
+                        }}
+                      >
+                        {d.getDate()}
+                      </div>
+                    </div>
+                  );
+                }
+                return days;
+              })()}
+            </div>
+          </div>
+        </aside>
+
+      </div>{/* END flex container */}
     </main>
     </>
   );

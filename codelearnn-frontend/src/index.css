@@ -1,42 +1,36 @@
-/* Import Google Fonts - 2025 Modern Tech Stack */
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+/* Import Google Fonts - Medha Launch UI */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&display=swap");
 
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Medha Theme System 2.0 (2025 Pivot)
-   Theme: Future Tech (Obsidian/Acid Lime)
+   Medha Theme System (Launch Ready)
+   Theme: Psychology-First Dark/Cream
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @theme {
   /* Colors */
-  --color-bg-base: var(--bg-base);
-  --color-bg-surface: var(--bg-surface);
-  --color-bg-elevated: var(--bg-elevated);
-  --color-border: var(--border);
-  --color-border-hover: var(--border-hover);
+  --color-bg-base: var(--bg-dark);
+  --color-bg-surface: var(--bg-dark-2);
+  --color-bg-light: var(--bg-light);
+  --color-bg-light-2: var(--bg-light-2);
+  
+  --color-accent-green: var(--accent-green);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-gold: var(--accent-gold);
+  --color-accent-red: var(--accent-red);
 
-  --color-primary: var(--primary);
-  --color-primary-glow: var(--primary-glow);
-  --color-secondary: var(--secondary);
+  --color-text-main: var(--text-on-dark);
+  --color-text-muted: var(--text-muted-dark);
+  --color-text-light-main: var(--text-on-light);
+  --color-text-light-muted: var(--text-muted-light);
 
-  --color-text-main: var(--text-main);
-  --color-text-muted: var(--text-muted);
-  --color-text-dim: var(--text-dim);
-
-  /* Semantic Colors */
-  --color-success: #00f0ff; /* Cyber Cyan */
-  --color-warning: #ffd600; /* Industrial Yellow */
-  --color-danger: #ff2e2e; /* Alert Red */
+  --color-border: var(--glass-border);
 
   /* Fonts */
-  --font-sans: "Manrope", system-ui, sans-serif;
-  --font-heading: "Space Grotesk", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-
-  /* Effects */
-  --shadow-glow: 0 0 40px -10px var(--primary-glow);
-  --shadow-surface: 0 20px 40px -20px rgba(0, 0, 0, 0.8);
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-heading: "Fraunces", "Playfair Display", serif;
+  --font-mono: "DM Mono", "JetBrains Mono", monospace;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -44,27 +38,37 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Dark Neon / Obsidian (Default) */
-  --bg-base: #030303; /* True Void */
-  --bg-surface: #0a0a0a; /* Obsidian */
-  --bg-elevated: #121212; /* Deep Graphite */
+  /* Core Colors */
+  --bg-dark:          #0A0A0F;
+  --bg-dark-2:        #111118;
+  --bg-light:         #F5F0E8;
+  --bg-light-2:       #EDEAE0;
 
-  --border: #1f1f22;
-  --border-hover: #3f3f46;
+  --accent-green:     #39FF14;
+  --accent-cyan:      #00D4FF;
+  --accent-gold:      #F5A623;
+  --accent-red:       #FF4444;
 
-  --primary: #ccff00; /* Acid Lime */
-  --primary-glow: rgba(204, 255, 0, 0.4);
-  --secondary: #7c3aed; /* Deep Violet */
+  --text-on-dark:     #FFFFFF;
+  --text-muted-dark:  #888888;
+  --text-on-light:    #0A0A0F;
+  --text-muted-light: #666666;
 
-  --text-main: #fafafa;
-  --text-muted: #a1a1aa; /* Zinc 400 */
-  --text-dim: #52525b; /* Zinc 600 */
-
-  --logo-gradient: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #d4d4d8 100%
-  ); /* White to Zinc-300 */
+  --glass-border:     rgba(255,255,255,0.08);
+  --glass-bg:         rgba(255,255,255,0.04);
+  
+  /* Retain for older components temporarily */
+  --bg-base: var(--bg-dark);
+  --bg-surface: var(--bg-dark-2);
+  --bg-elevated: #1a1a24;
+  --border: var(--glass-border);
+  --border-hover: rgba(255,255,255,0.15);
+  --primary: var(--accent-green);
+  --primary-glow: rgba(57, 255, 20, 0.4);
+  --secondary: var(--accent-cyan);
+  --text-main: var(--text-on-dark);
+  --text-muted: var(--text-muted-dark);
+  --text-dim: #666666;
 }
 
 [data-theme="light-aurora"] {
@@ -527,5 +531,34 @@ body::before {
     radial-gradient(ellipse 500px 500px at 70% 80%, rgba(16, 185, 129, 0.04), transparent),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100' viewBox='0 0 56 100'%3E%3Cpath d='M28 66L0 50L0 16L28 0L56 16L56 50L28 66L28 100' fill='none' stroke='rgba(255,255,255,0.02)' stroke-width='0.8'/%3E%3C/svg%3E");
   background-size: 100% 100%, 100% 100%, 56px 100px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LANDING PAGE VISUAL ENHANCEMENTS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Floating product preview card animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(2deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+/* Stats ticker scroll animation */
+@keyframes slide-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Decorative background text */
+.bg-text-decoration {
+  position: absolute;
+  font-family: "Fraunces", serif;
+  font-weight: 900;
+  text-transform: uppercase;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  z-index: 0;
 }
 

@@ -32,3 +32,8 @@ ecosystem.config.js.bak
 # Test
 __tests__/
 *.test.js.snap
+
+# ML/Python
+ml-classifier/chroma_data/
+ml-classifier/__pycache__/
+ml-classifier/rag/__pycache__/

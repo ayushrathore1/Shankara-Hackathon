@@ -1,0 +1,461 @@
+[
+  {
+    "id": "software_engineer",
+    "title": "Software Engineer",
+    "description": "Designs, develops, tests, and maintains software applications and systems. Works across the full software development lifecycle from requirements gathering to deployment and maintenance.",
+    "skills_required": ["problem solving", "logical thinking", "coding", "data structures", "algorithms", "system design", "debugging", "version control"],
+    "personality_fit": "Analytical, detail-oriented, enjoys solving complex problems, persistent, comfortable with abstract thinking, likes building things from scratch",
+    "roadmap": [
+      "Learn programming fundamentals (Python, JavaScript, or Java)",
+      "Master data structures and algorithms",
+      "Learn version control with Git",
+      "Build 3-5 real projects (web apps, CLI tools)",
+      "Study system design basics",
+      "Practice coding interviews on LeetCode/HackerRank",
+      "Apply for internships or entry-level roles"
+    ],
+    "resources": ["CS50 by Harvard", "The Odin Project", "LeetCode", "Full Stack Open"],
+    "salary_range": "₹4-25 LPA (India) | $70K-150K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "data_scientist",
+    "title": "Data Scientist",
+    "description": "Extracts insights from structured and unstructured data using statistics, machine learning, and data visualization. Helps organizations make data-driven decisions.",
+    "skills_required": ["statistics", "machine learning", "Python", "SQL", "data visualization", "critical thinking", "communication", "mathematics"],
+    "personality_fit": "Curious, loves finding patterns in data, comfortable with ambiguity, strong mathematical intuition, enjoys storytelling with numbers",
+    "roadmap": [
+      "Learn Python and SQL fundamentals",
+      "Study statistics and probability",
+      "Learn data manipulation with Pandas and NumPy",
+      "Master data visualization (Matplotlib, Seaborn, Tableau)",
+      "Study machine learning algorithms (scikit-learn)",
+      "Build 3-5 data analysis projects with real datasets",
+      "Learn deep learning basics (TensorFlow/PyTorch)",
+      "Create a portfolio on Kaggle"
+    ],
+    "resources": ["Andrew Ng's ML Course", "Kaggle", "StatQuest", "Fast.ai"],
+    "salary_range": "₹6-30 LPA (India) | $90K-160K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "ux_designer",
+    "title": "UX/UI Designer",
+    "description": "Creates intuitive, accessible, and visually appealing user interfaces and experiences. Conducts user research, creates wireframes and prototypes, and works closely with developers.",
+    "skills_required": ["user research", "wireframing", "prototyping", "visual design", "Figma", "empathy", "communication", "accessibility"],
+    "personality_fit": "Empathetic, creative, user-centric thinker, good communicator, detail-oriented with aesthetics, enjoys understanding human behavior",
+    "roadmap": [
+      "Learn design fundamentals (color theory, typography, layout)",
+      "Master Figma or Adobe XD",
+      "Study UX research methods (interviews, surveys, usability testing)",
+      "Learn information architecture and user flows",
+      "Build 5+ case studies with real or concept projects",
+      "Study accessibility standards (WCAG)",
+      "Create a portfolio website",
+      "Apply for junior UX designer roles"
+    ],
+    "resources": ["Google UX Design Certificate", "Refactoring UI", "Nielsen Norman Group", "Dribbble"],
+    "salary_range": "₹4-20 LPA (India) | $65K-130K (US)",
+    "demand_level": "high"
+  },
+  {
+    "id": "devops_engineer",
+    "title": "DevOps Engineer",
+    "description": "Bridges development and operations by automating infrastructure, CI/CD pipelines, monitoring, and deployment processes. Ensures reliable and scalable software delivery.",
+    "skills_required": ["Linux", "Docker", "Kubernetes", "CI/CD", "cloud platforms", "scripting", "monitoring", "networking"],
+    "personality_fit": "Systematic thinker, loves automation, comfortable with command-line tools, enjoys optimizing processes, patient troubleshooter",
+    "roadmap": [
+      "Learn Linux fundamentals and shell scripting",
+      "Master Docker containerization",
+      "Learn a cloud platform (AWS, Azure, or GCP)",
+      "Study CI/CD tools (GitHub Actions, Jenkins)",
+      "Learn Kubernetes for orchestration",
+      "Study Infrastructure as Code (Terraform, Ansible)",
+      "Set up monitoring (Prometheus, Grafana)",
+      "Get a cloud certification (AWS SAA, etc.)"
+    ],
+    "resources": ["KodeKloud", "Linux Academy", "AWS Free Tier", "TechWorld with Nana"],
+    "salary_range": "₹6-28 LPA (India) | $80K-160K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "product_manager",
+    "title": "Product Manager",
+    "description": "Defines product vision, strategy, and roadmap. Works at the intersection of business, technology, and design to build products that solve user problems and drive business value.",
+    "skills_required": ["strategic thinking", "user empathy", "data analysis", "communication", "prioritization", "stakeholder management", "market research"],
+    "personality_fit": "Big-picture thinker, excellent communicator, decisive, empathetic toward users, comfortable with ambiguity, natural leader",
+    "roadmap": [
+      "Understand product management fundamentals",
+      "Learn user research and customer discovery",
+      "Study product analytics (Mixpanel, Amplitude)",
+      "Practice writing PRDs and user stories",
+      "Learn agile/scrum methodologies",
+      "Build or manage a side project end-to-end",
+      "Network with PMs and join PM communities",
+      "Apply for APM programs or junior PM roles"
+    ],
+    "resources": ["Inspired by Marty Cagan", "Product School", "Lenny's Newsletter", "Reforge"],
+    "salary_range": "₹8-35 LPA (India) | $100K-180K (US)",
+    "demand_level": "high"
+  },
+  {
+    "id": "cybersecurity_analyst",
+    "title": "Cybersecurity Analyst",
+    "description": "Protects organizations from cyber threats by monitoring networks, analyzing vulnerabilities, responding to incidents, and implementing security measures.",
+    "skills_required": ["networking", "security protocols", "ethical hacking", "threat analysis", "incident response", "Linux", "SIEM tools", "risk assessment"],
+    "personality_fit": "Vigilant, detail-oriented, ethical mindset, enjoys puzzles and detective work, continuous learner, calm under pressure",
+    "roadmap": [
+      "Learn networking fundamentals (TCP/IP, DNS, firewalls)",
+      "Study cybersecurity basics (CIA triad, threat modeling)",
+      "Learn Linux and command-line security tools",
+      "Practice on CTF platforms (TryHackMe, HackTheBox)",
+      "Study for CompTIA Security+ certification",
+      "Learn SIEM tools (Splunk, ELK)",
+      "Study incident response procedures",
+      "Apply for SOC analyst or junior security roles"
+    ],
+    "resources": ["TryHackMe", "HackTheBox", "CompTIA Security+", "Cybrary"],
+    "salary_range": "₹4-22 LPA (India) | $70K-140K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "ai_ml_engineer",
+    "title": "AI/ML Engineer",
+    "description": "Builds and deploys machine learning models and AI systems at scale. Works on training pipelines, model optimization, and integrating AI into production applications.",
+    "skills_required": ["Python", "deep learning", "TensorFlow/PyTorch", "mathematics", "MLOps", "data engineering", "model optimization", "NLP/CV"],
+    "personality_fit": "Mathematically inclined, research-oriented, patient with experimentation, enjoys pushing boundaries of technology, comfortable with failure and iteration",
+    "roadmap": [
+      "Master Python and mathematics (linear algebra, calculus, probability)",
+      "Learn machine learning fundamentals (scikit-learn)",
+      "Study deep learning (neural networks, CNNs, RNNs, Transformers)",
+      "Choose a specialization (NLP, Computer Vision, Reinforcement Learning)",
+      "Learn MLOps (model deployment, monitoring, versioning)",
+      "Build end-to-end ML projects",
+      "Contribute to open-source ML projects",
+      "Apply for ML engineer roles"
+    ],
+    "resources": ["Fast.ai", "Deep Learning Specialization by Andrew Ng", "Hugging Face", "Papers With Code"],
+    "salary_range": "₹8-40 LPA (India) | $100K-200K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "full_stack_developer",
+    "title": "Full Stack Developer",
+    "description": "Develops both frontend and backend of web applications. Handles everything from user interfaces to server-side logic, databases, and deployment.",
+    "skills_required": ["HTML/CSS", "JavaScript", "React/Vue/Angular", "Node.js/Django", "databases", "REST APIs", "Git", "deployment"],
+    "personality_fit": "Versatile, enjoys variety in work, quick learner, comfortable switching contexts, likes seeing end-to-end results",
+    "roadmap": [
+      "Master HTML, CSS, and JavaScript",
+      "Learn a frontend framework (React, Vue, or Angular)",
+      "Study backend development (Node.js, Express, or Django)",
+      "Learn database management (MongoDB, PostgreSQL)",
+      "Build REST APIs and understand authentication",
+      "Learn deployment (Docker, cloud hosting, CI/CD)",
+      "Build 3-5 full-stack projects",
+      "Create a portfolio and apply for roles"
+    ],
+    "resources": ["The Odin Project", "Full Stack Open", "freeCodeCamp", "Traversy Media"],
+    "salary_range": "₹4-25 LPA (India) | $70K-150K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "mobile_app_developer",
+    "title": "Mobile App Developer",
+    "description": "Creates applications for iOS and Android platforms. May specialize in native development (Swift/Kotlin) or cross-platform frameworks (React Native, Flutter).",
+    "skills_required": ["mobile development", "UI/UX for mobile", "API integration", "state management", "app store deployment", "performance optimization"],
+    "personality_fit": "Creative, enjoys building tangible products, user-experience focused, detail-oriented, likes seeing immediate visual results",
+    "roadmap": [
+      "Choose a path: Native (Swift/Kotlin) or Cross-platform (Flutter/React Native)",
+      "Learn the chosen framework fundamentals",
+      "Study mobile UI/UX patterns and guidelines",
+      "Learn state management and navigation",
+      "Build 3+ apps with increasing complexity",
+      "Learn API integration and local storage",
+      "Publish an app to the Play Store or App Store",
+      "Build a portfolio and apply for roles"
+    ],
+    "resources": ["Flutter Official Docs", "React Native Guide", "100 Days of Swift", "Android Developers"],
+    "salary_range": "₹4-24 LPA (India) | $70K-150K (US)",
+    "demand_level": "high"
+  },
+  {
+    "id": "cloud_architect",
+    "title": "Cloud Architect",
+    "description": "Designs and oversees cloud computing strategies, infrastructure, and solutions. Ensures scalable, secure, and cost-effective cloud deployments for organizations.",
+    "skills_required": ["cloud platforms (AWS/Azure/GCP)", "system architecture", "networking", "security", "cost optimization", "microservices", "IaC"],
+    "personality_fit": "Strategic thinker, enjoys designing large-scale systems, good at balancing trade-offs, strong problem-solving skills, big-picture oriented",
+    "roadmap": [
+      "Learn cloud computing fundamentals",
+      "Get hands-on with one cloud platform (AWS recommended)",
+      "Study networking and security in the cloud",
+      "Learn Infrastructure as Code (Terraform, CloudFormation)",
+      "Study microservices and serverless architecture",
+      "Get certified (AWS Solutions Architect)",
+      "Design architecture for real-world scenarios",
+      "Gain experience through projects and consulting"
+    ],
+    "resources": ["AWS Training", "A Cloud Guru", "Cloud Academy", "Adrian Cantrill"],
+    "salary_range": "₹12-45 LPA (India) | $120K-200K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "blockchain_developer",
+    "title": "Blockchain Developer",
+    "description": "Develops decentralized applications (dApps), smart contracts, and blockchain protocols. Works with distributed ledger technology for finance, supply chain, and other domains.",
+    "skills_required": ["Solidity", "smart contracts", "cryptography", "distributed systems", "web3.js/ethers.js", "DeFi concepts", "JavaScript"],
+    "personality_fit": "Innovative, interested in decentralization and finance, enjoys working on cutting-edge technology, independent thinker, comfortable with risk",
+    "roadmap": [
+      "Understand blockchain fundamentals and cryptography",
+      "Learn Solidity programming for Ethereum",
+      "Study smart contract development and testing",
+      "Learn web3.js or ethers.js for frontend integration",
+      "Build DeFi or NFT projects",
+      "Study security and auditing of smart contracts",
+      "Contribute to open-source blockchain projects",
+      "Apply for blockchain developer roles or freelance"
+    ],
+    "resources": ["CryptoZombies", "Buildspace", "Ethereum.org", "Patrick Collins Web3 Course"],
+    "salary_range": "₹6-35 LPA (India) | $80K-180K (US)",
+    "demand_level": "medium"
+  },
+  {
+    "id": "game_developer",
+    "title": "Game Developer",
+    "description": "Creates video games for various platforms including PC, console, and mobile. Involves game design, programming game mechanics, graphics, physics, and audio integration.",
+    "skills_required": ["C++/C#", "Unity/Unreal Engine", "game physics", "3D math", "game design", "graphics programming", "optimization"],
+    "personality_fit": "Passionate gamer, creative, enjoys bringing ideas to life, patient with complex systems, artistic and technical balance, persistent",
+    "roadmap": [
+      "Choose a game engine (Unity with C# or Unreal with C++)",
+      "Learn the engine fundamentals through tutorials",
+      "Study game design principles",
+      "Build simple 2D games (platformer, puzzle)",
+      "Learn 3D game development and physics",
+      "Build a polished game and publish it (itch.io, Steam)",
+      "Study game optimization and performance",
+      "Build a portfolio and apply to game studios"
+    ],
+    "resources": ["Unity Learn", "Brackeys", "Game Dev TV", "GDC Vault"],
+    "salary_range": "₹3-20 LPA (India) | $60K-130K (US)",
+    "demand_level": "medium"
+  },
+  {
+    "id": "technical_writer",
+    "title": "Technical Writer",
+    "description": "Creates clear, concise documentation for technical products including API docs, user guides, tutorials, and knowledge base articles. Bridges the gap between technical teams and users.",
+    "skills_required": ["writing", "technical understanding", "documentation tools", "API documentation", "information architecture", "editing", "empathy for readers"],
+    "personality_fit": "Excellent communicator, enjoys simplifying complex topics, detail-oriented, empathetic toward readers, organized, patient",
+    "roadmap": [
+      "Strengthen writing fundamentals",
+      "Learn a technical domain (software, APIs, cloud)",
+      "Study documentation tools (Markdown, Swagger, GitBook)",
+      "Learn the Docs-as-Code approach",
+      "Write sample documentation for open-source projects",
+      "Build a portfolio of writing samples",
+      "Study UX writing principles",
+      "Apply for technical writer roles"
+    ],
+    "resources": ["Google Technical Writing Course", "Write the Docs", "Every Page is Page One", "Swagger/OpenAPI"],
+    "salary_range": "₹4-18 LPA (India) | $60K-120K (US)",
+    "demand_level": "medium"
+  },
+  {
+    "id": "digital_marketer",
+    "title": "Digital Marketer",
+    "description": "Promotes products and services through digital channels including SEO, social media, content marketing, email campaigns, and paid advertising. Analyzes data to optimize marketing strategies.",
+    "skills_required": ["SEO", "content marketing", "social media marketing", "Google Analytics", "paid advertising", "copywriting", "email marketing", "A/B testing"],
+    "personality_fit": "Creative, data-driven, excellent communicator, trend-aware, adaptable, enjoys storytelling, comfortable with experimentation",
+    "roadmap": [
+      "Learn digital marketing fundamentals",
+      "Master SEO (on-page, off-page, technical)",
+      "Learn content marketing and copywriting",
+      "Study social media marketing strategies",
+      "Learn Google Analytics and data analysis",
+      "Practice paid advertising (Google Ads, Meta Ads)",
+      "Build campaigns for real clients or personal projects",
+      "Get certified (Google Digital Garage, HubSpot)"
+    ],
+    "resources": ["Google Digital Garage", "HubSpot Academy", "Moz SEO Guide", "Neil Patel Blog"],
+    "salary_range": "₹3-18 LPA (India) | $50K-110K (US)",
+    "demand_level": "high"
+  },
+  {
+    "id": "business_analyst",
+    "title": "Business Analyst",
+    "description": "Analyzes business processes, identifies improvement opportunities, gathers requirements, and translates business needs into technical solutions. Acts as a bridge between stakeholders and tech teams.",
+    "skills_required": ["requirements gathering", "process modeling", "data analysis", "SQL", "stakeholder management", "documentation", "presentation skills"],
+    "personality_fit": "Analytical, excellent communicator, organized, enjoys understanding business processes, good at asking the right questions, diplomatic",
+    "roadmap": [
+      "Learn business analysis fundamentals (BABOK)",
+      "Study requirements engineering techniques",
+      "Learn SQL and data analysis basics",
+      "Master documentation and process modeling (BPMN, UML)",
+      "Study Agile methodologies",
+      "Practice with real business case studies",
+      "Get certified (CBAP, PMI-PBA)",
+      "Apply for junior BA or associate analyst roles"
+    ],
+    "resources": ["IIBA BABOK Guide", "Business Analysis Body of Knowledge", "Udemy BA courses", "BA Times"],
+    "salary_range": "₹5-22 LPA (India) | $65K-120K (US)",
+    "demand_level": "high"
+  },
+  {
+    "id": "financial_analyst",
+    "title": "Financial Analyst",
+    "description": "Evaluates financial data, creates financial models, prepares reports, and provides recommendations for investment decisions. Works in banking, consulting, or corporate finance.",
+    "skills_required": ["financial modeling", "Excel", "accounting", "data analysis", "valuation", "financial reporting", "risk assessment", "presentation"],
+    "personality_fit": "Numbers-oriented, detail-focused, disciplined, enjoys financial markets, good at research, comfortable with high-pressure environments",
+    "roadmap": [
+      "Learn accounting and financial statement analysis",
+      "Master Excel for financial modeling",
+      "Study corporate finance and valuation methods",
+      "Learn financial analysis frameworks (DCF, comparables)",
+      "Study for CFA Level 1 or financial certifications",
+      "Build financial models for real companies",
+      "Learn Python for financial data analysis",
+      "Apply for analyst roles in banking or corporate finance"
+    ],
+    "resources": ["CFA Institute", "Wall Street Prep", "Corporate Finance Institute", "Khan Academy Finance"],
+    "salary_range": "₹5-25 LPA (India) | $60K-130K (US)",
+    "demand_level": "high"
+  },
+  {
+    "id": "graphic_designer",
+    "title": "Graphic Designer",
+    "description": "Creates visual content for branding, marketing, web, and print. Works with typography, color, layout, and imagery to communicate messages effectively through design.",
+    "skills_required": ["Adobe Creative Suite", "typography", "color theory", "branding", "layout design", "illustration", "creative thinking", "attention to detail"],
+    "personality_fit": "Highly creative, visually oriented, appreciates aesthetics, good eye for detail, enjoys expressing ideas visually, open to feedback",
+    "roadmap": [
+      "Learn design principles (composition, color theory, typography)",
+      "Master Adobe Illustrator and Photoshop",
+      "Study branding and logo design",
+      "Learn print and digital design formats",
+      "Build a diverse portfolio (10+ projects)",
+      "Learn motion graphics basics (After Effects)",
+      "Study design trends and stay current",
+      "Freelance or apply for junior designer roles"
+    ],
+    "resources": ["Adobe Tutorials", "Canva Design School", "Behance", "Skillshare Design courses"],
+    "salary_range": "₹3-15 LPA (India) | $45K-90K (US)",
+    "demand_level": "medium"
+  },
+  {
+    "id": "content_creator",
+    "title": "Content Creator / YouTuber",
+    "description": "Creates engaging content for digital platforms like YouTube, Instagram, TikTok, or blogs. Builds an audience, monetizes content, and often becomes a personal brand.",
+    "skills_required": ["content creation", "video editing", "storytelling", "social media", "audience building", "SEO", "consistency", "personal branding"],
+    "personality_fit": "Outgoing or comfortable on camera, creative, consistent, enjoys sharing knowledge, resilient to criticism, entrepreneurial mindset",
+    "roadmap": [
+      "Choose a niche you're passionate about",
+      "Learn video production basics (filming, lighting, audio)",
+      "Master video editing (Premiere Pro, DaVinci Resolve, or CapCut)",
+      "Study YouTube/Instagram algorithm and SEO",
+      "Create and publish content consistently (2-4 times/week)",
+      "Build and engage with your community",
+      "Learn monetization strategies (ads, sponsorships, courses)",
+      "Scale and diversify your content"
+    ],
+    "resources": ["Ali Abdaal's YouTube Course", "Think Media", "Film Booth", "Creator Academy"],
+    "salary_range": "₹1-50 LPA (India) | Variable (US)",
+    "demand_level": "growing"
+  },
+  {
+    "id": "data_engineer",
+    "title": "Data Engineer",
+    "description": "Designs and builds data pipelines, warehouses, and infrastructure that enables data scientists and analysts to work with clean, reliable data at scale.",
+    "skills_required": ["SQL", "Python", "ETL pipelines", "data warehousing", "Spark", "Airflow", "cloud data services", "data modeling"],
+    "personality_fit": "Systematic, enjoys building infrastructure, detail-oriented, comfortable with large-scale systems, likes making things efficient and reliable",
+    "roadmap": [
+      "Master SQL and Python fundamentals",
+      "Learn data modeling and warehousing concepts",
+      "Study ETL/ELT pipeline design",
+      "Learn Apache Spark for large-scale data processing",
+      "Master a workflow orchestration tool (Airflow, Prefect)",
+      "Learn cloud data services (AWS Redshift, BigQuery, Snowflake)",
+      "Build end-to-end data pipelines",
+      "Get certified and apply for data engineer roles"
+    ],
+    "resources": ["DataCamp", "Databricks Academy", "Data Engineering Zoomcamp", "Seattle Data Guy"],
+    "salary_range": "₹6-30 LPA (India) | $90K-160K (US)",
+    "demand_level": "very high"
+  },
+  {
+    "id": "biotech_researcher",
+    "title": "Biotech Researcher",
+    "description": "Conducts research in biotechnology, genetics, pharmaceuticals, or biomedical sciences. Works in labs developing new drugs, therapies, or biological products.",
+    "skills_required": ["biology", "chemistry", "lab techniques", "research methodology", "data analysis", "scientific writing", "bioinformatics"],
+    "personality_fit": "Intellectually curious, patient, meticulous, enjoys scientific discovery, comfortable with long-term research, strong analytical skills",
+    "roadmap": [
+      "Complete a degree in biology, biotechnology, or related field",
+      "Learn laboratory techniques and safety protocols",
+      "Study molecular biology and genetics",
+      "Learn bioinformatics tools and data analysis",
+      "Gain research experience through internships or thesis projects",
+      "Publish research or present at conferences",
+      "Specialize in an area (genomics, drug discovery, etc.)",
+      "Pursue higher education (M.Sc/Ph.D) or industry roles"
+    ],
+    "resources": ["NCBI Resources", "Coursera Biology courses", "Khan Academy Biology", "Nature Education"],
+    "salary_range": "₹4-20 LPA (India) | $60K-120K (US)",
+    "demand_level": "medium"
+  },
+  {
+    "id": "mechanical_engineer",
+    "title": "Mechanical Engineer",
+    "description": "Designs, develops, and tests mechanical devices and systems. Works on everything from small components to large machines, vehicles, and thermal systems.",
+    "skills_required": ["CAD software", "thermodynamics", "mechanics", "material science", "manufacturing processes", "problem solving", "mathematics"],
+    "personality_fit": "Hands-on, enjoys building and testing physical things, strong spatial reasoning, analytical, methodical, likes working with machines",
+    "roadmap": [
+      "Complete a degree in mechanical engineering",
+      "Master CAD tools (SolidWorks, AutoCAD, CATIA)",
+      "Study core subjects (thermodynamics, fluid mechanics, strength of materials)",
+      "Learn manufacturing processes and materials",
+      "Gain hands-on experience through projects and internships",
+      "Learn simulation tools (ANSYS, MATLAB/Simulink)",
+      "Specialize (automotive, robotics, HVAC, aerospace)",
+      "Apply for design or manufacturing engineer roles"
+    ],
+    "resources": ["NPTEL Courses", "MIT OpenCourseWare", "GrabCAD", "Engineering Explained"],
+    "salary_range": "₹3-18 LPA (India) | $60K-110K (US)",
+    "demand_level": "medium"
+  },
+  {
+    "id": "project_manager",
+    "title": "Project Manager",
+    "description": "Plans, executes, and closes projects within scope, time, and budget. Coordinates teams, manages risks, and ensures project deliverables meet stakeholder expectations.",
+    "skills_required": ["project planning", "risk management", "team leadership", "communication", "budgeting", "Agile/Scrum", "stakeholder management", "tools (Jira, Asana)"],
+    "personality_fit": "Organized, natural leader, excellent communicator, calm under pressure, decisive, enjoys coordination and bringing order to chaos",
+    "roadmap": [
+      "Learn project management fundamentals (PMBOK)",
+      "Study Agile and Scrum methodologies",
+      "Learn project management tools (Jira, Asana, MS Project)",
+      "Practice risk management and planning",
+      "Lead small projects or volunteer initiatives",
+      "Get certified (PMP, CSM, or PRINCE2)",
+      "Develop leadership and communication skills",
+      "Apply for junior PM or scrum master roles"
+    ],
+    "resources": ["PMI PMBOK Guide", "Scrum.org", "Google Project Management Certificate", "Mountain Goat Software"],
+    "salary_range": "₹6-28 LPA (India) | $75K-140K (US)",
+    "demand_level": "high"
+  },
+  {
+    "id": "teacher_educator",
+    "title": "Teacher / Online Educator",
+    "description": "Educates students in academic subjects, professional skills, or specialized topics. Can work in schools, universities, coaching institutes, or create online courses and tutorials.",
+    "skills_required": ["subject expertise", "communication", "patience", "curriculum design", "presentation skills", "empathy", "adaptability"],
+    "personality_fit": "Patient, passionate about sharing knowledge, empathetic, enjoys mentoring, good communicator, finds fulfillment in others' growth",
+    "roadmap": [
+      "Develop deep expertise in your subject area",
+      "Learn teaching methodologies and pedagogy",
+      "Practice public speaking and presentation skills",
+      "Create lesson plans and course materials",
+      "Start teaching (tutoring, workshops, online content)",
+      "Get relevant certifications (B.Ed, CELTA, etc.)",
+      "Build an online presence (YouTube, Udemy, blog)",
+      "Grow your audience and impact"
+    ],
+    "resources": ["Coursera Teaching courses", "Khan Academy", "Udemy Instructor Program", "TeachThought"],
+    "salary_range": "₹3-15 LPA (India) | $40K-80K (US)",
+    "demand_level": "stable"
+  }
+]

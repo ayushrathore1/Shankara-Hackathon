@@ -42,6 +42,7 @@ import LearningPlanPage from "./pages/LearningPlanPage";
 import LearningPlayerPage from "./pages/LearningPlayerPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
+import RAGMentorPage from "./pages/RAGMentorPage";
 
 // Development mode
 const isDevelopment =
@@ -162,6 +163,9 @@ function AppContent() {
 
             {/* Profile */}
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+
+            {/* RAG Career Mentor */}
+            <Route path="/rag-mentor" element={<ProtectedRoute><RAGMentorPage /></ProtectedRoute>} />
 
             {/* Home — Primary Landing */}
             <Route path="/" element={<HomeRedirect />} />

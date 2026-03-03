@@ -1,4 +1,6 @@
 const express = require('express');
+const { WebSocketServer } = require('ws');
+const VoiceStreamSession = require('./services/VoiceStreamService');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -208,6 +210,10 @@ app.use('/api/user/careers', require('./routes/userCareers'));
 app.use('/api/user/roadmap', require('./routes/userRoadmap'));
 app.use('/api/user/mentor', require('./routes/userMentor'));
 
+// RAG Career Mentor (Vector DB + Groq)
+const ragMentorRoutes = require('./routes/ragMentor');
+app.use('/api/rag-mentor', ragMentorRoutes);
+
 // Initialize background workers
 const { initializeWorkers } = require('./services/BackgroundWorkers');
 initializeWorkers();
@@ -399,6 +405,40 @@ const server = app.listen(PORT, () => {
 
   // Start ML Classifier as a child process
   spawnMLClassifier();
+});
+
+// ─── WebSocket Server for Streaming Voice ───────────────────────────
+const wss = new WebSocketServer({ server, path: '/voice-stream' });
+const voiceApiKeys = [process.env.GROQ_API_KEY, process.env.GROQ_API_KEY2].filter(Boolean);
+
+wss.on('connection', (ws) => {
+  console.log('[WS] Voice stream connected');
+  const session = new VoiceStreamSession(ws, voiceApiKeys);
+
+  ws.on('message', (data, isBinary) => {
+    if (isBinary) {
+      session.onAudioChunk(data);
+    } else {
+      try {
+        const msg = JSON.parse(data.toString());
+        switch (msg.type) {
+          case 'start_call': session.start(); break;
+          case 'interrupt': session.interrupt(); break;
+          case 'end_call': session.destroy(); break;
+        }
+      } catch {}
+    }
+  });
+
+  ws.on('close', () => {
+    console.log('[WS] Voice stream disconnected');
+    session.destroy();
+  });
+
+  ws.on('error', (err) => {
+    console.error('[WS] Error:', err.message);
+    session.destroy();
+  });
 });
 
 // Handle unhandled promise rejections

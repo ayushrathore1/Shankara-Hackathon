@@ -747,4 +747,18 @@ export const careerMentorAPI = {
   suggest: (data) => api.post('/career-mentor/suggest', data),
 };
 
+// RAG Career Mentor (Vector DB + Groq — structured career advice)
+export const ragMentorAPI = {
+  chat: (message) => api.post('/rag-mentor/chat', { message }),
+  health: () => api.get('/rag-mentor/health'),
+  voice: (audioBlob) => {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.webm');
+    return api.post('/rag-mentor/voice', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000, // Voice pipeline can take up to 60s
+    });
+  },
+};
+
 export default api;
