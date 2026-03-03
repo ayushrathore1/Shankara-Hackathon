@@ -483,7 +483,7 @@ const DashboardPage = () => {
           animate="visible"
           variants={fadeIn}
           transition={{ delay: 0.05 }}
-          className="grid grid-cols-2 gap-4 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
         >
           {/* XP + Rank — Hero Card */}
           <motion.div

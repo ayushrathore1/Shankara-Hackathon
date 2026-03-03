@@ -34,6 +34,7 @@ import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import JoinWaitlistPage from "./pages/JoinWaitlistPage";
 
 // Core Protected Pages
 import DashboardPage from "./pages/DashboardPage";
@@ -81,7 +82,7 @@ const ConditionalHeader = () => {
 
   const standalonePages = [
     "/login", "/signup", "/career-discovery",
-    "/name", "/quiz", "/results", "/preview", "/roadmap",
+    "/name", "/quiz", "/results", "/preview", "/roadmap", "/join-waitlist",
   ];
   if (standalonePages.some(p => location.pathname.startsWith(p))) return null;
 
@@ -97,8 +98,9 @@ const ConditionalHeader = () => {
 const ConditionalFooter = () => {
   const location = useLocation();
   const standalonePages = [
-    "/career-discovery", "/name", "/quiz", "/results", "/preview", "/roadmap",
+    "/career-discovery", "/name", "/quiz", "/results", "/preview", "/roadmap", "/join-waitlist",
   ];
+  if (location.pathname === "/") return null;
   if (standalonePages.some(p => location.pathname.startsWith(p))) return null;
   return <Footer />;
 };
@@ -142,6 +144,7 @@ function AppContent() {
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+            <Route path="/join-waitlist" element={<JoinWaitlistPage />} />
 
             {/* 1. Career Discovery — Auth required */}
             <Route path="/career-discovery" element={<FlowLandingPage />} />
